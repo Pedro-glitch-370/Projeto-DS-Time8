@@ -1,13 +1,35 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>rpg</title>
+    <link rel="stylesheet" href="/src/components/barra-superior/barra-superior.css" />
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <nav class="barra-superior">
+      <div class="esquerda">
+        <a href="#home">
+          <img src="/src/assets/logo.png" alt="Página Principal" class="logo-img" />
+        </a>
+      </div>
+      <div class="meio">
+        <a href="#mapa">Mapa</a>
+        <a href="#tarefas">Minhas Tarefas</a>
+        <a href="#capibas">Capibas</a>
+      </div>
+      <div class="direita">
+        <a href="#login" id="login">Entrar</a>
+        <div class="opcoes" id="opcoes">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+  </nav>
+    
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
