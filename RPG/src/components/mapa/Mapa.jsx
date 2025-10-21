@@ -5,16 +5,24 @@ export default function Mapa() {
   //local e popUp de cada pino
   const pinos = [
     {
-      coord: [-8.065193, -34.890279],
-      msg: "Local 1"
+      coord: [-8.069600, -34.888016],
+      msg: "Pintar Quadra Campo dos Coelhos"
     },
     {
-      coord: [-8.077771, -34.909829],
-      msg: "Local 2"
+      coord: [-8.061921, -34.901674],
+      msg: "Criar área simples de lazer"
     },
     {
-      coord: [-8.041080, -34.875555],
-      msg: "Local 3"
+      coord: [-8.057035, -34.900528],
+      msg: "Pintar campo na Praça do Derby"
+    },
+    {
+      coord: [-8.076426, -34.930399],
+      msg: "Criar área simples de lazer"
+    },
+    {
+      coord: [-8.085939, -34.886663],
+      msg: "Criar área simples de lazer"
     }
   ]
 
