@@ -2,33 +2,33 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>rpg</title>
-    <link rel="stylesheet" href="/src/components/barra-superior/barra-superior.css" />
+    <title>Tarefas</title>
+    <link rel="stylesheet" href="src/css/tarefas.css" />
   </head>
   <body>
-    <div id="root"></div>
-    <nav class="barra-superior">
-      <div class="esquerda">
-        <a href="#home">
-          <img src="/src/assets/logo - conecta recife .png" alt="Página Principal" class="logo-img" />
-        </a>
-      </div>
-      <div class="meio">
-        <a href="index.html">Mapa</a>
-        <a href="tarefa.html">Minhas Tarefas(x)</a>
-        <a href="saldo.html">Saldo</a>
-      </div>
-      <div class="direita">
-        <a href="#login" id="login">Entrar</a>
-        <div class="opcoes" id="opcoes">
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      </div>
-  </nav>
-    <script type="module" src="/src/main.jsx"></script>
+    <div id="barra-navegacao"></div>
+
+    <div id ="tarefas-disponiveis">
+
+
+    </div>
+      
+    </div>
+
+
+
+    <script>
+      fetch('/src/components/barra-superior/index.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('barra-navegacao').innerHTML = html;
+
+          let link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = '/src/components/barra-superior/barra-superior.css';
+          document.head.appendChild(link);
+        })
+    </script>
   </body>
 </html>
