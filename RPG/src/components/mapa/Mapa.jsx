@@ -23,6 +23,10 @@ export default function Mapa() {
     {
       coord: [-8.085939, -34.886663],
       msg: "Criar área simples de lazer"
+    },
+    {
+      coord: [-8.072237, -34.925757],
+      msg: "Mural em Escola Municipal"
     }
   ]
 

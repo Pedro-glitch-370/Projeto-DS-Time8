@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saldos</title>
+    <link rel="stylesheet" href="src/css/saldo.css" />
+  </head>
+  <body>
+    <div id="barra-navegacao"></div>
+
+    <div id ="saldo">
+        <div class="carrossel-container">
+            <div class="carrossel">
+                <div class="pessoa">
+                <p class="nome"></p>
+                <p class="saldo"></p>
+                </div>
+                <div class="pessoa">
+                <p class="nome"></p>
+                <p class="saldo"></p>
+                </div>
+                <div class="pessoa">
+                <p class="nome"></p>
+                <p class="saldo"></p>
+                </div>
+                <div class="pessoa">
+                <p class="nome"></p>
+                <p class="saldo"></p>
+                </div>
+            </div>
+            <button class="prev" onclick="mudarSlide(-1)">&#10094;</button>
+            <button class="next" onclick="mudarSlide(1)">&#10095;</button>
+        </div>
+    </div>
+
+    <div id="painel_saldo"></div>
+
+    <script>
+      fetch('/index.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('barra-navegacao').innerHTML = html;
+
+          let link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = '/src/components/barra-superior/barra-superior.css';
+          document.head.appendChild(link);
+        })
+    </script>
+  </body>
+</html>
