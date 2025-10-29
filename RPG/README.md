@@ -1,3 +1,15 @@
+# Como rodar
+
+**Clonou repositório?**
+node -v para checar se o node tá instalado
+cd RPG para não ficar baixando coisa onde não precisa
+npm install -g vite para instalar o vite (globalmente?)
+npm install e npm run dev já basta pra visualizar
+
+**Se, por algum motivo, der problema com o Leaftlet:**
+npm install react@rc react-dom@rc leaflet
+npm install react-leaflet@next
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
