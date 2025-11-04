@@ -1,10 +1,17 @@
 # Como rodar
 
 **Clonou repositório?**
-node -v para checar se o node tá instalado
-cd RPG para não ficar baixando coisa onde não precisa
-npm install -g vite para instalar o vite (globalmente?)
-npm install e npm run dev já basta pra visualizar
+
+- **Em um terminal**:
+- node -v (só pra checar)
+- cd backend
+- node server.js
+
+- **Em outro terminal**:
+- cd RPG
+- npm install -g vite
+- npm install
+- npm run dev
 
 **Se, por algum motivo, der problema com o Leaftlet:**
 npm install react@rc react-dom@rc leaflet
