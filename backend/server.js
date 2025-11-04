@@ -10,6 +10,7 @@ const PORT = 5000;
 
 // MIDDLEWARES - Funções que processam as requisições antes das rotas
 // Habilita CORS para permitir que o frontend (React) acesse este backend
+// por meio da permissão de um aplicativo web em uma origem acessar recursos em outra origem diferente
 app.use(cors());
 // Configura o Express para interpretar JSON no corpo das requisições
 app.use(express.json());
@@ -19,27 +20,27 @@ app.use(express.json());
 const pinos = [
   {
     id: 1,
-    coord: [-8.063149, -34.871139], // Latitude e longitude do Marco Zero - Recife
-    msg: "Praça do Marco Zero - ponto inicial da cidade",
-    titulo: "Marco Zero"
+    coord: [-8.061921, -34.901674], // Latitude e longitude - Recife
+    msg: "Criar área simples de lazer",
+    titulo: "Área de Lazer"
   },
   {
     id: 2,
-    coord: [-8.061692, -34.871157], // Coordenadas do Paço do Frevo
-    msg: "Paço do Frevo - museu dedicado ao frevo",
-    titulo: "Paço do Frevo"
+    coord: [-8.072237, -34.925757], // Coordenadas
+    msg: "Realizar Mural em Escola Municipal",
+    titulo: "Escola Municipal"
   },
   {
     id: 3,
-    coord: [-8.062258, -34.870942], // Coordenadas da Embaixada dos Bonecos
-    msg: "Embaixada dos Bonecos Gigantes - artesanato local",
-    titulo: "Bonecos Gigantes"
+    coord: [-8.057035, -34.900528], // Coordenadas
+    msg: "Pintar e Renovar Campo na Praça do Derby",
+    titulo: "Campo na Praça do Derby"
   },
   {
     id: 4,
-    coord: [-8.064200, -34.872500], // Coordenadas da Caixa Cultural
-    msg: "Caixa Cultural - centro cultural com exposições",
-    titulo: "Caixa Cultural"
+    coord: [-8.069600, -34.888016], // Coordenadas
+    msg: "Pintar e Renovar Quadra Campo dos Coelhos",
+    titulo: "Quadra Campo dos Coelhos"
   },
 ];
 

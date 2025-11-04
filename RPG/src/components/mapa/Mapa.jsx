@@ -44,9 +44,9 @@ export default function Mapa() {
         setPinos([
           {
             id: 99,
-            coord: [-8.063149, -34.871139], // Coordenadas do Marco Zero no Recife
-            msg: "Marco Zero - Backend offline, usando dados locais",
-            titulo: "Marco Zero (Offline)"
+            coord: [-8.069600, -34.888016], // Coordenadas
+            msg: "Pintar e Renovar Quadra Campo dos Coelhos",
+            titulo: "Quadra Campo dos Coelhos (Offline)"
           }
         ])
       } finally {
