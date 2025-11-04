@@ -24,6 +24,7 @@ const pinos = [
     msg: "Criar área simples de lazer",
     titulo: "Área de Lazer",
     recompensa: "Recompensa: xx Capibas",
+    confirmado: false,
   },
   {
     id: 2,
@@ -31,6 +32,7 @@ const pinos = [
     msg: "Realizar Mural em Escola Municipal",
     titulo: "Escola Municipal",
     recompensa: "Recompensa: xx Capibas",
+    confirmado: false,
   },
   {
     id: 3,
@@ -38,6 +40,7 @@ const pinos = [
     msg: "Pintar e Renovar Campo na Praça do Derby",
     titulo: "Campo na Praça do Derby",
     recompensa: "Recompensa: xx Capibas",
+    confirmado: false,
   },
   {
     id: 4,
@@ -45,6 +48,7 @@ const pinos = [
     msg: "Pintar e Renovar Quadra Campo dos Coelhos",
     titulo: "Quadra Campo dos Coelhos",
     recompensa: "Recompensa: xx Capibas",
+    confirmado: false,
   },
 ];
 
