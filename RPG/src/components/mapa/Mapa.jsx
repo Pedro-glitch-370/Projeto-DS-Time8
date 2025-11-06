@@ -106,6 +106,7 @@ export default function Mapa() {
                   htmlFor={`foto-${pino.id}`}
                   style={{
                     width: "40px",
+                    height: "40px",
                     cursor: "pointer",
                     padding: "40px",
                     backgroundColor: "#ffffffff",
@@ -115,6 +116,7 @@ export default function Mapa() {
                     display: "inline-block",
                   }}
                 >
+                  <img src="/src/assets/Vector.png" alt="Adicionar Foto" ></img>
                   Enviar Foto
                 </label>
                 <input
