@@ -87,7 +87,7 @@ export default function Mapa() {
           <Marker key={pino.id} position={pino.coord}>
             <Popup>
               <div className='modal'>
-                <h3>📍 {pino.titulo}</h3>
+                <h3>{pino.titulo}</h3>
 
                 {/*Upload da foto*/}
                 <label htmlFor={`foto-${pino.id}`}>

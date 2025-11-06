@@ -18,6 +18,7 @@
 }
 
 .imagem {
+    opacity: 0.5;
     padding: 20px;
     width: 60px;
     height: 46px;
@@ -29,10 +30,9 @@
 
 .botaoConfirmar {
     opacity: 0.5;
-    cursor: pointer;
     color: #1449C0;
-    border-radius: 500px; 
-    border: 3px solid transparent;
+    border-radius: 10px; 
+    border: 2.5px solid transparent;
     padding: 10px;
     transition: opacity 0.5s ease-in-out;
 
@@ -49,7 +49,6 @@
 
 .botaoConfirmar:hover {
     opacity: 100%;
-    cursor: pointer;
     transition-duration: 0.5s;
 }
 
