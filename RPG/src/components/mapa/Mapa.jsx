@@ -105,10 +105,13 @@ export default function Mapa() {
                 <label
                   htmlFor={`foto-${pino.id}`}
                   style={{
+                    width: "40px",
                     cursor: "pointer",
                     padding: "40px",
-                    backgroundColor: "#eee",
-                    borderRadius: "5px",
+                    backgroundColor: "#ffffffff",
+                    borderRadius: "20px",
+                    borderStyle: "dotted",
+                    borderColor: "darkblue",
                     display: "inline-block",
                   }}
                 >
