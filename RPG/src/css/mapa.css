@@ -1,0 +1,58 @@
+.msgCarregandoMapa {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 18px;
+}
+
+.espacoMapa {
+    height: 100vh;
+    width: 100%;
+}
+
+.modal {
+    text-align: center;
+    color: #1449C0;
+    width: 200px;
+}
+
+.imagem {
+    padding: 20px;
+    width: 60px;
+    height: 46px;
+    cursor: pointer;
+    border-radius: 10px;
+    border-style: dotted;
+    border-color: #1449C0;
+}
+
+.botaoConfirmar {
+    opacity: 0.5;
+    cursor: pointer;
+    color: #1449C0;
+    border-radius: 500px; 
+    border: 3px solid transparent;
+    padding: 10px;
+    transition: opacity 0.5s ease-in-out;
+
+    background: 
+        linear-gradient(white, white) padding-box,
+        linear-gradient(
+            to right,
+            #4DC48A,
+            #1449C0
+        ) border-box;
+
+    background-clip: padding-box, border-box;
+}
+
+.botaoConfirmar:hover {
+    opacity: 100%;
+    cursor: pointer;
+    transition-duration: 0.5s;
+}
+
+.inputFoto {
+    display: none;
+}

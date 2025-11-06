@@ -1,3 +1,4 @@
+import '../../css/mapa.css'
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
@@ -64,15 +65,7 @@ export default function Mapa() {
   // Renderiza o estado de carregamento
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          fontSize: "18px",
-        }}
-      >
+      <div className='msgCarregandoMapa'>
         🗺️ Carregando mapa...
       </div>
     );
@@ -85,7 +78,7 @@ export default function Mapa() {
         center={[-8.063, -34.871]}
         zoom={13}
         scrollWheelZoom={false}
-        style={{ height: "100vh", width: "100%" }}
+        className='espacoMapa'
       >
         <TileLayer url="https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token=txyn1dkLKLyeAVZpRphN9bgMLMXyX4ID2M7twL0qufk633O6XjmXLC2W54qmibZF" />
 
@@ -93,38 +86,19 @@ export default function Mapa() {
           // Renderiza cada pino em sua posição junto com sua mensagem
           <Marker key={pino.id} position={pino.coord}>
             <Popup>
-              <div
-                style={{
-                  textAlign: "center",
-                  color: "darkblue",
-                }}
-              >
+              <div className='modal'>
                 <h3>📍 {pino.titulo}</h3>
 
                 {/*Upload da foto*/}
-                <label
-                  htmlFor={`foto-${pino.id}`}
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    cursor: "pointer",
-                    padding: "40px",
-                    backgroundColor: "#ffffffff",
-                    borderRadius: "20px",
-                    borderStyle: "dotted",
-                    borderColor: "darkblue",
-                    display: "inline-block",
-                  }}
-                >
-                  <img src="/src/assets/Vector.png" alt="Adicionar Foto" ></img>
-                  Enviar Foto
+                <label htmlFor={`foto-${pino.id}`}>
+                  <img className='imagem' src="/src/assets/AdicionarFoto.png" alt="Adicionar Foto" ></img>
                 </label>
                 <input
                   type="file"
                   id={`foto-${pino.id}`}
                   accept="image/*"
                   title="Enviar Foto"
-                  style={{ display: "none" }}
+                  className='inputFoto'
                 />
 
                 {/*Descrição da atividade e recompensa*/}
@@ -134,16 +108,7 @@ export default function Mapa() {
                 </p>
 
                 {/*Botão de confirmação */}
-                <button
-                  style={{
-                    opacity: "50%",
-                    cursor: "pointer",
-                    color: "darkblue",
-                    borderColor: "darkblue",
-                    borderRadius: "5px",
-                    padding: "8px",
-                  }}
-                >
+                <button className='botaoConfirmar'>
                   Confirme sua presença
                 </button>
               </div>
