@@ -18,14 +18,7 @@ L.Icon.Default.mergeOptions({
 
 // Componente propriamente dito
 export default function Mapa() {
-  //const [corPinos, setCorPino] = useState(pinoAzul); // Função para mudar a cor do pino
-  /*const mudarCorPino = (corPinos) => {
-    if (corPinos == pinoAzul) {
-      setCorPino(pinoVerde);
-    } else {
-      setCorPino(pinoAzul);
-    }
-  };*/
+
   const [pinos, setPinos] = useState([]); // Array para armazenar os pinos do backend
   const [loading, setLoading] = useState(true); // Controla o estado de carregamento
 
@@ -85,30 +78,6 @@ export default function Mapa() {
     );
   }
 
-  // Pino azul
-  /*const pinoAzul = new L.Icon({
-    iconUrl:
-      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-    shadowUrl:
-      "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });
-
-  // Pino verde
-  const pinoVerde = new L.Icon({
-    iconUrl:
-      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-    shadowUrl:
-      "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });*/
-
   // Retorna mapa e cada pino
   return (
     <>
@@ -121,7 +90,7 @@ export default function Mapa() {
         <TileLayer url="https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token=txyn1dkLKLyeAVZpRphN9bgMLMXyX4ID2M7twL0qufk633O6XjmXLC2W54qmibZF" />
 
         {pinos.map((pino) => (
-          // Renderiza cada pino em sua posição junto com sua mensagem - icon={corPinos}
+          // Renderiza cada pino em sua posição junto com sua mensagem
           <Marker key={pino.id} position={pino.coord}>
             <Popup>
               <div
@@ -159,7 +128,7 @@ export default function Mapa() {
                   <strong>{pino.recompensa}</strong>
                 </p>
 
-                {/*Botão de confirmação - onClick={mudarCorPino}*/}
+                {/*Botão de confirmação */}
                 <button
                   style={{
                     opacity: "50%",
