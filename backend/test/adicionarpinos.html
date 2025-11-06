@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Adicionar Pino</title>
+</head>
+<body>
+    <h1>Adicionar Novo Pino</h1>
+    <form action="/api/pinos/adicionar" method="POST">
+        <input type="text" name="nome" placeholder="Nome" required>
+        <input type="number" step="any" name="latitude" placeholder="Latitude" required>
+        <input type="number" step="any" name="longitude" placeholder="Longitude" required>
+        <textarea name="msg" placeholder="Mensagem" required></textarea>
+        <button type="submit">Adicionar</button>
+    </form>
+</body>
+</html>

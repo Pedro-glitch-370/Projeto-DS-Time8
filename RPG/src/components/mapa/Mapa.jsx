@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useState } from 'react'
 import L from 'leaflet'
+import api from'../../services/api'
 
 // CORREÇÃO DOS ÍCONES DO LEAFLET NO REACT
 // Remove a implementação padrão de ícones do Leaflet para evitar problemas de caminho
@@ -27,13 +28,12 @@ export default function Mapa() {
         console.log('🔄 Buscando pinos do backend...')
         
         // Faz a requisição para a API do backend
-        const response = await fetch('http://localhost:5000/api/pinos')
+        const response = await api.get('/pinos')
         // Converte a resposta para JSON
-        const data = await response.json()
         
-        console.log('✅ Pinos carregados:', data)
+        console.log('✅ Pinos carregados:', response.data)
         // Atualiza o estado com os pinos recebidos
-        setPinos(data)
+        setPinos(response.data)
         
       } catch (err) {
         // TRATAMENTO DE ERRO - Se a requisição falhar
@@ -44,9 +44,9 @@ export default function Mapa() {
         setPinos([
           {
             id: 99,
-            coord: [-8.063149, -34.871139], // Coordenadas do Marco Zero no Recife
+            coordinates: [-8.063149, -34.871139], // Coordenadas do Marco Zero no Recife
             msg: "Marco Zero - Backend offline, usando dados locais",
-            titulo: "Marco Zero (Offline)"
+            nome: "Marco Zero (Offline)"
           }
         ])
       } finally {
@@ -90,12 +90,13 @@ export default function Mapa() {
       {/* RENDERIZAÇÃO DINÂMICA DOS PINOS */}
       {pinos.map(pino => (
         // Marcador para cada pino no mapa
-        <Marker key={pino.id} position={pino.coord}>
+        <Marker key={pino.id} 
+        position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}>
           {/* Popup que aparece ao clicar no marcador */}
           <Popup>
             <div>
               {/* Título do pino com emoji de localização */}
-              <h3>📍 {pino.titulo}</h3>
+              <h3>📍 {pino.nome}</h3>
               {/* Mensagem/descrição do pino */}
               <p>{pino.msg}</p>
             </div>
