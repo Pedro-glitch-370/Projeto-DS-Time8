@@ -41,10 +41,8 @@ router.post('/adicionar', async (req, res) => {
     try {
         const { nome, latitude, longitude, msg } = req.body;
         
-        // ⚠️ PROBLEMA 1: Você estava usando variáveis não definidas
         console.log('Dados recebidos:', { nome, latitude, longitude, msg });
         
-        // ⚠️ PROBLEMA 2: Estrutura incorreta para o modelo Pino
         const novoPino = new Pino({
             nome: nome,
             localizacao: {
@@ -54,11 +52,9 @@ router.post('/adicionar', async (req, res) => {
             msg: msg
         });
 
-        // ⚠️ PROBLEMA 3: Falta await e resposta ao cliente
         const pinoSalvo = await novoPino.save();
         console.log("✅ Pino salvo no banco de dados:", pinoSalvo._id);
         
-        // ⚠️ PROBLEMA 4: Você não estava enviando resposta
         res.redirect('/api/pinos/adicionar?success=true');
         
     } catch (err) {
@@ -70,6 +66,6 @@ router.post('/adicionar', async (req, res) => {
 // ================================================================
 // Rota para deletar
 
-// Tota para atualizar
+// Rota para atualizar
 
 module.exports = router
