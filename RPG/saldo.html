@@ -10,39 +10,31 @@
     <div id="barra-navegacao"></div>
 
     <div id ="saldo">
-
-    <div class="carrossel-container">
-      <div class="carrossel">
-        <div class="pessoa">
-          <p class="nome"></p>
-          <p class="saldo"></p>
+        <div class="carrossel-container">
+            <div class="carrossel">
+                <div class="pessoa">
+                <p class="nome"></p>
+                <p class="saldo"></p>
+                </div>
+                <div class="pessoa">
+                <p class="nome"></p>
+                <p class="saldo"></p>
+                </div>
+                <div class="pessoa">
+                <p class="nome"></p>
+                <p class="saldo"></p>
+                </div>
+                <div class="pessoa">
+                <p class="nome"></p>
+                <p class="saldo"></p>
+                </div>
+            </div>
+            <button class="prev" onclick="mudarSlide(-1)">&#10094;</button>
+            <button class="next" onclick="mudarSlide(1)">&#10095;</button>
         </div>
-        <div class="pessoa">
-          <p class="nome"></p>
-          <p class="saldo"></p>
-        </div>
-        <div class="pessoa">
-          <p class="nome"></p>
-          <p class="saldo"></p>
-        </div>
-        <div class="pessoa">
-          <p class="nome"></p>
-          <p class="saldo"></p>
-        </div>
-      </div>
-      <button class="prev" onclick="mudarSlide(-1)">&#10094;</button>
-      <button class="next" onclick="mudarSlide(1)">&#10095;</button>
     </div>
 
-
-    </div>
-
-    <div id="painel_saldo">
-
-      
-    </div>
-
-
+    <div id="painel_saldo"></div>
 
     <script>
       fetch('/index.html')
