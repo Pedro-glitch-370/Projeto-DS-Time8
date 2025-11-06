@@ -15,7 +15,6 @@ const PORT = process.env.PORT || 5001;
 // MIDDLEWARES - Funções que processam as requisições antes das rotas
 // Habilita CORS para permitir que o frontend (React) acesse este backend
 app.use(cors())
-// Configura o Express para interpretar JSON no corpo das requisições
 app.use(express.json())
 
 // ==================================================
@@ -39,7 +38,6 @@ app.use('/api/pinos', pinoRoutes)
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend está funcionando! 🎉' });
 });
-
 
 // ==================================================
 // INICIALIZAÇÃO DO SERVIDOR
