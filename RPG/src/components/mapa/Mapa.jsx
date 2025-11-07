@@ -6,14 +6,20 @@ import api from'../../services/api'
 
 // CORREÇÃO DOS ÍCONES DO LEAFLET NO REACT
 // Remove a implementação padrão de ícones do Leaflet para evitar problemas de caminho
-delete L.Icon.Default.prototype._getIconUrl;
+delete L.Icon.Default.prototype._getIconUrl
 
 // Configura as URLs corretas para os ícones dos marcadores
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+})
+
+const recifeBounds = [
+    [-8.200, -35.050], // Sudoeste (SW) - Ex: Cabo de Santo Agostinho (próximo) e limite oeste
+    [-7.900, -34.800]  // Nordeste (NE) - Ex: Olinda (próximo) e limite leste (mar)
+]
+
 
 export default function Mapa() {
   // ESTADO DO COMPONENTE
@@ -81,6 +87,10 @@ export default function Mapa() {
       center={[-8.063, -34.871]} // Posição inicial do mapa (Recife Antigo)
       zoom={15} // Nível de zoom inicial
       style={{ height: '100vh', width: '100%' }} // Ocupa toda a tela
+      maxBounds={recifeBounds} // Limita a visualização do mapa aos limites do Brasil
+      maxBoundsViscosity={1.0} // Impede que o usuário arraste o mapa para fora dos limites
+      minZoom={13} // Usuário não pode afastar o mapa além do zoom 12
+      maxZoom={18} // Usuário não pode aproximar o mapa além do zoom 18
     >
       {/* Camada de tiles (mapa de fundo) do OpenStreetMap */}
       <TileLayer
