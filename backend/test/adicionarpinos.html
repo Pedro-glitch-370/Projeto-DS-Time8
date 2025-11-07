@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adicionar Pino</title>
+    <style>
+      /* ======= ESTILOS GERAIS ======= */
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(135deg, #1e90ff, #00bfff);
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 16px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+      }
+
+      h1 {
+        color: #0078d7;
+        margin-bottom: 25px;
+        font-size: 1.8rem;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      input,
+      textarea {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+      }
+
+      input:focus,
+      textarea:focus {
+        border-color: #0078d7;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 120, 215, 0.4);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      button {
+        padding: 12px;
+        border: none;
+        background: #0078d7;
+        color: #fff;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+      }
+
+      button:hover {
+        background: #005fa3;
+      }
+
+      .msg-sucesso {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+      }
+
+      .msg-erro {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Adicionar Novo Pino 📍</h1>
+
+      <!-- Mensagem de feedback -->
+      <div id="mensagem"></div>
+
+      <form id="formPino" action="/api/pinos/adicionar" method="POST">
+        <input type="text" name="nome" placeholder="Nome do Pino" required />
+        <input
+          type="number"
+          step="any"
+          name="latitude"
+          placeholder="Latitude"
+          required
+        />
+        <input
+          type="number"
+          step="any"
+          name="longitude"
+          placeholder="Longitude"
+          required
+        />
+        <textarea name="msg" placeholder="Mensagem" required></textarea>
+        <button type="submit">Adicionar Pino</button>
+      </form>
+    </div>
+
+    <script>
+      // Adiciona feedback visual sem precisar recarregar a página inteira
+      const form = document.getElementById("formPino");
+      const msgDiv = document.getElementById("mensagem");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        msgDiv.innerHTML = "";
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+          const res = await fetch("/api/pinos/adicionar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (res.ok) {
+            msgDiv.innerHTML =
+              '<div class="msg-sucesso">✅ Pino adicionado com sucesso!</div>';
+            form.reset();
+          } else {
+            const erro = await res.text();
+            msgDiv.innerHTML = `<div class="msg-erro">❌ Erro: ${erro}</div>`;
+          }
+        } catch (err) {
+          msgDiv.innerHTML = `<div class="msg-erro">❌ Falha na conexão: ${err.message}</div>`;
+        }
+      });
+    </script>
+  </body>
+</html>

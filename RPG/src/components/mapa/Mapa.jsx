@@ -32,12 +32,9 @@ export default function Mapa() {
 
         // Faz a requisição para a API do backend
         const response = await api.get("/pinos");
-        // Converte a resposta para JSON
-        const data = await response.json();
-
-        console.log("✅ Pinos carregados:", data);
+        console.log("✅ Pinos carregados:", response.data);
         // Atualiza o estado com os pinos recebidos
-        setPinos(data);
+        setPinos(response.data);
       } catch (err) {
         // Se a requisição falhar
         console.error("❌ Erro ao buscar pinos:", err);
@@ -80,7 +77,13 @@ export default function Mapa() {
 
         {pinos.map((pino) => (
           // Renderiza cada pino em sua posição junto com sua mensagem
-          <Marker key={pino.id} position={pino.coord}>
+          <Marker
+            key={pino.id}
+            position={[
+              pino.localizacao.coordinates[1],
+              pino.localizacao.coordinates[0],
+            ]}
+          >
             <Popup>
               <div className="modal">
                 <h3>{pino.titulo}</h3>

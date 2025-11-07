@@ -3,13 +3,15 @@
 **Clonou repositório?**
 
 - **Em um terminal**:
-- node -v (só pra checar)
 - cd backend
-- node server.js
+- npm install
+- npm install express
+- npm install cors
+- npm install mongoose
+- npm start
 
 - **Em outro terminal**:
 - cd RPG
-- npm install -g vite
 - npm install
 - npm run dev
 
