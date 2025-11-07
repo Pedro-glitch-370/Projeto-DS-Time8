@@ -10,7 +10,7 @@ Contém a lógica centralizada para iniciar, gerenciar e encerrar a conexão com
 MongoDB (ou outro serviço externo). Isola as credenciais e o status do DB do 
 restante da aplicação.
 
-================================================================================
+=======================================================================================
 
 /models:
 
@@ -24,7 +24,7 @@ Define a estrutura dos dados da aplicação. Cada arquivo representa uma coleç�
 no banco de dados e determina as regras de validação (Schema) e os métodos de
 interação com o DB (Model).
 
-================================================================================
+=======================================================================================
 
 /controller:
 
@@ -38,7 +38,7 @@ Recebe as requisições das rotas, interage com os Models para manipular os dado
 (CRUD - Criar, Ler, Atualizar, Deletar), e formata a resposta antes de enviá-la
 de volta. É o mediador entre as Rotas e os Models.
 
-================================================================================
+=======================================================================================
 
 /routes:
 
@@ -51,7 +51,7 @@ Função no Backend:
 Contém o código que define os endpoints da API e as funções de callback que lidam
 com as requisições HTTP, encaminhando-as para a lógica de negócio ou modelos.
 
-================================================================================
+=======================================================================================
 
 /test:
 
@@ -65,7 +65,7 @@ Armazena os scripts para testar as funcionalidades da API (rotas, modelos, etc.)
 Essencial para garantir que o código funciona conforme o esperado e prevenir
 regressões.
 
-================================================================================
+=======================================================================================
 
 server:
 
@@ -81,7 +81,7 @@ carrega middlewares,
 estabelece a conexão inicial com o Banco de Dados (usando /config), 
 e inicia o servidor HTTP para escutar as requisições.
 
-================================================================================
+=======================================================================================
 
 ORDEM DE ACONTECIMENTO
 
@@ -89,7 +89,7 @@ primeiro o banco de dados e inicializado, depois as rotas são criadas
 
 quando o usuario entrar no view e mandar alguma informação de ela, ela deve ser trasferida até o bankend, conferida por um controler, e depois de verifica deve mandar uma resposta atraves do proprio controler dependendo do que for ou de um model, ai depois essa api vai mandar essa informação de volta atraves de uma resposta (se necessario)
 
-===============================================================================
+=======================================================================================
 
 // Fluxo quando o usuario interage
 
@@ -113,7 +113,7 @@ ENVIA RESPOSTA HTTP (JSON, HTML, redirect)
          ↓
 VIEW - Atualiza a interface do usuário
 
-===============================================================================
+=======================================================================================
 
 // FLUXO COMPLETO:
 
