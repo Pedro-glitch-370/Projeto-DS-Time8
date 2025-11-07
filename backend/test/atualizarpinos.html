@@ -10,8 +10,8 @@
       }
 
       body {
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: linear-gradient(135deg, #007bff, #00bfff);
+        font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+        background: linear-gradient(135deg, #0489ff, #047eeb, #1b61ff);
         margin: 0;
         padding: 0;
         color: #333;
@@ -118,14 +118,14 @@
       }
 
       .alerta.sucesso {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
+        background: #64ffb4;
+        color: #2f7854;
+        border: 1px solid #4dc48a;
       }
 
       .alerta.erro {
         background: #f8d7da;
-        color: #721c24;
+        color: #7b0000;
         border: 1px solid #f5c6cb;
       }
 
@@ -219,6 +219,7 @@
             body: JSON.stringify(dados),
           });
 
+          // Mensagens de sucesso e de erro
           if (res.ok) {
             mostrarMensagem("✅ Pino atualizado com sucesso!", "sucesso");
             carregarPinos();
