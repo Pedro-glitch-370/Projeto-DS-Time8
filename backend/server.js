@@ -1,22 +1,84 @@
-// Importa o framework Express para criar o servidor web
-import express from "express";
-// Importa o middleware CORS para permitir requisições de diferentes origens
-import cors from "cors";
+// ================== Importações ==================
+const express = require("express"); // Importa o framework Express para criar o servidor web
+const app = express(); // Cria uma instância do aplicativo Express
+const cors = require("cors"); // Importa o middleware CORS para permitir requisições de diferentes origens
+const { connectDB, disconnectDB, getDBStatus } = require("./config/db"); // Importa a configuração do banco de dados
 
-// Cria uma instância do aplicativo Express
-const app = express();
+const pinoRoutes = require("./routes/pinosRoutes"); // importa as rotas
+/*quando criar novas rotas, adicionar aqui*/
+
+// ==================================================
 // Define a porta onde o servidor vai rodar
-const PORT = 5000;
+const PORT = process.env.PORT || 5001;
 
-// MIDDLEWARES - Funções que processam as requisições antes das rotas
-// Habilita CORS para permitir que o frontend (React) acesse este backend
-// por meio da permissão de um aplicativo web em uma origem acessar recursos em outra origem diferente
-app.use(cors());
-// Configura o Express para interpretar JSON no corpo das requisições
+// ==================================================
+// Conexão com o Banco de Dados
+const initializeDatabase = async () => {
+  try {
+    await connectDB();
+    console.log("🗄️ Banco de dados inicializado com sucesso!");
+  } catch (error) {
+    console.error("❌ Falha ao inicializar o banco de dados:", error);
+    process.exit(1);
+  }
+};
+
+// ==================================================
+// Middlewares - Funções que processam as requisições antes das rotas
+app.use(cors()); // Habilita CORS para permitir que o frontend (React) acesse este backend
+app.use(express.urlencoded({ extended: true })); // Middleware para interpretar dados JSON e dados de formulários URL-encoded
 app.use(express.json());
 
-// BANCO DE DADOS SIMULADO - Array com os pinos fixos do mapa
-// Em uma aplicação real, isso viria de um banco de dados
+// ==================================================
+// Rotas da API
+app.use("/api/pinos", pinoRoutes);
+
+// ==================================================
+// Inicialização do Servidor
+const startServer = async () => {
+  try {
+    await initializeDatabase(); // inicializa o banco de dados, antes do server ficar online
+
+    // inicia o servidor na porta previamente definida
+    const server = app.listen(PORT, () => {
+      console.log("=".repeat(50));
+      console.log("🚀 SERVIDOR BACKEND INICIADO!");
+      console.log(`📍 Porta: ${PORT}`); // numero da porta que o server tá rodando
+      console.log(`📍 URL: http://localhost:${PORT}/api/test`); // rota pra testar se o backend tá funcionando
+      console.log(`📍 URL: http://localhost:${PORT}/api/pinos`); // rota que pega todos os pinos do mongoDB
+      console.log(`📍 URL: http://localhost:${PORT}/api/pinos/adicionar`); // rota para adicioar pinos
+      console.log(`📍 URL: http://localhost:${PORT}/api/pinos/deletar`); // rota para deletar os pinos
+      console.log(`📍 URL: http://localhost:${PORT}/api/pinos/atualizar`); // rota para atualizar os pinos
+      console.log(
+        `📍 Banco de dados: ${
+          getDBStatus().connected ? "Conectado ✅" : "Desconectado ❌"
+        }`
+      ); // indica se o banco de dados foi conectado
+      console.log("=".repeat(50));
+    });
+
+    // captura o sinal de encerramento do processo pra fechar a conexão com o banco
+    process.on("SIGINT", async () => {
+      console.log("\n🔻 Recebido SIGINT - Encerrando servidor...");
+      await disconnectDB();
+      server.close(() => {
+        console.log("👋 Servidor encerrado!");
+        process.exit(0);
+      });
+    });
+
+    // tratamento de erros na inicialização
+  } catch (error) {
+    console.error("❌ Falha ao iniciar o servidor:", error);
+    process.exit(1);
+  }
+};
+
+// ==================================================
+// função que inicia o servidor, boa pratica para deixar o codigo organizado e funcional
+startServer();
+
+/*
 const pinos = [
   {
     id: 1,
@@ -51,32 +113,4 @@ const pinos = [
     confirmado: false,
   },
 ];
-
-// ROTAS DA API
-
-// Rota principal - Retorna todos os pinos do mapa
-// GET http://localhost:5000/api/pinos
-app.get("/api/pinos", (req, res) => {
-  // Log para debug - mostra quando alguém acessa a rota
-  console.log("📌 Alguém solicitou os pinos!");
-  // Retorna o array de pinos como JSON
-  res.json(pinos);
-});
-
-// Rota de teste - Para verificar se o servidor está funcionando
-// GET http://localhost:5000/api/test
-app.get("/api/test", (req, res) => {
-  res.json({ message: "Backend está funcionando! 🎉" });
-});
-
-// INICIALIZAÇÃO DO SERVIDOR
-// Inicia o servidor na porta especificada
-app.listen(PORT, () => {
-  // Mensagem visualmente destacada no console
-  console.log("=".repeat(50));
-  console.log("🚀 SERVIDOR BACKEND INICIADO!");
-  console.log(`📍 Porta: ${PORT}`);
-  console.log(`📍 URL dos pinos: http://localhost:${PORT}/api/pinos`);
-  console.log(`📍 URL de teste: http://localhost:${PORT}/api/test`);
-  console.log("=".repeat(50));
-});
+*/

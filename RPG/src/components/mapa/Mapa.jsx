@@ -1,8 +1,9 @@
-import '../../css/mapa.css'
+import "../../css/mapa.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 import L from "leaflet";
+import api from "../../services/api";
 
 // Pra evitar problemas de caminho
 delete L.Icon.Default.prototype._getIconUrl;
@@ -19,7 +20,6 @@ L.Icon.Default.mergeOptions({
 
 // Componente propriamente dito
 export default function Mapa() {
-
   const [pinos, setPinos] = useState([]); // Array para armazenar os pinos do backend
   const [loading, setLoading] = useState(true); // Controla o estado de carregamento
 
@@ -31,7 +31,7 @@ export default function Mapa() {
         console.log("🔄 Buscando pinos do backend...");
 
         // Faz a requisição para a API do backend
-        const response = await fetch("http://localhost:5000/api/pinos");
+        const response = await api.get("/pinos");
         // Converte a resposta para JSON
         const data = await response.json();
 
@@ -43,7 +43,7 @@ export default function Mapa() {
         console.error("❌ Erro ao buscar pinos:", err);
         console.log("⚠️ Usando pinos de fallback...");
 
-        // Quando o backend não está disponível
+        // Quando o backend não tá disponível
         setPinos([
           {
             id: 99,
@@ -64,11 +64,7 @@ export default function Mapa() {
 
   // Renderiza o estado de carregamento
   if (loading) {
-    return (
-      <div className='msgCarregandoMapa'>
-        🗺️ Carregando mapa...
-      </div>
-    );
+    return <div className="msgCarregandoMapa">🗺️ Carregando mapa...</div>;
   }
 
   // Retorna mapa e cada pino
@@ -78,7 +74,7 @@ export default function Mapa() {
         center={[-8.063, -34.871]}
         zoom={13}
         scrollWheelZoom={false}
-        className='espacoMapa'
+        className="espacoMapa"
       >
         <TileLayer url="https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token=txyn1dkLKLyeAVZpRphN9bgMLMXyX4ID2M7twL0qufk633O6XjmXLC2W54qmibZF" />
 
@@ -86,19 +82,23 @@ export default function Mapa() {
           // Renderiza cada pino em sua posição junto com sua mensagem
           <Marker key={pino.id} position={pino.coord}>
             <Popup>
-              <div className='modal'>
+              <div className="modal">
                 <h3>{pino.titulo}</h3>
 
                 {/*Upload da foto*/}
                 <label htmlFor={`foto-${pino.id}`}>
-                  <img className='imagem' src="/src/assets/AdicionarFoto.png" alt="Adicionar Foto" ></img>
+                  <img
+                    className="imagem"
+                    src="/src/assets/AdicionarFoto.png"
+                    alt="Adicionar Foto"
+                  ></img>
                 </label>
                 <input
                   type="file"
                   id={`foto-${pino.id}`}
                   accept="image/*"
                   title="Enviar Foto"
-                  className='inputFoto'
+                  className="inputFoto"
                 />
 
                 {/*Descrição da atividade e recompensa*/}
@@ -108,7 +108,7 @@ export default function Mapa() {
                 </p>
 
                 {/*Botão de confirmação */}
-                <button className='botaoConfirmar'>
+                <button className="botaoConfirmar">
                   Confirme sua presença
                 </button>
               </div>
