@@ -12,10 +12,17 @@
         color: #333;
         margin: 0;
         padding: 0;
-        display: flex;
         height: 100vh;
+        display: flex;
         justify-content: center;
         align-items: center;
+      }
+
+      .pagina {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
       }
 
       .container {
@@ -29,9 +36,9 @@
       }
 
       h1 {
-        color: #1449c0;
-        margin-bottom: 25px;
-        font-size: 1.8rem;
+        color: white;
+        margin: 30px 0 20px;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
       }
 
       form {
@@ -70,11 +77,12 @@
         border-radius: 8px;
         cursor: pointer;
         font-size: 1rem;
-        transition: background 0.3s ease;
+        transition: background 0.3s ease, transform 0.1s ease;
       }
 
       button:hover {
         background: #1449c0;
+        transform: scale(1.03);
       }
 
       .msg-sucesso {
@@ -97,31 +105,33 @@
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="pagina">
       <h1>Adicionar Novo Pino</h1>
 
-      <!-- Mensagem de feedback -->
-      <div id="mensagem"></div>
+      <div class="container">
+        <!-- Mensagem de feedback -->
+        <div id="mensagem"></div>
 
-      <form id="formPino" action="/api/pinos/adicionar" method="POST">
-        <input type="text" name="nome" placeholder="Nome do Pino" required />
-        <input
-          type="number"
-          step="any"
-          name="latitude"
-          placeholder="Latitude"
-          required
-        />
-        <input
-          type="number"
-          step="any"
-          name="longitude"
-          placeholder="Longitude"
-          required
-        />
-        <textarea name="msg" placeholder="Mensagem" required></textarea>
-        <button type="submit">Adicionar Pino</button>
-      </form>
+        <form id="formPino" action="/api/pinos/adicionar" method="POST">
+          <input type="text" name="nome" placeholder="Nome do Pino" required />
+          <input
+            type="number"
+            step="any"
+            name="latitude"
+            placeholder="Latitude"
+            required
+          />
+          <input
+            type="number"
+            step="any"
+            name="longitude"
+            placeholder="Longitude"
+            required
+          />
+          <textarea name="msg" placeholder="Mensagem" required></textarea>
+          <button type="submit">Adicionar Pino</button>
+        </form>
+      </div>
     </div>
 
     <script>

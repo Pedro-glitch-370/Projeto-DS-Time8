@@ -10,7 +10,7 @@
 
       body {
         font-family: "Segoe UI", Arial, sans-serif;
-        background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+        background: linear-gradient(135deg, #ff6b6b, #be0000);
         margin: 0;
         padding: 0;
         color: #333;
@@ -63,6 +63,12 @@
         font-size: 0.95rem;
       }
 
+      .btn-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+      }
+
       .btn-deletar {
         background: #ff4d4d;
         color: #fff;
@@ -76,7 +82,7 @@
       }
 
       .btn-deletar:hover {
-        background: #cc0000;
+        background: #7b0000;
         transform: scale(1.05);
       }
 
@@ -93,14 +99,14 @@
       }
 
       .alerta.sucesso {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
+        background: #64ffb4;
+        color: #2f7854;
+        border: 1px solid #4dc48a;
       }
 
       .alerta.erro {
         background: #f8d7da;
-        color: #721c24;
+        color: #7b0000;
         border: 1px solid #f5c6cb;
       }
 
@@ -127,7 +133,7 @@
     </style>
   </head>
   <body>
-    <h1>Deletar Pinos 📍</h1>
+    <h1>Deletar Pinos</h1>
 
     <div id="mensagem"></div>
     <div id="lista-pinos">Carregando pinos...</div>
@@ -163,7 +169,7 @@
             <strong>${pino.nome}</strong>
             <p>${pino.msg}</p>
             <p><b>Localização:</b> ${pino.localizacao.coordinates[1]}, ${pino.localizacao.coordinates[0]}</p>
-            <button class="btn-deletar" onclick="deletarPino('${pino._id}')">🗑️ Deletar</button>
+            <div class="btn-container"><button class="btn-deletar" onclick="deletarPino('${pino._id}')">Deletar</button><div>
           `;
             lista.appendChild(div);
           });

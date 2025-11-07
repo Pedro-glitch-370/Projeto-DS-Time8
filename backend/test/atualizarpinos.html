@@ -24,7 +24,7 @@
       h1 {
         color: white;
         text-align: center;
-        margin: 30px 0 10px;
+        margin: 30px 0 20px;
         text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
       }
 
@@ -90,21 +90,26 @@
         min-height: 70px;
       }
 
+      .btn-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+      }
+
       .btn-atualizar {
-        background-color: #007bff;
+        background-color: #1449c0;
         color: white;
         border: none;
         padding: 10px 16px;
         border-radius: 8px;
         cursor: pointer;
-        margin-top: 15px;
         font-weight: 600;
         font-size: 0.95rem;
         transition: background 0.3s ease, transform 0.1s ease;
       }
 
       .btn-atualizar:hover {
-        background-color: #0056b3;
+        background-color: #047eeb;
         transform: scale(1.03);
       }
 
@@ -141,7 +146,7 @@
     </style>
   </head>
   <body>
-    <h1>Atualizar Pinos 📍</h1>
+    <h1>Atualizar Pinos</h1>
 
     <div id="mensagem"></div>
 
@@ -191,7 +196,7 @@
             <label>Mensagem:</label>
             <textarea id="msg-${pino._id}">${pino.msg}</textarea>
             
-            <button class="btn-atualizar" onclick="atualizarPino('${pino._id}')">💾 Atualizar</button>
+            <div class="btn-container"><button class="btn-atualizar" onclick="atualizarPino('${pino._id}')">Atualizar</button><div>
           `;
 
             lista.appendChild(div);
