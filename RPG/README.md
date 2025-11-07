@@ -12,7 +12,6 @@
 
 - **Em outro terminal**:
 - cd RPG
-- npm install
 - npm run dev
 
 **Se, por algum motivo, der problema com o Leaftlet:**
