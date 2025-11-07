@@ -1,68 +1,88 @@
-// config/database.js
-const mongoose = require('mongoose');
+// Importa a biblioteca Mongoose para interagir com o MongoDB
+const mongoose = require('mongoose')
 
+// =================================================================
+/**
+ * Tenta estabelecer a conexão com o banco de dados MongoDB.
+ * A URI de conexão é obtida da variável de ambiente MONGODB_URI ou usa um fallback local.
+ * * @async
+ * @returns {Promise<mongoose.Connection>} A instância de conexão bem-sucedida do Mongoose.
+ */
 const connectDB = async () => {
     try {
-        const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/RPG';
+        // Obtém a URI de conexão, utilizando uma variável de ambiente ou um valor padrão
+        const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/RPG'
         
-        const connection = await mongoose.connect(MONGODB_URI);
+        // Conecta ao MongoDB usando Mongoose
+        const connection = await mongoose.connect(MONGODB_URI)
         
+        // Logs de sucesso e detalhes da conexão
         console.log('✅ Conectado ao MongoDB:', connection.connection.name);
-        console.log('📍 Host:', connection.connection.host);
-        console.log('📍 Porta:', connection.connection.port);
+        console.log('📍 Host:', connection.connection.host) 
+        console.log('📍 Porta:', connection.connection.port)
         
-        return connection;
+        return connection; 
         
     } catch (error) {
-        console.error('❌ Erro ao conectar com MongoDB:', error.message);
-        process.exit(1);
+        // Logs de erro e encerramento do processo em caso de falha crítica na conexão inicial
+        console.error('❌ Erro ao conectar com MongoDB:', error.message)
+        process.exit(1)
     }
 };
 
+// =================================================================
 /**
- * Fecha a conexão com o MongoDB
- * @returns {Promise}
+ * Fecha a conexão ativa com o MongoDB.
+ * * @async
  */
 const disconnectDB = async () => {
     try {
         await mongoose.connection.close();
-        console.log('🔌 Conexão com MongoDB fechada');
+        console.log('🔌 Conexão com MongoDB fechada')
     } catch (error) {
-        console.error('❌ Erro ao fechar conexão:', error.message);
+        console.error('❌ Erro ao fechar conexão:', error.message)
     }
-};
+}
 
+// =================================================================
 /**
- * Verifica o status da conexão
- * @returns {Object} Status da conexão
+ * Retorna o status atual da conexão com o banco de dados.
+ * * @returns {Object} Objeto contendo o status detalhado da conexão.
  */
 const getDBStatus = () => {
     return {
-        connected: mongoose.connection.readyState === 1,
-        readyState: mongoose.connection.readyState,
-        host: mongoose.connection.host,
-        port: mongoose.connection.port,
-        name: mongoose.connection.name
-    };
-};
+        // 'connected' é true se o readyState for 1 (CONNECTED)
+        connected: mongoose.connection.readyState === 1, 
+        readyState: mongoose.connection.readyState, 
+        host: mongoose.connection.host, 
+        port: mongoose.connection.port, 
+        name: mongoose.connection.name 
+    }
+}
 
-// Event listeners para monitorar a conexão
+// =================================================================
+// Listeners de Eventos do Mongoose para monitoramento contínuo da conexão
+
+// Evento disparado quando a conexão é estabelecida
 mongoose.connection.on('connected', () => {
-    console.log('🟢 Mongoose conectado ao MongoDB');
-});
+    console.log('🟢 Mongoose conectado ao MongoDB')
+}) 
 
+// Evento disparado quando ocorre um erro após a conexão inicial
 mongoose.connection.on('error', (err) => {
-    console.error('🔴 Erro na conexão do Mongoose:', err);
-});
+    console.error('🔴 Erro na conexão do Mongoose:', err)
+}) 
 
+// Evento disparado quando a conexão é perdida
 mongoose.connection.on('disconnected', () => {
-    console.log('🟡 Mongoose desconectado do MongoDB');
-});
+    console.log('🟡 Mongoose desconectado do MongoDB')
+}) 
 
-// Exporta as funções
+// =================================================================
+// Exporta as funções e a instância do Mongoose para uso em outros módulos
 module.exports = {
     connectDB,
     disconnectDB,
     getDBStatus,
-    mongoose // Exporta o mongoose também, caso precise em outros lugares
-};
+    mongoose 
+}
