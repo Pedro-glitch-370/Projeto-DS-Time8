@@ -1,57 +1,52 @@
 .msgCarregandoMapa {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-size: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 18px;
 }
 
 .espacoMapa {
-    height: 100vh;
-    width: 100%;
+  height: 100vh;
+  width: 100%;
 }
 
 .modal {
-    text-align: center;
-    color: #1449C0;
-    width: 200px;
+  text-align: center;
+  color: #1449c0;
+  width: 200px;
 }
 
 .imagem {
-    opacity: 0.5;
-    padding: 20px;
-    width: 60px;
-    height: 46px;
-    cursor: pointer;
-    border-radius: 10px;
-    border-style: dotted;
-    border-color: #1449C0;
+  opacity: 0.5;
+  padding: 20px;
+  width: 60px;
+  height: 46px;
+  cursor: pointer;
+  border-radius: 10px;
+  border-style: dotted;
+  border-color: #1449c0;
 }
 
 .botaoConfirmar {
-    opacity: 0.5;
-    color: #1449C0;
-    border-radius: 10px; 
-    border: 2.5px solid transparent;
-    padding: 10px;
-    transition: opacity 0.5s ease-in-out;
+  opacity: 0.5;
+  color: #1449c0;
+  border-radius: 10px;
+  border: 2.5px solid transparent;
+  padding: 10px;
+  transition: opacity 0.5s ease-in-out;
 
-    background: 
-        linear-gradient(white, white) padding-box,
-        linear-gradient(
-            to right,
-            #4DC48A,
-            #1449C0
-        ) border-box;
+  background: linear-gradient(white, white) padding-box,
+    linear-gradient(to right, #4dc48a, #1449c0) border-box;
 
-    background-clip: padding-box, border-box;
+  background-clip: padding-box, border-box;
 }
 
 .botaoConfirmar:hover {
-    opacity: 100%;
-    transition-duration: 0.5s;
+  opacity: 100%;
+  transition-duration: 0.5s;
 }
 
 .inputFoto {
-    display: none;
+  display: none;
 }

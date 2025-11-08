@@ -4,7 +4,7 @@ const app = express(); // Cria uma instância do aplicativo Express
 const cors = require("cors"); // Importa o middleware CORS para permitir requisições de diferentes origens
 const { connectDB, disconnectDB, getDBStatus } = require("./config/db"); // Importa a configuração do banco de dados
 
-const pinoRoutes = require("./routes/pinosRoutes"); // importa as rotas
+const pinoRoutes = require("./routes/pinosRoutes"); // Importa as rotas
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -53,11 +53,11 @@ const startServer = async () => {
         `📍 Banco de dados: ${
           getDBStatus().connected ? "Conectado ✅" : "Desconectado ❌"
         }`
-      ); // indica se o banco de dados foi conectado
+      ); // Indica se o banco de dados foi conectado
       console.log("=".repeat(50));
     });
 
-    // captura o sinal de encerramento do processo pra fechar a conexão com o banco
+    // Captura o sinal de encerramento do processo pra fechar a conexão com o banco
     process.on("SIGINT", async () => {
       console.log("\n🔻 Recebido SIGINT - Encerrando servidor...");
       await disconnectDB();
@@ -67,7 +67,7 @@ const startServer = async () => {
       });
     });
 
-    // tratamento de erros na inicialização
+    // Tratamento de erros na inicialização
   } catch (error) {
     console.error("❌ Falha ao iniciar o servidor:", error);
     process.exit(1);
@@ -75,5 +75,5 @@ const startServer = async () => {
 };
 
 // ==================================================
-// função que inicia o servidor, boa pratica para deixar o codigo organizado e funcional
+// Função que inicia o servidor, boa pratica para deixar o codigo organizado e funcional
 startServer();

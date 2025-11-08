@@ -1,6 +1,7 @@
 # Como rodar
 
 **Clonou repositório?**
+OBS: Tente fazer os passos a seguir em um terminal diferente do powershell.
 
 - **Em um terminal**:
 - cd backend
