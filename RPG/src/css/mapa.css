@@ -50,3 +50,23 @@
 .inputFoto {
   display: none;
 }
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+  text-align: center;
+}
+
+.retryButton {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: "none";
+  border-radius: "4px";
+  cursor: "pointer";
+  margin-top: "10px";
+}
