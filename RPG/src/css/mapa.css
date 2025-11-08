@@ -11,9 +11,14 @@
   width: 100%;
 }
 
-.modal {
-  text-align: center;
+.mensagem {
   color: #1449c0;
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 200px;
 }
 

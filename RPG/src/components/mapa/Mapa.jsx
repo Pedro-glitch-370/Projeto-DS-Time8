@@ -1,5 +1,11 @@
 import "../../css/mapa.css";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  ZoomControl,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import L from "leaflet";
@@ -104,12 +110,15 @@ export default function Mapa() {
         className="espacoMapa"
         center={MAP_CONFIG.center}
         zoom={MAP_CONFIG.zoom}
+        zoomControl={false}
         maxBounds={MAP_CONFIG.recifeBounds}
         maxBoundsViscosity={1.0}
         minZoom={MAP_CONFIG.minZoom}
         maxZoom={MAP_CONFIG.maxZoom}
       >
         <TileLayer url="https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token=txyn1dkLKLyeAVZpRphN9bgMLMXyX4ID2M7twL0qufk633O6XjmXLC2W54qmibZF" />
+
+        <ZoomControl position="bottomleft" />
 
         <MapClickHandler
           setIsSidebarOpen={setIsSidebarOpen}
@@ -140,9 +149,8 @@ export default function Mapa() {
             eventHandlers={{ click: () => onPinoClick(pino) }}
           >
             <Popup>
-              {/* style={styles.popupContent} */}
-              <div classname="modal">
-                <h3>{pino.titulo}</h3>
+              <div className="modal">
+                <h3 className="mensagem">{pino.nome}</h3>
 
                 {/*Upload da foto*/}
                 <label htmlFor={`foto-${pino.id}`}>
@@ -161,9 +169,9 @@ export default function Mapa() {
                 />
 
                 {/*Descrição da atividade e recompensa*/}
-                <p>{pino.msg}</p>
-                <p>
-                  <strong>{pino.recompensa}</strong>
+                <p className="mensagem">{pino.msg}</p>
+                <p className="mensagem">
+                  <strong>Recompensa: xx capibas</strong>
                 </p>
 
                 {/*Botão de confirmação */}
@@ -191,16 +199,3 @@ export default function Mapa() {
     </>
   );
 }
-
-/*const styles = {
-  manageButton: {
-    padding: "5px 10px",
-    backgroundColor: "#ff4444",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-    marginTop: "10px",
-    width: "100%",
-  },
-};*/
