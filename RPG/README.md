@@ -6,13 +6,11 @@ OBS: Tente fazer os passos a seguir em um terminal diferente do powershell.
 - **Em um terminal**:
 - cd backend
 - npm install
-- npm install express
-- npm install cors
-- npm install mongoose
 - npm start
 
 - **Em outro terminal**:
 - cd RPG
+- npm install
 - npm run dev
 
 **Se, por algum motivo, der problema com o Leaftlet:**
