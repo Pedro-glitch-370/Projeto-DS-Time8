@@ -75,3 +75,10 @@
   cursor: "pointer";
   margin-top: "10px";
 }
+
+.popUpNovoPonto {
+  color: #1449c0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

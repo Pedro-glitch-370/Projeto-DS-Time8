@@ -130,9 +130,10 @@ export default function Mapa() {
         {tempPin && (
           <Marker position={[tempPin.lat, tempPin.lng]} icon={ICONS.temporary}>
             <Popup>
-              <strong>Novo Ponto</strong>
-              <br />
-              Preencha as informações ao lado para salvar.
+              <div className="popUpNovoPonto">
+                <strong>Novo Ponto</strong>
+                Preencha as informações ao lado para salvar.
+              </div>
             </Popup>
           </Marker>
         )}
