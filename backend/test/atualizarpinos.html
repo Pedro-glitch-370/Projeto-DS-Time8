@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Atualizar Pinos</title>
+    <style>
+      /* ======= ESTILO GERAL ======= */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+        background: linear-gradient(135deg, #0489ff, #047eeb, #1b61ff);
+        margin: 0;
+        padding: 0;
+        color: #333;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      h1 {
+        color: white;
+        text-align: center;
+        margin: 30px 0 20px;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+      }
+
+      #lista-pinos {
+        width: 100%;
+        max-width: 600px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+        padding: 25px;
+        margin-bottom: 40px;
+        backdrop-filter: blur(8px);
+      }
+
+      .pino {
+        background: #f9fafc;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        transition: all 0.2s ease-in-out;
+      }
+
+      .pino:hover {
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .pino strong {
+        display: block;
+        color: #007bff;
+        margin-bottom: 5px;
+      }
+
+      .pino label {
+        display: block;
+        font-weight: 600;
+        color: #555;
+        margin-top: 8px;
+        font-size: 0.9rem;
+      }
+
+      .pino input,
+      .pino textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 0.95rem;
+        margin-top: 4px;
+        transition: all 0.2s ease;
+      }
+
+      .pino input:focus,
+      .pino textarea:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+      }
+
+      .pino textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+
+      .btn-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+      }
+
+      .btn-atualizar {
+        background-color: #1449c0;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: background 0.3s ease, transform 0.1s ease;
+      }
+
+      .btn-atualizar:hover {
+        background-color: #047eeb;
+        transform: scale(1.03);
+      }
+
+      /* ======= MENSAGENS ======= */
+      .alerta {
+        text-align: center;
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        font-weight: 500;
+      }
+
+      .alerta.sucesso {
+        background: #64ffb4;
+        color: #2f7854;
+        border: 1px solid #4dc48a;
+      }
+
+      .alerta.erro {
+        background: #f8d7da;
+        color: #7b0000;
+        border: 1px solid #f5c6cb;
+      }
+
+      @media (max-width: 600px) {
+        #lista-pinos {
+          padding: 20px;
+          border-radius: 10px;
+        }
+        .pino {
+          padding: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Atualizar Pinos</h1>
+
+    <div id="mensagem"></div>
+
+    <div id="lista-pinos">Carregando pinos...</div>
+
+    <script>
+      const msgDiv = document.getElementById("mensagem");
+
+      // Função para exibir mensagens bonitas
+      function mostrarMensagem(texto, tipo) {
+        msgDiv.innerHTML = `<div class="alerta ${tipo}">${texto}</div>`;
+        setTimeout(() => (msgDiv.innerHTML = ""), 4000);
+      }
+
+      // Função para carregar todos os pinos
+      async function carregarPinos() {
+        try {
+          const res = await fetch("/api/pinos");
+          const pinos = await res.json();
+
+          const lista = document.getElementById("lista-pinos");
+          lista.innerHTML = "";
+
+          if (pinos.length === 0) {
+            lista.innerHTML =
+              '<p style="text-align:center;">🚫 Nenhum pino cadastrado.</p>';
+            return;
+          }
+
+          pinos.forEach((pino) => {
+            const div = document.createElement("div");
+            div.classList.add("pino");
+
+            const [lng, lat] = pino.localizacao.coordinates;
+
+            div.innerHTML = `
+            <strong>ID:</strong> ${pino._id}
+            <label>Nome:</label>
+            <input type="text" id="nome-${pino._id}" value="${pino.nome}">
+            
+            <label>Latitude:</label>
+            <input type="number" step="any" id="lat-${pino._id}" value="${lat}">
+            
+            <label>Longitude:</label>
+            <input type="number" step="any" id="lng-${pino._id}" value="${lng}">
+            
+            <label>Mensagem:</label>
+            <textarea id="msg-${pino._id}">${pino.msg}</textarea>
+            
+            <div class="btn-container"><button class="btn-atualizar" onclick="atualizarPino('${pino._id}')">Atualizar</button><div>
+          `;
+
+            lista.appendChild(div);
+          });
+        } catch (err) {
+          console.error("Erro ao carregar pinos:", err);
+          document.getElementById("lista-pinos").innerText =
+            "Erro ao carregar pinos.";
+        }
+      }
+
+      // Função para atualizar um pino específico
+      async function atualizarPino(id) {
+        const nome = document.getElementById(`nome-${id}`).value;
+        const latitude = document.getElementById(`lat-${id}`).value;
+        const longitude = document.getElementById(`lng-${id}`).value;
+        const msg = document.getElementById(`msg-${id}`).value;
+
+        const dados = { nome, latitude, longitude, msg };
+
+        try {
+          const res = await fetch(`/api/pinos/atualizar/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dados),
+          });
+
+          // Mensagens de sucesso e de erro
+          if (res.ok) {
+            mostrarMensagem("✅ Pino atualizado com sucesso!", "sucesso");
+            carregarPinos();
+          } else {
+            const erro = await res.json();
+            mostrarMensagem("❌ Erro ao atualizar: " + erro.error, "erro");
+          }
+        } catch (err) {
+          console.error("Erro ao atualizar pino:", err);
+          mostrarMensagem("❌ Erro inesperado ao atualizar pino.", "erro");
+        }
+      }
+
+      carregarPinos();
+    </script>
+  </body>
+</html>

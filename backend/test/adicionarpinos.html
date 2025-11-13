@@ -1,16 +1,174 @@
 <!DOCTYPE html>
-<html>
-<head>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Adicionar Pino</title>
-</head>
-<body>
-    <h1>Adicionar Novo Pino</h1>
-    <form action="/api/pinos/adicionar" method="POST">
-        <input type="text" name="nome" placeholder="Nome" required>
-        <input type="number" step="any" name="latitude" placeholder="Latitude" required>
-        <input type="number" step="any" name="longitude" placeholder="Longitude" required>
-        <textarea name="msg" placeholder="Mensagem" required></textarea>
-        <button type="submit">Adicionar</button>
-    </form>
-</body>
+    <style>
+      /* ======= ESTILOS GERAIS ======= */
+      body {
+        font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+        background: linear-gradient(135deg, #1449c0, #1b61ff, #047eeb);
+        color: #333;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .pagina {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .container {
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+      }
+
+      h1 {
+        color: white;
+        margin: 30px 0 20px;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      input,
+      textarea {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+      }
+
+      input:focus,
+      textarea:focus {
+        border-color: #1449c0;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 120, 215, 0.4);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      button {
+        padding: 12px;
+        border: none;
+        background: #047eeb;
+        color: #fff;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s ease, transform 0.1s ease;
+      }
+
+      button:hover {
+        background: #1449c0;
+        transform: scale(1.03);
+      }
+
+      .msg-sucesso {
+        background: #64ffb4;
+        color: #2f7854;
+        border: 1px solid #4dc48a;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+      }
+
+      .msg-erro {
+        background: #f8d7da;
+        color: #7b0000;
+        border: 1px solid #f5c6cb;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pagina">
+      <h1>Adicionar Novo Pino</h1>
+
+      <div class="container">
+        <!-- Mensagem de feedback -->
+        <div id="mensagem"></div>
+
+        <form id="formPino" action="/api/pinos/adicionar" method="POST">
+          <input type="text" name="nome" placeholder="Nome do Pino" required />
+          <input
+            type="number"
+            step="any"
+            name="latitude"
+            placeholder="Latitude"
+            required
+          />
+          <input
+            type="number"
+            step="any"
+            name="longitude"
+            placeholder="Longitude"
+            required
+          />
+          <textarea name="msg" placeholder="Mensagem" required></textarea>
+          <button type="submit">Adicionar Pino</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Adiciona feedback visual sem precisar recarregar a página inteira
+      const form = document.getElementById("formPino"); // seleciona o formulário
+      const msgDiv = document.getElementById("mensagem"); // seleciona a div com as mensagens de sucesso ou erro
+
+      // Impede que a página recarregue e trata o envio via javascript
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        msgDiv.innerHTML = "";
+
+        // Pega os dados preenchidos e transforma em um objeto javascript
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        // Faz uma requisição POST, envia os dados como JSON, o express recebe e cria um novo pino no banco
+        try {
+          const res = await fetch("/api/pinos/adicionar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          // Mensagens de sucesso e de erro
+          if (res.ok) {
+            msgDiv.innerHTML =
+              '<div class="msg-sucesso">✅ Pino adicionado com sucesso!</div>';
+            form.reset();
+          } else {
+            const erro = await res.text();
+            msgDiv.innerHTML = `<div class="msg-erro">❌ Erro: ${erro}</div>`;
+          }
+        } catch (err) {
+          msgDiv.innerHTML = `<div class="msg-erro">❌ Falha na conexão: ${err.message}</div>`;
+        }
+      });
+    </script>
+  </body>
 </html>

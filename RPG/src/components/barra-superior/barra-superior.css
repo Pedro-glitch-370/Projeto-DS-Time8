@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #1449C0; /* cor do figma */
+  background-color: #1449c0; /* cor do figma */
   color: white;
   display: flex;
   align-items: center;
@@ -26,7 +26,7 @@
 
 .barra-superior .meio {
   flex: 2;
-  justify-content: center; 
+  justify-content: center;
   gap: 20px;
 }
 
@@ -53,7 +53,7 @@
   color: white;
   text-decoration: none;
   font-weight: 600;
-  background-color: #2F7854;
+  background-color: #2f7854;
   transition: background-color 0.3s ease;
 }
 
@@ -62,7 +62,7 @@
 /* #4DC48A */
 
 #login:hover {
-  background-color: #4DC48A;
+  background-color: #4dc48a;
 }
 
 .barra-superior .opcoes {
@@ -82,14 +82,14 @@
 }
 
 .barra-superior .meio {
-  padding: 6px 16px;  
-  border-radius: 12px; 
+  padding: 6px 16px;
+  border-radius: 12px;
   border: 2px solid white;
   display: flex;
   gap: 16px;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 0 6px rgba(0,0,0,0.15);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
   max-width: fit-content;
 }
 .barra-superior .meio a {
@@ -102,7 +102,7 @@
 }
 
 .barra-superior .meio a:hover {
-  background-color: rgba(255,255,255,0.3);
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Para ajeitar o tamanho do logo. Por sinal, ele vai ser clicavel ne? */

@@ -1,12 +1,12 @@
 // Importa a biblioteca Axios para fazer requisições HTTP
-import axios from 'axios';
+import axios from "axios";
 
 // Cria uma instância customizada do Axios com configurações padrão
 const api = axios.create({
   // URL base para todas as requisições
   // Todas as chamadas API serão feitas para http://localhost:5001/api + o endpoint específico
-  baseURL: 'http://localhost:5001/api', // URL do backend (servidor local na porta 5000)
-  
+  baseURL: "http://localhost:5001/api", // URL do backend (servidor local na porta 5000)
+
   // Tempo máximo de espera para uma requisição (em milissegundos)
   // Se a requisição demorar mais de 5 segundos, será cancelada automaticamente
   timeout: 5000, // 5 segundos

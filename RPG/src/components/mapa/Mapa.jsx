@@ -1,108 +1,202 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
-import { useEffect, useState } from 'react'
-import L from 'leaflet'
-import api from'../../services/api'
+import "../../css/mapa.css";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  ZoomControl,
+} from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import L from "leaflet";
+import { MAP_CONFIG, ICONS } from "./constantesMapa.js";
+import MapClickHandler from "./MapClickHandler.jsx";
+import LoadingSpinner from "./LoadingSpinner.jsx";
+import usePinosManagement from "./usePinosManagement.js";
+import {
+  handleSavePino,
+  handleDeletePino,
+  handlePinoClick,
+} from "./acoesPinos.js";
+import Sidebar from "../barra-lateral/barra-lateral.jsx";
 
-// CORREÇÃO DOS ÍCONES DO LEAFLET NO REACT
-// Remove a implementação padrão de ícones do Leaflet para evitar problemas de caminho
+// =================================================================
+// Pra evitar problemas de caminho
 delete L.Icon.Default.prototype._getIconUrl;
 
-// Configura as URLs corretas para os ícones dos marcadores
+// URLs corretas dos ícones dos pinos
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
+// =================================================================
+// Componente principal
 export default function Mapa() {
-  // ESTADO DO COMPONENTE
-  const [pinos, setPinos] = useState([]) // Array para armazenar os pinos do backend
-  const [loading, setLoading] = useState(true) // Controla o estado de carregamento
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [tempPin, setTempPin] = useState(null);
+  const [selectedPino, setSelectedPino] = useState(null);
 
-  // EFEITO PARA BUSCAR OS PINOS DO BACKEND
+  const { pinos, loading, error, fetchPinos, addPino, removePino } =
+    usePinosManagement();
+
+  // Efeito pra buscar os pinos
   useEffect(() => {
-    // Função assíncrona para buscar os pinos da API
-    const fetchPinos = async () => {
-      try {
-        console.log('🔄 Buscando pinos do backend...')
-        
-        // Faz a requisição para a API do backend
-        const response = await api.get('/pinos')
-        // Converte a resposta para JSON
-        
-        console.log('✅ Pinos carregados:', response.data)
-        // Atualiza o estado com os pinos recebidos
-        setPinos(response.data)
-        
-      } catch (err) {
-        // TRATAMENTO DE ERRO - Se a requisição falhar
-        console.error('❌ Erro ao buscar pinos:', err)
-        console.log('⚠️ Usando pinos de fallback...')
-        
-        // DADOS DE FALLBACK - Usado quando o backend não está disponível
-        setPinos([
-          {
-            id: 99,
-            coordinates: [-8.063149, -34.871139], // Coordenadas do Marco Zero no Recife
-            msg: "Marco Zero - Backend offline, usando dados locais",
-            nome: "Marco Zero (Offline)"
-          }
-        ])
-      } finally {
-        // SEMPRE executa - finaliza o estado de carregamento
-        setLoading(false)
-      }
-    }
+    fetchPinos();
+  }, [fetchPinos]);
 
-    // Chama a função para buscar os pinos
-    fetchPinos()
-  }, []) // Array de dependências vazio = executa apenas uma vez ao montar o componente
+  // Função que salva um pino e atualiza a configuração deles
+  const onSavePino = useCallback(
+    (dados) =>
+      handleSavePino({
+        dados,
+        addPino,
+        setIsSidebarOpen,
+        setTempPin,
+        setSelectedPino,
+      }),
+    [addPino]
+  );
 
-  // RENDERIZAÇÃO DO ESTADO DE CARREGAMENTO
-  if (loading) {
+  // Função que deleta um pino e remove ele da configuração atual
+  const onDeletePino = useCallback(
+    (pinoId) =>
+      handleDeletePino({
+        pinoId,
+        removePino,
+        setIsSidebarOpen,
+        setSelectedPino,
+      }),
+    [removePino]
+  );
+
+  // Função que lida com o clique em um pino
+  const onPinoClick = useCallback(
+    (pino) => handlePinoClick(pino, setSelectedPino, setIsSidebarOpen),
+    []
+  );
+
+  // Pinos válidos memoizados
+  const pinosValidos = useMemo(
+    () => pinos.filter((pino) => pino.localizacao?.coordinates?.length === 2),
+    [pinos]
+  );
+
+  // Estados de carregamento e erro
+  if (loading) return <LoadingSpinner />;
+
+  if (error && pinos.length === 0) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '18px' 
-      }}>
-        🗺️ Carregando mapa...
+      <div className="errorContainer">
+        <h3>Erro ao carregar mapa</h3>
+        <p>{error}</p>
+        <button onClick={fetchPinos} className="retryButton">
+          Tentar Novamente
+        </button>
       </div>
-    )
+    );
   }
 
-  // RENDERIZAÇÃO PRINCIPAL DO MAPA
+  // =================================================================
+  // Retorna mapa e cada pino
   return (
-    // Container principal do mapa do Leaflet
-    <MapContainer 
-      center={[-8.063, -34.871]} // Posição inicial do mapa (Recife Antigo)
-      zoom={15} // Nível de zoom inicial
-      style={{ height: '100vh', width: '100%' }} // Ocupa toda a tela
-    >
-      {/* Camada de tiles (mapa de fundo) do OpenStreetMap */}
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    <>
+      <MapContainer
+        scrollWheelZoom={false}
+        className="espacoMapa"
+        center={MAP_CONFIG.center}
+        zoom={MAP_CONFIG.zoom}
+        zoomControl={false}
+        maxBounds={MAP_CONFIG.recifeBounds}
+        maxBoundsViscosity={1.0}
+        minZoom={MAP_CONFIG.minZoom}
+        maxZoom={MAP_CONFIG.maxZoom}
+      >
+        <TileLayer url="https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token=txyn1dkLKLyeAVZpRphN9bgMLMXyX4ID2M7twL0qufk633O6XjmXLC2W54qmibZF" />
 
-      {/* RENDERIZAÇÃO DINÂMICA DOS PINOS */}
-      {pinos.map(pino => (
-        // Marcador para cada pino no mapa
-        <Marker key={pino.id} 
-        position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}>
-          {/* Popup que aparece ao clicar no marcador */}
-          <Popup>
-            <div>
-              {/* Título do pino com emoji de localização */}
-              <h3>📍 {pino.nome}</h3>
-              {/* Mensagem/descrição do pino */}
-              <p>{pino.msg}</p>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
-  )
+        <ZoomControl position="bottomleft" />
+
+        <MapClickHandler
+          setIsSidebarOpen={setIsSidebarOpen}
+          setTempPin={setTempPin}
+          setSelectedPino={setSelectedPino}
+        />
+
+        {/* Pino temporário */}
+        {tempPin && (
+          <Marker position={[tempPin.lat, tempPin.lng]} icon={ICONS.temporary}>
+            <Popup>
+              <div className="popUpNovoPonto">
+                <strong>Novo Ponto</strong>
+                Preencha as informações ao lado para salvar.
+              </div>
+            </Popup>
+          </Marker>
+        )}
+
+        {/* Pinos existentes */}
+        {pinosValidos.map((pino) => (
+          // Renderiza cada pino em sua posição junto com sua mensagem
+          <Marker
+            key={pino._id || pino.id}
+            position={[
+              pino.localizacao.coordinates[1],
+              pino.localizacao.coordinates[0],
+            ]}
+            eventHandlers={{ click: () => onPinoClick(pino) }}
+          >
+            <Popup>
+              <div className="modal">
+                <h3 className="mensagem">{pino.nome}</h3>
+
+                {/*Upload da foto*/}
+                <label htmlFor={`foto-${pino.id}`}>
+                  <img
+                    className="imagem"
+                    src="/src/assets/AdicionarFoto.png"
+                    alt="Adicionar Foto"
+                  ></img>
+                </label>
+                <input
+                  type="file"
+                  id={`foto-${pino.id}`}
+                  accept="image/*"
+                  title="Enviar Foto"
+                  className="inputFoto"
+                />
+
+                {/*Descrição da atividade e recompensa*/}
+                <p className="mensagem">{pino.msg}</p>
+                <p className="mensagem">
+                  <strong>Recompensa: xx capibas</strong>
+                </p>
+
+                {/*Botão de confirmação */}
+                <button className="botaoConfirmar">
+                  Confirme sua presença
+                </button>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => {
+          setIsSidebarOpen(false);
+          setTempPin(null);
+          setSelectedPino(null);
+        }}
+        tempPin={tempPin}
+        selectedPino={selectedPino}
+        onSave={onSavePino}
+        onDelete={onDeletePino}
+      />
+    </>
+  );
 }
