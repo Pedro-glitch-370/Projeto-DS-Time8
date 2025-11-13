@@ -92,7 +92,7 @@ export default function Sidebar({
       />
 
       <div className="buttonGroup">
-        {tempPin && (
+        {tempPin && !selectedPino && (
           <button onClick={handleSave} className="saveButton">
             Salvar Ponto
           </button>
