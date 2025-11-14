@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose")
+const Schema = mongoose.Schema
 
 // Json Schema que define a estrutura de um pino no MongoDB
 const PinoSchema = new Schema({
@@ -30,7 +30,7 @@ const PinoSchema = new Schema({
 });
 
 // Índice para buscas geográficas
-PinoSchema.index({ localizacao: "2dsphere" });
+PinoSchema.index({ localizacao: "2dsphere" })
 
 // Exporta o modelo Pino baseado no PinoSchema
-module.exports = mongoose.model("pinos", PinoSchema);
+module.exports = mongoose.model("pinos", PinoSchema)
