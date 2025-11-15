@@ -5,7 +5,6 @@ const Schema = mongoose.Schema
 const adminSchema = new Schema({
     nome: { type: String, requiered: true }, // nome do admin
     email: { type: String, requiered: true }, // email do admin
-    registroDePinos: { type: String, requiered: true }, // registro dos pinos criados pelo admin
     nivelDeAcesso: { type: Number, requiered: true, default: 1 } // admins vão ter o nivel de acesso 1 por padrão
 })
 

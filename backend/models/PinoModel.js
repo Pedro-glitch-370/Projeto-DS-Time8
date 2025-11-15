@@ -22,12 +22,14 @@ const PinoSchema = new Schema({
   // mensagem que vai ter no pino
   msg: { type: String, required: true },
 
+  capibas: { type: Number, required: true, default: 0 }, // capibas iniciais do pino
+
   // Data de criação do pino, sempre salva o a data atual
   createdAt: {
     type: Date,
     default: Date.now,
   },
-});
+})
 
 // Índice para buscas geográficas
 PinoSchema.index({ localizacao: "2dsphere" })
