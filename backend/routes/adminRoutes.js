@@ -3,72 +3,60 @@ const router = express.Router()
 const path = require("path")
 const fs = require("fs")
 const pinoController = require("../controllers/pinoController")
+const adminController = require("../controllers/adminController")
 
 // ==================================================
-// deletar o pino, mostrar a tela de deletar
-router.get("/deletar-pino", (req, res) => {
-  try {
-    const htmlPath = path.join(__dirname, "../test/deletarpinos.html")
-    const htmlContent = fs.readFileSync(htmlPath, "utf8")
-    res.send(htmlContent)
-  } catch (err) {
-    console.error("❌ Erro ao carregar Dashboard Admin:", err)
-    res.status(500).send("Erro ao carregar página do admin")
-  }
-})
-// ============================== DELETAR PINO
-router.delete("/deletar-pino/:id", pinoController.deletarPino)
+// ROTAS DOS ADMINS
+// ==================================================
+
+// Criar admin
+router.post("/criar-admin", adminController.criarAdmin)
+
+// Listar todos admins
+router.get("/admins", adminController.listarAdmins)
+
+// Deletar admin
+router.delete("/deletar-admin/:id", adminController.deletarAdmin)
 
 // ==================================================
-// 📍 CADASTRAR PINOS - Formulário
+// ROTAS DOS PINOS
+// ==================================================
+
+// Página de cadastrar pino
 router.get("/cadastrar-pino", (req, res) => {
   try {
     const htmlPath = path.join(__dirname, "../test/adicionarpinos.html")
     const htmlContent = fs.readFileSync(htmlPath, "utf8")
     res.send(htmlContent)
   } catch (err) {
-    console.error("❌ Erro ao carregar HTML de cadastro:", err)
-    res.status(500).send("Erro ao carregar página de cadastro")
+    console.error("❌ Erro ao carregar cadastro:", err)
+    res.status(500).send("Erro ao carregar página")
   }
 })
 
-// ==================================================
-// 📍 CADASTRAR PINOS - Processar formulário
+// Processar cadastro de pino
 router.post("/cadastrar-pino", pinoController.criarPino)
 
-// ==================================================
-// VER MAPA
-router.get("/mapa", (req, res) => {
-  try {
-    const htmlPath = path.join(__dirname, "../test/adicionarpinos.html")
-    const htmlContent = fs.readFileSync(htmlPath, "utf8")
-    res.send(htmlContent)
-  } catch (err) {
-    console.error("❌ Erro ao carregar Mapa Admin:", err)
-    res.status(500).send("Erro ao carregar mapa")
-  }
-})
-
-// ==================================================
-// 🔍 API - Buscar todos os pinos
+// API - Buscar todos os pinos
 router.get("/pinos", pinoController.getTodosPinos)
 
-// ==================================================
-// ✏️ EDITAR PINO - Formulário
+// Página de editar pino
 router.get("/editar-pino/:id", (req, res) => {
   try {
     const htmlPath = path.join(__dirname, "../test/atualizarpinos.html")
     const htmlContent = fs.readFileSync(htmlPath, "utf8")
     res.send(htmlContent)
   } catch (err) {
-    console.error("❌ Erro ao carregar Editar Pino:", err)
-    res.status(500).send("Erro ao carregar página de edição")
+    console.error("❌ Erro ao carregar edição:", err)
+    res.status(500).send("Erro ao carregar página")
   }
 })
 
-// ==================================================
-// ✏️ EDITAR PINO - Processar atualização
+// Processar edição de pino
 router.put("/editar-pino/:id", pinoController.atualizarPino)
+
+// Processar deleção de pino
+router.delete("/deletar-pino/:id", pinoController.deletarPino)
 
 // ==================================================
 module.exports = router

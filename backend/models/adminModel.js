@@ -1,12 +1,25 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
-// esquema dos admins
 const adminSchema = new Schema({
-    nome: { type: String, requiered: true }, // nome do admin
-    email: { type: String, requiered: true }, // email do admin
-    registroDePinos: { type: String, requiered: true }, // registro dos pinos criados pelo admin
-    nivelDeAcesso: { type: Number, requiered: true, default: 1 } // admins vão ter o nivel de acesso 1 por padrão
+    nome: { 
+        type: String, 
+        required: true // ✅ CORRETO
+    },
+    email: { 
+        type: String, 
+        required: true, 
+        unique: true 
+    },
+    registroDePinos: { 
+        type: Number, 
+        default: 0
+    },
+    nivelDeAcesso: { 
+        type: Number, 
+        required: true, 
+        default: 1 
+    }
 })
 
 module.exports = mongoose.model("admin", adminSchema)
