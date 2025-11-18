@@ -8,6 +8,7 @@ export default function Sidebar({
   selectedPino,
   onSave,
   onDelete,
+  onUpdate
 }) {
   const [nome, setNome] = useState("");
   const [msg, setMsg] = useState("");
@@ -36,9 +37,7 @@ export default function Sidebar({
         msg: msg,
         coordinates: [tempPin.lng, tempPin.lat],
       });
-    } else if (selectedPino) {
-      // TODO: Implementar edição de pino existente
-      alert("Edição de pino ainda não implementada");
+
     }
   };
 
@@ -46,6 +45,35 @@ export default function Sidebar({
     if (selectedPino) {
       const pinoId = selectedPino._id || selectedPino.id;
       onDelete(pinoId);
+    }
+  };
+
+  const handleUpdate = () => {
+    if (!nome || !msg) {
+        alert("Preencha o nome e a mensagem para atualizar.");
+        return;
+    }
+
+    if (selectedPino) {
+        // Monta o objeto de pino atualizado.
+        // É essencial incluir o ID do pino para que o backend saiba qual atualizar.
+        const updatedPinoData = {
+            // Preserva o ID (usa _id ou id, dependendo do seu backend)
+            id: selectedPino._id || selectedPino.id, 
+            
+            // Novos valores do estado local
+            nome: nome,
+            msg: msg,
+            
+            // Preserva as coordenadas para o backend (se necessário)
+            coordinates: selectedPino.localizacao?.coordinates || null, 
+        };
+
+        // Chama a prop onUptade que será implementada no componente pai
+        onUptade(updatedPinoData); 
+        
+        // Opcional: Fechar a barra lateral após a atualização
+        // onClose(); 
     }
   };
 
@@ -89,12 +117,18 @@ export default function Sidebar({
         onChange={(e) => setMsg(e.target.value)}
         className="input"
         disabled={!!selectedPino} // Desabilita edição por enquanto
-      />
+      /> 
 
       <div className="buttonGroup">
         {tempPin && !selectedPino && (
           <button onClick={handleSave} className="saveButton">
             Salvar Ponto
+          </button>
+        )}
+
+        {selectedPino && (
+          <button onClick={handleUpdate} className="updateButton">
+            Atualizar Ponto
           </button>
         )}
 

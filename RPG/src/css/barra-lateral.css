@@ -67,6 +67,21 @@
   transform: scale(1.03);
 }
 
+.updateButton {
+  padding: 10px;
+  background-color: #ff7300;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.updateButton:hover {
+  background-color: #ff7300;
+  transform: scale(1.03);
+}
+
 .deleteButton {
   padding: 10px;
   background-color: #be0000;
