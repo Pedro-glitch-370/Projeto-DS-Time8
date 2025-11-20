@@ -4,35 +4,50 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recife Point Game</title>
-    <link
-      rel="stylesheet"
-      href="/src/components/barra-superior/barra-superior.css"
-    />
+    <style>
+      /* Reset para evitar barras brancas */
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+      #root {
+        height: 100vh;
+      }
+      
+      /* Loading inicial */
+      #loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+        background: #1449c0;
+        color: white;
+      }
+    </style>
   </head>
 
   <body>
-    <div id="root"></div>
-    <nav class="barra-superior">
-      <div class="esquerda">
-        <img src="/src/assets/LogoConecta.png" alt="Logo" class="logo-img" />
+    <div id="root">
+      <div id="loading">
+        <p>Carregando Recife Point Game...</p>
       </div>
-      <div class="meio">
-        <a href="index.html">Mapa</a>
-        <a href="tarefa.html">Minhas Tarefas</a>
-        <a href="saldo.html">Capibas</a>
-      </div>
-      <div class="direita">
-        <a href="#login" id="login">Entrar</a>
-        <div class="opcoes" id="opcoes">
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      </div>
-    </nav>
-
-    <div class="w-100 h-100" id="map"></div>
+    </div>
 
     <script type="module" src="/src/main.jsx"></script>
+    
+    <script>
+      // Remove o loading quando o React carregar
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          const loading = document.getElementById('loading');
+          if (loading) {
+            loading.style.display = 'none';
+          }
+        }, 1000);
+      });
+    </script>
   </body>
 </html>

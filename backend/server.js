@@ -8,6 +8,7 @@ const { connectDB, disconnectDB, getDBStatus } = require("./config/db") // Impor
 const pinoRoutes = require("./routes/pinosRoutes") 
 const clienteRoutes = require("./routes/ClienteRoutes")
 const adminRoutes = require("./routes/adminRoutes")
+const authRoutes = require("./routes/authRoutes")
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -37,6 +38,7 @@ app.use(express.json()) // Middleware para interpretar dados JSON no corpo das r
 app.use("/api/pinos", pinoRoutes)
 app.use("/api/clientes", clienteRoutes)
 app.use("/api/admins", adminRoutes)
+app.use("/api/auth", authRoutes)
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================

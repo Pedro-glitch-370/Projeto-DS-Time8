@@ -82,3 +82,27 @@
   flex-direction: column;
   align-items: center;
 }
+
+/* Ajustes para barra superior fixa */
+.mapa-container {
+  height: 100vh;
+  width: 100%;
+}
+
+
+/* Garantir que o mapa fique abaixo da barra fixa */
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Loading e error containers ajustados */
+.loading-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}

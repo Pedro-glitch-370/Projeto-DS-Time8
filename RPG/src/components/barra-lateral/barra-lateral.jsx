@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "../../css/barra-lateral.css";
+import "./barra-lateral.css";
 
 export default function Sidebar({
   isOpen,
@@ -92,7 +92,7 @@ export default function Sidebar({
       />
 
       <div className="buttonGroup">
-        {tempPin && (
+        {tempPin && !selectedPino && (
           <button onClick={handleSave} className="saveButton">
             Salvar Ponto
           </button>

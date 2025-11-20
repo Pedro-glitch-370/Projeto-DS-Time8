@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar - Recife Point Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo img {
+            max-width: 150px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5a6fd8;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+            background: #f8d7da;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            color: #155724;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+            background: #d4edda;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+            color: #667eea;
+        }
+
+        .user-type {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-type label {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .user-type input[type="radio"] {
+            display: none;
+        }
+
+        .user-type input[type="radio"]:checked + span {
+            background: #667eea;
+            color: white;
+        }
+
+        .user-type span {
+            display: block;
+            padding: 0.5rem;
+            border-radius: 3px;
+        }
+
+        .login-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .login-link:hover {
+            text-decoration: underline;
+        }
+
+        .back-to-map {
+            display: block;
+            text-align: center;
+            margin-top: 0.5rem;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .back-to-map:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <img src="/src/assets/LogoConecta.png" alt="Recife Point Game">
+        </div>
+        
+        <h2 style="text-align: center; margin-bottom: 1.5rem; color: #333;">Criar Conta</h2>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="nome">Nome *</label>
+                <input type="text" id="nome" name="nome" placeholder="Seu nome completo" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Tipo de usuário *</label>
+                <div class="user-type">
+                    <label>
+                        <input type="radio" name="tipo" value="cliente" checked>
+                        <span>Cliente</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="tipo" value="admin">
+                        <span>Admin</span>
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit">Registrar</button>
+        </form>
+
+        <a href="login.html" class="login-link">Já tem uma conta? Faça login</a>
+        <a href="index.html" class="back-to-map">← Voltar ao Mapa</a>
+        
+        <div class="error" id="errorMessage"></div>
+        <div class="success" id="successMessage"></div>
+        <div class="loading" id="loading">Registrando...</div>
+    </div>
+
+<script>
+    console.log("🔍 DEBUG: register.html carregado");
+
+    // Registro - APENAS cria a conta, NÃO faz login automático
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        console.log("🔍 DEBUG: Formulário submetido");
+        e.preventDefault();
+        
+        const nome = document.getElementById('nome').value;
+        const email = document.getElementById('email').value;
+        const tipo = document.querySelector('input[name="tipo"]:checked').value;
+        
+        console.log("🔍 DEBUG: Dados do formulário:", { nome, email, tipo });
+        
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const loading = document.getElementById('loading');
+        
+        // Validar campos obrigatórios
+        if (!nome || !email) {
+            errorMessage.textContent = 'Nome e email são obrigatórios';
+            errorMessage.style.display = 'block';
+            return;
+        }
+        
+        loading.style.display = 'block';
+        errorMessage.style.display = 'none';
+        successMessage.style.display = 'none';
+        
+        try {
+            console.log("🔍 DEBUG: Fazendo requisição para /api/auth/register");
+            
+            const response = await fetch('http://localhost:5001/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    nome,
+                    email,
+                    tipo
+                })
+            });
+            
+            console.log("🔍 DEBUG: Status da resposta:", response.status);
+            console.log("🔍 DEBUG: Headers:", response.headers);
+            
+            // Tenta ler a resposta como texto primeiro para debug
+            const responseText = await response.text();
+            console.log("🔍 DEBUG: Resposta completa:", responseText);
+            
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error("❌ Não é JSON válido:", responseText.substring(0, 200));
+                throw new Error('Servidor retornou resposta inválida. A rota /api/auth/register existe?');
+            }
+            
+            if (response.ok) {
+                console.log("🔍 DEBUG: Registro bem-sucedido");
+                successMessage.textContent = 'Registro realizado com sucesso! Redirecionando para login...';
+                successMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            } else {
+                console.log("🔍 DEBUG: Erro na resposta:", data.message);
+                throw new Error(data.message || 'Erro no registro');
+            }
+            
+        } catch (error) {
+            console.error('❌ ERRO no registro:', error);
+            errorMessage.textContent = error.message + ' - Verifique se o servidor está rodando na porta 5001';
+            errorMessage.style.display = 'block';
+        } finally {
+            loading.style.display = 'none';
+        }
+    });
+
+    // Teste a conexão com a API quando a página carregar
+    window.addEventListener('load', async () => {
+        try {
+            console.log("🔍 DEBUG: Testando conexão com a API...");
+            const response = await fetch('http://localhost:5001/api/pinos');
+            if (response.ok) {
+                console.log("✅ API está respondendo");
+            } else {
+                console.error("❌ API não está respondendo corretamente");
+            }
+        } catch (error) {
+            console.error("❌ Não foi possível conectar com a API:", error);
+        }
+    });
+</script>
+</body>
+</html>
