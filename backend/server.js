@@ -6,9 +6,8 @@ const { connectDB, disconnectDB, getDBStatus } = require("./config/db") // Impor
 
 // Importa as rotas
 const pinoRoutes = require("./routes/pinosRoutes") 
-const clienteRoutes = require("./routes/ClienteRoutes")
-const adminRoutes = require("./routes/adminRoutes")
-const authRoutes = require("./routes/authRoutes")
+const clienteAuthRoutes = require("./routes/clienteAuthRoutes.js")
+const adminAuthRoutes = require("./routes/adminAuthRoutes.js")
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -36,9 +35,8 @@ app.use(express.json()) // Middleware para interpretar dados JSON no corpo das r
 // ==================================================
 // Rotas da API
 app.use("/api/pinos", pinoRoutes)
-app.use("/api/clientes", clienteRoutes)
-app.use("/api/admins", adminRoutes)
-app.use("/api/auth", authRoutes)
+app.use("/api/auth/clientes", clienteAuthRoutes)
+app.use("/api/auth/admins", adminAuthRoutes)
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================

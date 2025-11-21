@@ -85,12 +85,17 @@
             text-align: center;
             margin-top: 1rem;
             display: none;
+            background: #f8d7da;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
         }
 
         .loading {
             display: none;
             text-align: center;
             margin-top: 1rem;
+            color: #667eea;
         }
 
         .register-link {
@@ -143,49 +148,87 @@
     </div>
 
     <script>
-        // Login - apenas com email
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // Elementos da UI
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const loading = document.getElementById('loading');
+
+    // Configuração da API
+    const API_BASE_URL = 'http://localhost:5001/api';
+
+    // Função para verificar se o servidor está online
+    async function checkServerStatus() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/pinos`);
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    // Login - apenas com email
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        
+        // Validação básica
+        if (!email) {
+            showError('Por favor, informe seu email');
+            return;
+        }
+
+        // Mostrar loading
+        loading.style.display = 'block';
+        errorMessage.style.display = 'none';
+
+        try {
+            // Tenta primeiro como admin, depois como cliente
+            let response = await fetch(`${API_BASE_URL}/auth/admins/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email })
+            });
             
-            const email = document.getElementById('email').value;
-            const errorMessage = document.getElementById('errorMessage');
-            const loading = document.getElementById('loading');
-            
-            if (!email) {
-                errorMessage.textContent = 'Email é obrigatório';
-                errorMessage.style.display = 'block';
-                return;
-            }
-            
-            loading.style.display = 'block';
-            errorMessage.style.display = 'none';
-            
-            try {
-                const response = await fetch('http://localhost:5001/api/auth/login', {
+            if (response.status === 404 || !response.ok) {
+                // Se não for admin, tenta como cliente
+                response = await fetch(`${API_BASE_URL}/auth/clientes/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ email })
                 });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = 'index.html';
-                } else {
-                    throw new Error(data.message || 'Erro no login');
-                }
-                
-            } catch (error) {
-                console.error('Erro no login:', error);
-                errorMessage.textContent = error.message;
-                errorMessage.style.display = 'block';
-            } finally {
-                loading.style.display = 'none';
             }
-        });
-    </script>
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Login bem-sucedido
+                localStorage.setItem('user', JSON.stringify(data.user || data));
+                window.location.href = 'index.html';
+            } else {
+                throw new Error(data.message || 'Email não encontrado');
+            }
+            
+        } catch (error) {
+            console.error('Erro no login:', error);
+            if (error.message.includes('Failed to fetch')) {
+                showError('Servidor offline. Verifique se o backend está rodando na porta 5001.');
+            } else {
+                showError(error.message || 'Erro ao fazer login. Tente novamente.');
+            }
+        } finally {
+            loading.style.display = 'none';
+        }
+    });
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+    }
+</script>
 </body>
 </html>

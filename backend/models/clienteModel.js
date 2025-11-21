@@ -7,7 +7,8 @@ const clienteSchema = new Schema({
     email: { type: String, requiered: true }, // email do cliente
     tipo: { type: String, enum: ['cliente', 'admin'], required: true },
     capibas: { type:Number, requiered: true, default: 0 }, // cliente sempre começa com 0 capibas
-    nivelDeAcesso: { type: Number, requiered: true, default: 0 } // usuarios vão ter o nivel de acesso 0 por padrão
+    tarefasCompletas: { type: Number, default: 0 },
+    ultimaAtividade: { type: Date, default: Date.now }
 }, {
     timestamps: true
 })
