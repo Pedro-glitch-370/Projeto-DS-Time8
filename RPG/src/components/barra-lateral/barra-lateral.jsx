@@ -25,20 +25,35 @@ export default function Sidebar({
   }, [selectedPino]);
 
   const handleSave = () => {
-    if (!nome || !msg) {
-      alert("Preencha o nome e a mensagem.");
-      return;
-    }
+  if (!nome || !msg) {
+    alert("Preencha o nome e a mensagem.");
+    return;
+  }
 
-    if (tempPin) {
-      // Salvando novo pino
-      onSave({
-        nome: nome,
-        msg: msg,
-        coordinates: [tempPin.lng, tempPin.lat],
-      });
-    }
-  };
+  if (tempPin) {
+    console.log('🔍 SIDEBAR - Dados antes de enviar:');
+    console.log('📍 tempPin:', tempPin);
+    console.log('📍 tempPin.lat:', tempPin.lat);
+    console.log('📍 tempPin.lng:', tempPin.lng);
+    console.log('📍 São números?', typeof tempPin.lat, typeof tempPin.lng);
+
+    // CORREÇÃO: Garantir que as coordenadas são um array
+    const coordinates = [
+      Number(tempPin.lng), // longitude
+      Number(tempPin.lat)  // latitude
+    ];
+
+    console.log('📍 coordinates criado:', coordinates);
+    console.log('📍 É array válido?', Array.isArray(coordinates) && coordinates.length === 2);
+
+    // Salvando novo pino
+    onSave({
+      nome: nome,
+      msg: msg,
+      coordinates: coordinates // DEVE SER [longitude, latitude]
+    });
+  }
+};
 
   const handleUpdate = () => {
   if (!nome || !msg) {

@@ -1,4 +1,4 @@
-const Pino = require("../models/PinoModel") // Importa o Model (Schema) do Pino para interagir com o MongoDB
+const Pino = require("../models/pinoModel") // Importa o Model (Schema) do Pino para interagir com o MongoDB
 
 // ==================================================
 /**
@@ -11,50 +11,86 @@ const Pino = require("../models/PinoModel") // Importa o Model (Schema) do Pino 
 
 const criarPino = async (req, res) => {
   try {
-    // Extrai os campos do corpo da requisição
-    const { nome, latitude, longitude, msg } = req.body
+    console.log('🔍 BACKEND - Dados recebidos no criarPino:');
+    console.log('📦 req.body completo:', req.body);
+    console.log('📍 Tem localizacao?', !!req.body.localizacao);
+    console.log('📍 localizacao:', req.body.localizacao);
+    console.log('📍 Tem coordinates?', !!req.body.localizacao?.coordinates);
+    console.log('📍 coordinates:', req.body.localizacao?.coordinates);
+    console.log('📍 Tipo de coordinates:', typeof req.body.localizacao?.coordinates);
+    console.log('📍 É array?', Array.isArray(req.body.localizacao?.coordinates));
 
-    // Validação dos dados de entrada
-    const lng = parseFloat(longitude)
-    const lat = parseFloat(latitude)
+    // CORREÇÃO: Aceitar tanto o formato com localizacao quanto formato direto
+    let coordinates;
 
-    // Verifica se as coordenadas são números válidos após a conversão
-    if (isNaN(lng) || isNaN(lat)) {
-      // Retorna um erro 400 (Bad Request) se a validação falhar
-      return res
-        .status(400)
-        .send("Erro: Latitude e Longitude devem ser números válidos.")
+    if (req.body.localizacao && req.body.localizacao.coordinates) {
+      // Formato: { localizacao: { coordinates: [lng, lat] } }
+      coordinates = req.body.localizacao.coordinates;
+      console.log('📍 Usando formato localizacao.coordinates');
+    } else if (req.body.coordinates) {
+      // Formato alternativo: { coordinates: [lng, lat] }
+      coordinates = req.body.coordinates;
+      console.log('📍 Usando formato direto coordinates');
+    } else {
+      console.log('❌ Nenhum formato de coordenadas encontrado');
+      return res.status(400).json({
+        message: "Formato de localização inválido. Use { localizacao: { coordinates: [lng, lat] } } ou { coordinates: [lng, lat] }"
+      });
     }
 
-    console.log("Dados recebidos no Controller:", {
-      nome,
-      latitude,
-      longitude,
-      msg,
-    })
+    console.log('📍 Coordenadas extraídas:', coordinates);
 
-    // Interação com o Model (cria uma nova instância do pino)
+    // Validação dos dados de entrada
+    if (!req.body.nome || !req.body.msg) {
+      return res.status(400).json({
+        message: "Nome e mensagem são obrigatórios"
+      });
+    }
+
+    if (!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2) {
+      return res.status(400).json({
+        message: "Coordenadas devem ser um array com 2 elementos [longitude, latitude]"
+      });
+    }
+
+    const [longitude, latitude] = coordinates;
+
+    // Verifica se as coordenadas são números válidos
+    const lng = parseFloat(longitude);
+    const lat = parseFloat(latitude);
+
+    if (isNaN(lng) || isNaN(lat)) {
+      return res.status(400).json({
+        message: "Longitude e Latitude devem ser números válidos."
+      });
+    }
+
+    console.log("📍 Coordenadas processadas:", { longitude: lng, latitude: lat });
+
+    // Cria o pino com o formato correto do Schema
     const novoPino = new Pino({
-      nome: nome,
-      // O Mongoose espera as coordenadas no formato GeoJSON [longitude, latitude]
+      nome: req.body.nome,
+      msg: req.body.msg,
+      capibas: Number(req.body.capibas) || 0,
       localizacao: {
         type: "Point",
-        coordinates: [lng, lat],
-      },
-      msg: msg,
-    })
+        coordinates: [lng, lat] // [longitude, latitude] - FORMATO CORRETO
+      }
+    });
 
-    // Salva o novo pino no banco de dados, retornando o objeto salvo
-    const pinoSalvo = await novoPino.save()
-    console.log("✅ Pino salvo no banco de dados:", pinoSalvo._id)
+    const pinoSalvo = await novoPino.save();
+    console.log("✅ Pino salvo no banco de dados:", pinoSalvo._id);
 
-    // Resposta pro cliente
-    // Redireciona o usuário de volta com um parâmetro de sucesso
-    res.redirect("/api/pinos/adicionar?success=true")
+    res.status(201).json({
+      message: "Pino criado com sucesso",
+      pino: pinoSalvo
+    });
+
   } catch (err) {
-    // Manipulação de erros e resposta 500 (Internal Server Error)
-    console.error("❌ Erro ao salvar pino no Controller:", err)
-    res.status(500).send("Erro ao salvar pino: " + err.message)
+    console.error("❌ Erro ao salvar pino no Controller:", err);
+    res.status(500).json({
+      message: "Erro ao salvar pino: " + err.message
+    });
   }
 }
 
@@ -128,18 +164,7 @@ const atualizarPino = async (req, res) => {
     const { nome, msg, localizacao } = req.body;
 
     console.log("✏️ Recebendo atualização para pino ID:", id);
-    console.log("📝 Dados recebidos no backend:", { nome, msg, localizacao });
-    
-    // DEBUG DETALHADO
-    console.log("📍 Coordenadas recebidas:", localizacao?.coordinates);
-    console.log("📍 São números válidos?", 
-      !isNaN(localizacao?.coordinates?.[0]), 
-      !isNaN(localizacao?.coordinates?.[1])
-    );
-    console.log("📍 Valores exatos:", 
-      localizacao?.coordinates?.[0], 
-      localizacao?.coordinates?.[1]
-    );
+    console.log("📝 Dados recebidos:", { nome, msg, localizacao });
 
     // Validações básicas
     if (!nome || !msg || !localizacao) {
@@ -148,26 +173,26 @@ const atualizarPino = async (req, res) => {
       });
     }
 
-    // Verifica se as coordenadas existem e são válidas
     if (!localizacao.coordinates || !Array.isArray(localizacao.coordinates)) {
-      console.log("❌ Coordenadas não são um array:", localizacao.coordinates);
       return res.status(400).json({ 
         message: "Formato de coordenadas inválido" 
       });
     }
 
-    const [lng, lat] = localizacao.coordinates;
+    const [longitude, latitude] = localizacao.coordinates;
     
     // Verifica se são números válidos
-    if (typeof lng !== 'number' || typeof lat !== 'number' || isNaN(lng) || isNaN(lat)) {
+    const lng = parseFloat(longitude);
+    const lat = parseFloat(latitude);
+    
+    if (isNaN(lng) || isNaN(lat)) {
       console.log("❌ Coordenadas inválidas - lng:", lng, "lat:", lat);
-      console.log("❌ Tipos - lng:", typeof lng, "lat:", typeof lat);
       return res.status(400).json({ 
-        message: "Latitude e Longitude devem ser números válidos." 
+        message: "Longitude e Latitude devem ser números válidos." 
       });
     }
 
-    console.log("✅ Coordenadas válidas:", lng, lat);
+    console.log("✅ Coordenadas válidas:", { longitude: lng, latitude: lat });
 
     // Verificar se o pino existe
     const pinoExistente = await Pino.findById(id);
@@ -175,7 +200,7 @@ const atualizarPino = async (req, res) => {
       return res.status(404).json({ message: "Pino não encontrado" });
     }
 
-    // Atualizar o pino
+    // Atualizar o pino - FORMATO CORRETO
     const pinoAtualizado = await Pino.findByIdAndUpdate(
       id,
       {
@@ -183,7 +208,7 @@ const atualizarPino = async (req, res) => {
         msg,
         localizacao: {
           type: "Point",
-          coordinates: [lng, lat]
+          coordinates: [lng, lat] // [longitude, latitude] - FORMATO CORRETO
         }
       },
       { new: true, runValidators: true }
@@ -197,7 +222,6 @@ const atualizarPino = async (req, res) => {
     console.error("❌ Erro ao atualizar pino:", error);
     
     if (error.name === 'ValidationError') {
-      console.error("❌ Erro de validação do Mongoose:", error.errors);
       return res.status(400).json({ 
         message: "Dados inválidos",
         errors: error.errors 
@@ -205,7 +229,6 @@ const atualizarPino = async (req, res) => {
     }
     
     if (error.name === 'CastError') {
-      console.error("❌ Erro de cast (ID inválido):", error);
       return res.status(400).json({ 
         message: "ID do pino inválido" 
       });
