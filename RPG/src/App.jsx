@@ -1,5 +1,5 @@
 import Mapa from './components/mapa/Mapa.jsx'
-import './App.css'
+import './css/App.css'
 
 export default function App() {
   
