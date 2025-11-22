@@ -289,8 +289,9 @@ export default function Sidebar({
 
   return (
     <div className="sidebar">
-      <SidebarHeader selectedPino={selectedPino} onClose={onClose} />
-      
+    <SidebarHeader selectedPino={selectedPino} onClose={onClose} />
+    
+    <div className="sidebar-content">
       <CoordinatesInfo tempPin={tempPin} selectedPino={selectedPino} />
 
       <InputField
@@ -318,17 +319,18 @@ export default function Sidebar({
         <small>💡 Digite a quantidade de capibas que os usuários receberão ao completar esta atividade</small>
       </div>
 
-      <ActionButtons
-        mode={currentMode}
-        onSave={handleSave}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
-        onCancel={handleCancel}
-      />
-
       <PinoInfo selectedPino={selectedPino} />
 
       <DebugInfo selectedPino={selectedPino} />
     </div>
+
+    <ActionButtons
+      mode={currentMode}
+      onSave={handleSave}
+      onUpdate={handleUpdate}
+      onDelete={handleDelete}
+      onCancel={handleCancel}
+    />
+  </div>
   );
 }

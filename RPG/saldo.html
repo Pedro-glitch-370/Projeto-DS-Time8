@@ -3,50 +3,114 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Saldos</title>
-    <link rel="stylesheet" href="src/css/saldo.css" />
+    <title>Saldo</title>
+    <link rel="stylesheet" href="/src/css/saldo.css" />
+    <link rel="stylesheet" href="/src/components/barra-superior/barra-superior.css" />
   </head>
   <body>
-    <div id="barra-navegacao"></div>
-
-    <div id ="saldo">
-        <div class="carrossel-container">
-            <div class="carrossel">
-                <div class="pessoa">
-                <p class="nome"></p>
-                <p class="saldo"></p>
-                </div>
-                <div class="pessoa">
-                <p class="nome"></p>
-                <p class="saldo"></p>
-                </div>
-                <div class="pessoa">
-                <p class="nome"></p>
-                <p class="saldo"></p>
-                </div>
-                <div class="pessoa">
-                <p class="nome"></p>
-                <p class="saldo"></p>
-                </div>
-            </div>
-            <button class="prev" onclick="mudarSlide(-1)">&#10094;</button>
-            <button class="next" onclick="mudarSlide(1)">&#10095;</button>
+    <!-- Navbar -->
+    <nav class="barra-superior">
+      <div class="esquerda">
+        <img 
+          src="/src/assets/LogoConecta.png" 
+          alt="Logo" 
+          class="logo-img"
+          onclick="window.location.href = 'index.html'"
+          style="cursor: pointer"
+        />
+      </div>
+      <div class="meio">
+        <a href="index.html">Mapa</a>
+        <a href="tarefa.html">Minhas Tarefas</a>
+        <a href="saldo.html" class="ativo">Capibas</a>
+      </div>
+      <div class="direita">
+        <a 
+          href="login.html"
+          id="login"
+        >
+          Entrar
+        </a>
+        <div class="opcoes" id="opcoes">
+          <div></div>
+          <div></div>
+          <div></div>
         </div>
+      </div>
+    </nav>
+
+    <div id="saldo">
+      <div class="saldo-container">
+        <h1>🏆 Ranking de Capibas</h1>
+        
+        <div class="carrossel-container">
+          <div class="carrossel">
+            <div class="pessoa">
+              <p class="nome">Maria Silva</p>
+              <p class="saldo">🎯 1º Lugar</p>
+              <p class="pontos">250 capibas</p>
+            </div>
+            <div class="pessoa">
+              <p class="nome">João Santos</p>
+              <p class="saldo">🥈 2º Lugar</p>
+              <p class="pontos">180 capibas</p>
+            </div>
+            <div class="pessoa">
+              <p class="nome">Ana Oliveira</p>
+              <p class="saldo">🥉 3º Lugar</p>
+              <p class="pontos">150 capibas</p>
+            </div>
+            <div class="pessoa">
+              <p class="nome">Pedro Costa</p>
+              <p class="saldo">4º Lugar</p>
+              <p class="pontos">120 capibas</p>
+            </div>
+          </div>
+          <button class="prev" onclick="mudarSlide(-1)">&#10094;</button>
+          <button class="next" onclick="mudarSlide(1)">&#10095;</button>
+        </div>
+
+        <div class="meu-saldo">
+          <h2>Meu Saldo</h2>
+          <div class="saldo-pessoal">
+            <span class="valor">75 capibas</span>
+            <span class="posicao">🎮 5º Lugar</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div id="painel_saldo"></div>
-
     <script>
-      fetch('/index.html')
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById('barra-navegacao').innerHTML = html;
+      // Lógica do carrossel
+      let slideIndex = 0;
+      
+      function mudarSlide(n) {
+        const slides = document.querySelectorAll('.pessoa');
+        slideIndex += n;
+        
+        if (slideIndex >= slides.length) slideIndex = 0;
+        if (slideIndex < 0) slideIndex = slides.length - 1;
+        
+        const carrossel = document.querySelector('.carrossel');
+        carrossel.style.transform = `translateX(-${slideIndex * 100}%)`;
+      }
 
-          let link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = '/src/components/barra-superior/barra-superior.css';
-          document.head.appendChild(link);
-        })
+      // Destacar link ativo na navbar
+      document.addEventListener('DOMContentLoaded', function() {
+        const currentPage = window.location.pathname.split('/').pop();
+        const links = document.querySelectorAll('.meio a');
+        
+        links.forEach(link => {
+          if (link.getAttribute('href') === currentPage) {
+            link.classList.add('ativo');
+          }
+        });
+      });
+
+      // Auto-rotate do carrossel
+      setInterval(() => {
+        mudarSlide(1);
+      }, 5000);
     </script>
   </body>
 </html>

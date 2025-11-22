@@ -1,9 +1,134 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  font-weight: 400;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding-top: 70px;
+}
+
+.saldo-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.saldo-container h1 {
+  color: white;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.carrossel-container {
+  position: relative;
+  max-width: 400px;
+  margin: 30px auto;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  background: white;
+}
+
+.carrossel {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.pessoa {
+  min-width: 100%;
+  padding: 40px 30px;
+  text-align: center;
+  background: white;
+}
+
+.pessoa .nome {
+  font-size: 1.5rem;
+  color: #1449c0;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.pessoa .saldo {
+  font-size: 1.1rem;
+  color: #ff6b35;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.pessoa .pontos {
+  font-size: 2rem;
+  color: #2f7854;
+  font-weight: bold;
+}
+
+.prev, .next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1449c0;
+  color: white;
+  border: none;
+  padding: 15px;
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 20px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.prev { left: 10px; }
+.next { right: 10px; }
+
+.prev:hover, .next:hover {
+  background: #0d3a9c;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.meu-saldo {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin-top: 30px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.meu-saldo h2 {
+  color: #1449c0;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.saldo-pessoal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.valor {
+  font-size: 2rem;
+  color: #2f7854;
+  font-weight: bold;
+}
+
+.posicao {
+  font-size: 1.2rem;
+  color: #ff6b35;
+  font-weight: bold;
+}
+
+/* Link ativo na navbar */
+.barra-superior .meio a.ativo {
+  color: #ffd700;
+  font-weight: bold;
+  border-bottom: 2px solid #ffd700;
 }

@@ -1,9 +1,94 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  font-weight: 400;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding-top: 70px;
+}
+
+/* Container principal */
+.tarefas-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.tarefas-container h1 {
+  color: white;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Lista de tarefas */
+.lista-tarefas {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Item individual de tarefa */
+.tarefa-item {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  border-left: 6px solid #1449c0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tarefa-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+}
+
+.tarefa-item h3 {
+  color: #1449c0;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+}
+
+.tarefa-item p {
+  color: #666;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.recompensa {
+  color: #2f7854 !important;
+  font-size: 1.1rem;
+  margin-top: 15px !important;
+}
+
+.btn-confirmar {
+  background: linear-gradient(135deg, #2f7854 0%, #256745 100%);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.btn-confirmar:hover {
+  background: linear-gradient(135deg, #256745 0%, #1e5634 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Link ativo na navbar */
+.barra-superior .meio a.ativo {
+  color: #ffd700;
+  font-weight: bold;
+  border-bottom: 2px solid #ffd700;
 }
