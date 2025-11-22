@@ -39,7 +39,7 @@ export default function Mapa() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  const { pinos, loading, error, fetchPinos, addPino, removePino } =
+  const { pinos, loading, error, fetchPinos, addPino, removePino, updatePino } =
     usePinosManagement();
 
   // Efeito pra verificar autenticação
@@ -76,6 +76,18 @@ export default function Mapa() {
     [addPino]
   );
 
+  // Função que atualiza um pino existente
+  const onUpdatePino = useCallback(
+    (dados) => {
+      if (selectedPino && selectedPino._id) {
+        updatePino(selectedPino._id, dados);
+        setIsSidebarOpen(false);
+        setSelectedPino(null);
+      }
+    },
+    [selectedPino, updatePino]
+  );
+
   // Função que deleta um pino e remove ele da configuração atual
   const onDeletePino = useCallback(
     (pinoId) =>
@@ -90,8 +102,16 @@ export default function Mapa() {
 
   // Função que lida com o clique em um pino
   const onPinoClick = useCallback(
-    (pino) => handlePinoClick(pino, setSelectedPino, setIsSidebarOpen),
-    []
+    (pino) => {
+      // Se for admin, abre a sidebar em modo edição
+      if (isAdmin) {
+        setSelectedPino(pino);
+        setIsSidebarOpen(true);
+        setTempPin(null);
+      }
+      // Se não for admin, só mostra o popup normal
+    },
+    [isAdmin]
   );
 
   // Pinos válidos memoizados
@@ -257,24 +277,18 @@ export default function Mapa() {
                     Confirme sua presença
                   </button>
 
-                  {/* Botão de edição - APENAS para admins logados */}
+                  {/* Aviso para admin - apenas informativo */}
                   {isAdmin && (
-                    <button 
-                      className="botaoEditar"
-                      onClick={() => onPinoClick(pino)}
-                      style={{
-                        background: '#ffc107',
-                        color: 'black',
-                        border: 'none',
-                        padding: '0.5rem',
-                        borderRadius: '5px',
-                        marginTop: '0.5rem',
-                        cursor: 'pointer',
-                        width: '100%'
-                      }}
-                    >
-                      ✏️ Editar Pino
-                    </button>
+                    <div style={{ 
+                      marginTop: '0.5rem', 
+                      padding: '0.5rem', 
+                      background: '#e3f2fd', 
+                      borderRadius: '5px',
+                      fontSize: '0.8rem',
+                      textAlign: 'center'
+                    }}>
+                      💡 Admin: Clique fora do popup para editar este pino
+                    </div>
                   )}
                 </div>
               </Popup>
@@ -295,6 +309,7 @@ export default function Mapa() {
           tempPin={tempPin}
           selectedPino={selectedPino}
           onSave={onSavePino}
+          onUpdate={onUpdatePino}
           onDelete={onDeletePino}
           user={user}
         />

@@ -124,47 +124,96 @@ const deletarPino = async (req, res) => {
 
 const atualizarPino = async (req, res) => {
   try {
-    const pinoId = req.params.id;
-    const { nome, latitude, longitude, msg } = req.body
+    const { id } = req.params;
+    const { nome, msg, localizacao } = req.body;
 
-    // Validação das coordenadas
-    const lng = parseFloat(longitude)
-    const lat = parseFloat(latitude)
+    console.log("✏️ Recebendo atualização para pino ID:", id);
+    console.log("📝 Dados recebidos no backend:", { nome, msg, localizacao });
+    
+    // DEBUG DETALHADO
+    console.log("📍 Coordenadas recebidas:", localizacao?.coordinates);
+    console.log("📍 São números válidos?", 
+      !isNaN(localizacao?.coordinates?.[0]), 
+      !isNaN(localizacao?.coordinates?.[1])
+    );
+    console.log("📍 Valores exatos:", 
+      localizacao?.coordinates?.[0], 
+      localizacao?.coordinates?.[1]
+    );
 
-    if (isNaN(lng) || isNaN(lat)) {
-      return res
-        .status(400)
-        .send("Erro: Latitude e Longitude devem ser números válidos.");
+    // Validações básicas
+    if (!nome || !msg || !localizacao) {
+      return res.status(400).json({ 
+        message: "Nome, mensagem e localização são obrigatórios" 
+      });
     }
 
-    // Tenta encontrar e atualizar o pino
+    // Verifica se as coordenadas existem e são válidas
+    if (!localizacao.coordinates || !Array.isArray(localizacao.coordinates)) {
+      console.log("❌ Coordenadas não são um array:", localizacao.coordinates);
+      return res.status(400).json({ 
+        message: "Formato de coordenadas inválido" 
+      });
+    }
+
+    const [lng, lat] = localizacao.coordinates;
+    
+    // Verifica se são números válidos
+    if (typeof lng !== 'number' || typeof lat !== 'number' || isNaN(lng) || isNaN(lat)) {
+      console.log("❌ Coordenadas inválidas - lng:", lng, "lat:", lat);
+      console.log("❌ Tipos - lng:", typeof lng, "lat:", typeof lat);
+      return res.status(400).json({ 
+        message: "Latitude e Longitude devem ser números válidos." 
+      });
+    }
+
+    console.log("✅ Coordenadas válidas:", lng, lat);
+
+    // Verificar se o pino existe
+    const pinoExistente = await Pino.findById(id);
+    if (!pinoExistente) {
+      return res.status(404).json({ message: "Pino não encontrado" });
+    }
+
+    // Atualizar o pino
     const pinoAtualizado = await Pino.findByIdAndUpdate(
-      pinoId,
+      id,
       {
-        // Objeto com os campos a serem atualizados
-        nome: nome,
+        nome,
+        msg,
         localizacao: {
           type: "Point",
-          coordinates: [lng, lat],
-        },
-        msg: msg,
+          coordinates: [lng, lat]
+        }
       },
-      { new: true } // { new: true } retorna o documento atualizado, não o antigo
-    )
+      { new: true, runValidators: true }
+    );
 
-    // Verifica se o pino foi encontrado e atualizado
-    if (!pinoAtualizado) {
-      return res.status(404).json({ error: "Pino não encontrado." })
+    console.log("✅ Pino atualizado com sucesso:", pinoAtualizado._id);
+    
+    res.json(pinoAtualizado);
+
+  } catch (error) {
+    console.error("❌ Erro ao atualizar pino:", error);
+    
+    if (error.name === 'ValidationError') {
+      console.error("❌ Erro de validação do Mongoose:", error.errors);
+      return res.status(400).json({ 
+        message: "Dados inválidos",
+        errors: error.errors 
+      });
     }
-
-    // Retorna o pino atualizado em JSON
-    console.log(`🔄 Pino atualizado: ${pinoId}`)
-    res.json(pinoAtualizado)
-  } catch (err) {
-    // Captura erros de banco de dados ou formato de ID
-    res
-      .status(500)
-      .json({ error: "Erro ao atualizar pino no Controller: " + err.message })
+    
+    if (error.name === 'CastError') {
+      console.error("❌ Erro de cast (ID inválido):", error);
+      return res.status(400).json({ 
+        message: "ID do pino inválido" 
+      });
+    }
+    
+    res.status(500).json({ 
+      message: "Erro interno do servidor ao atualizar pino" 
+    });
   }
 }
 

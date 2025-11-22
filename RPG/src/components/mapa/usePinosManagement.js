@@ -32,11 +32,33 @@ const usePinosManagement = () => {
     setPinos(prev => prev.filter(pino => pino._id !== pinoId));
   }, []);
 
-  // Atualizar pino
-  const updatePino = useCallback((pinoId, pinoAtualizado) => {
-    setPinos(prev => prev.map(pino => 
-      pino._id === pinoId ? pinoAtualizado : pino
-    ));
+  // ATUALIZAR PINO - COM LOGS DETALHADOS
+  const updatePino = useCallback(async (pinoId, dadosAtualizados) => {
+    setLoading(true);
+    setError(null);
+    try {
+      console.log('🔄 usePinosManagement: Iniciando atualização');
+      console.log('📦 pinoId:', pinoId);
+      console.log('📦 dadosAtualizados:', dadosAtualizados);
+      
+      const pinoAtualizado = await pinoService.updatePino(pinoId, dadosAtualizados);
+      
+      console.log('✅ usePinosManagement: Pino atualizado com sucesso:', pinoAtualizado);
+      
+      // Atualiza o pino na lista local
+      setPinos(prev => prev.map(pino => 
+        pino._id === pinoId ? pinoAtualizado : pino
+      ));
+      
+      return pinoAtualizado;
+    } catch (err) {
+      const errorMsg = err.message || 'Erro ao atualizar pino';
+      console.error('❌ usePinosManagement: Erro ao atualizar:', err);
+      setError(errorMsg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   return {
