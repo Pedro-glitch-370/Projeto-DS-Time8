@@ -13,6 +13,32 @@
   overflow-y: auto;
 }
 
+.capibas-info {
+  margin: -0.5rem 0 1rem 0;
+  padding: 0.5rem;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #856404;
+}
+
+.capibas-info small {
+  font-size: 0.75rem;
+}
+
+/* Remove as setas dos inputs numéricos */
+.input-group input[type="text"][inputmode="numeric"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.input-group input[type="text"][inputmode="numeric"]::-webkit-outer-spin-button,
+.input-group input[type="text"][inputmode="numeric"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .header {
   color: #1449c0;
   display: flex;
