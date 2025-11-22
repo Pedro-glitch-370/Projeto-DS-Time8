@@ -17,6 +17,7 @@ const criarPino = async (req, res) => {
     console.log('📍 localizacao:', req.body.localizacao);
     console.log('📍 Tem coordinates?', !!req.body.localizacao?.coordinates);
     console.log('📍 coordinates:', req.body.localizacao?.coordinates);
+    console.log('🪙 Capibas recebidos:', req.body.capibas)
     console.log('📍 Tipo de coordinates:', typeof req.body.localizacao?.coordinates);
     console.log('📍 É array?', Array.isArray(req.body.localizacao?.coordinates));
 
@@ -66,6 +67,7 @@ const criarPino = async (req, res) => {
     }
 
     console.log("📍 Coordenadas processadas:", { longitude: lng, latitude: lat });
+    console.log("🪙 Capibas processados:", req.body.capibas);
 
     // Cria o pino com o formato correto do Schema
     const novoPino = new Pino({
@@ -161,10 +163,11 @@ const deletarPino = async (req, res) => {
 const atualizarPino = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, msg, localizacao } = req.body;
+     const { nome, msg, localizacao, capibas } = req.body;
 
     console.log("✏️ Recebendo atualização para pino ID:", id);
     console.log("📝 Dados recebidos:", { nome, msg, localizacao });
+    console.log("🪙 Capibas para atualizar:", capibas);
 
     // Validações básicas
     if (!nome || !msg || !localizacao) {
@@ -193,6 +196,7 @@ const atualizarPino = async (req, res) => {
     }
 
     console.log("✅ Coordenadas válidas:", { longitude: lng, latitude: lat });
+    console.log("✅ Capibas válidos:", capibas);
 
     // Verificar se o pino existe
     const pinoExistente = await Pino.findById(id);
@@ -206,6 +210,7 @@ const atualizarPino = async (req, res) => {
       {
         nome,
         msg,
+        capibas: Number(capibas) || 0,
         localizacao: {
           type: "Point",
           coordinates: [lng, lat] // [longitude, latitude] - FORMATO CORRETO
@@ -215,7 +220,8 @@ const atualizarPino = async (req, res) => {
     );
 
     console.log("✅ Pino atualizado com sucesso:", pinoAtualizado._id);
-    
+    console.log("🪙 Novos capibas:", pinoAtualizado.capibas);
+
     res.json(pinoAtualizado);
 
   } catch (error) {

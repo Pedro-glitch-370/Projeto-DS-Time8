@@ -19,7 +19,7 @@ const formatarDadosPino = (pinoData) => {
   return {
     nome: pinoData.nome,
     msg: pinoData.msg,
-    capibas: Number(pinoData.capibas) || 0,
+    capibas: Number(pinoData.capibas) || 0, // ← GARANTIR QUE CAPIBAS SEJA ENVIADO
     localizacao: {
       type: "Point",
       coordinates: coordinates
@@ -30,6 +30,7 @@ const formatarDadosPino = (pinoData) => {
 const logRequisicao = (operacao, dados) => {
   console.log(`🔍 ${operacao} - Dados:`, dados);
   console.log(`📍 Coordenadas:`, dados.localizacao?.coordinates);
+  console.log(`🪙 Capibas:`, dados.capibas); // ← LOG DOS CAPIBAS
 };
 
 const logErro = (operacao, error) => {
@@ -103,4 +104,4 @@ export const pinoService = {
       throw error;
     }
   }
-};
+}

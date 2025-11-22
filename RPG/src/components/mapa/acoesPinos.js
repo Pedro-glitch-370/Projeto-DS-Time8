@@ -13,6 +13,7 @@ const verificarPermissaoAdmin = () => {
 const formatarDadosPino = (dados) => ({
   nome: dados.nome,
   msg: dados.msg,
+  capibas: Number(dados.capibas) || 0,
   latitude: dados.coordinates[1], // lat
   longitude: dados.coordinates[0], // lng
 });
