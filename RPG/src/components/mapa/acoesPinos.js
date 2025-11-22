@@ -86,7 +86,7 @@ export async function handleDeletePino({
 }
 
 // =================================================================
-// Função pra atualizar pino (nova função)
+// Função pra atualizar pino
 export async function handleUpdatePino({
   pinoId,
   dados,

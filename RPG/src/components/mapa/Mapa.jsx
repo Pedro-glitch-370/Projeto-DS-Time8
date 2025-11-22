@@ -7,11 +7,10 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 
 // No topo do Mapa.jsx, adicione:
 import "../../components/barra-superior/barra-superior.css";
-import { handleSavePino, handleDeletePino, handlePinoClick } from "./acoesPinos.js";
+import { handleSavePino, handleDeletePino, handleUpdatePino, handlePinoClick } from "./acoesPinos.js";
 import { MAP_CONFIG, ICONS } from "./constantesMapa.js";
 import usePinosManagement from "./usePinosManagement.js";
 import MapClickHandler from "./MapClickHandler.jsx";
-import LoadingSpinner from "./LoadingSpinner.jsx";
 import Sidebar from "../barra-lateral/barra-lateral.jsx";
 import { authService } from "../../services/authService.js";
 
@@ -39,7 +38,7 @@ export default function Mapa() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  const { pinos, loading, error, fetchPinos, addPino, removePino } =
+  const { pinos, loading, error, fetchPinos, addPino, removePino, updatePino } =
     usePinosManagement();
 
   // Efeito pra verificar autenticação
@@ -86,6 +85,20 @@ export default function Mapa() {
         setSelectedPino,
       }),
     [removePino]
+  );
+
+  // Função que atualiza um pino
+  // recebe o objeto da barra lateral e manda para handleUpdatePino
+  const onUpdatePino = useCallback(
+    (updatedPinoData) =>
+      handleUpdatePino({
+        pinoId: updatedPinoData.id,
+        dados: updatedPinoData,
+        updatePino,
+        setIsSidebarOpen,
+        setSelectedPino,
+      }),
+    [updatePino]
   );
 
   // Função que lida com o clique em um pino
@@ -136,7 +149,7 @@ export default function Mapa() {
   // Retorna mapa e cada pino
   return (
     <div className="mapa-container">
-      {/* SUA BARRA SUPERIOR PERSONALIZADA - SEMPRE com botão ENTRAR */}
+      {/* Barra superior personalizada */}
       <nav className="barra-superior">
         <div className="esquerda">
           <img 
@@ -153,7 +166,7 @@ export default function Mapa() {
           <a href="saldo.html">Capibas</a>
         </div>
         <div className="direita">
-          {/* SEMPRE mostra o botão ENTRAR, independente de estar logado ou não */}
+          {/* Sempre tá mostrando o botão de entrar */}
           <a 
             href="#login"
             id="login"
@@ -172,7 +185,7 @@ export default function Mapa() {
         </div>
       </nav>
 
-      {/* Container do mapa - com margin-top para não ficar embaixo da barra fixa */}
+      {/* Container do mapa */}
       <div style={{ marginTop: '70px', height: 'calc(100vh - 70px)' }}>
         <MapContainer
           scrollWheelZoom={false}
@@ -202,7 +215,7 @@ export default function Mapa() {
             />
           )}
 
-          {/* Pino temporário (apenas para admin) */}
+          {/* Só mostra pino temporário se for admin */}
           {tempPin && isAdmin && (
             <Marker position={[tempPin.lat, tempPin.lng]} icon={ICONS.temporary}>
               <Popup>
@@ -214,7 +227,7 @@ export default function Mapa() {
             </Marker>
           )}
 
-          {/* Pinos existentes - TODOS podem ver, mesmo sem login */}
+          {/* Pinos existentes */}
           {pinosValidos.map((pino) => (
             <Marker
               key={pino._id || pino.id}
@@ -256,26 +269,6 @@ export default function Mapa() {
                   <button className="botaoConfirmar">
                     Confirme sua presença
                   </button>
-
-                  {/* Botão de edição - APENAS para admins logados */}
-                  {isAdmin && (
-                    <button 
-                      className="botaoEditar"
-                      onClick={() => onPinoClick(pino)}
-                      style={{
-                        background: '#ffc107',
-                        color: 'black',
-                        border: 'none',
-                        padding: '0.5rem',
-                        borderRadius: '5px',
-                        marginTop: '0.5rem',
-                        cursor: 'pointer',
-                        width: '100%'
-                      }}
-                    >
-                      ✏️ Editar Pino
-                    </button>
-                  )}
                 </div>
               </Popup>
             </Marker>
@@ -296,6 +289,7 @@ export default function Mapa() {
           selectedPino={selectedPino}
           onSave={onSavePino}
           onDelete={onDeletePino}
+          onUpdate={onUpdatePino}
           user={user}
         />
       )}

@@ -8,20 +8,44 @@ export default function Sidebar({
   selectedPino,
   onSave,
   onDelete,
+  onUpdate
 }) {
   const [nome, setNome] = useState("");
   const [msg, setMsg] = useState("");
+  const [lat, setLat] = useState(0);
+  const [lng, setLng] = useState(0);
 
   // Efeito pra preencher os campos quando um pino existente é selecionado
   useEffect(() => {
     if (selectedPino) {
       setNome(selectedPino.nome || "");
       setMsg(selectedPino.msg || "");
+      setLat(selectedPino.localizacao?.coordinates?.[1] || "");
+      setLng(selectedPino.localizacao?.coordinates?.[0] || "");
+    } else if (tempPin) {
+      setNome("");
+      setMsg("");
+      setLat(tempPin.lat || "");
+      setLng(tempPin.lng || "");
     } else {
       setNome("");
       setMsg("");
+      setLat("");
+      setLng("");
     }
-  }, [selectedPino]);
+  }, [selectedPino, tempPin]);
+
+  // Variáveis apenas para dar permissão de atualizar pino
+  const originalNome = selectedPino?.nome || "";
+  const originalMsg = selectedPino?.msg || "";
+  const originalLat = selectedPino?.localizacao?.coordinates?.[1] || 0;
+  const originalLng = selectedPino?.localizacao?.coordinates?.[0] || 0;
+
+  const hasChanges =
+  nome !== originalNome ||
+  msg !== originalMsg ||
+  Number(lat) !== Number(originalLat) ||
+  Number(lng) !== Number(originalLng);
 
   const handleSave = () => {
     if (!nome || !msg) {
@@ -36,9 +60,6 @@ export default function Sidebar({
         msg: msg,
         coordinates: [tempPin.lng, tempPin.lat],
       });
-    } else if (selectedPino) {
-      // TODO: Implementar edição de pino existente
-      alert("Edição de pino ainda não implementada");
     }
   };
 
@@ -46,6 +67,25 @@ export default function Sidebar({
     if (selectedPino) {
       const pinoId = selectedPino._id || selectedPino.id;
       onDelete(pinoId);
+    }
+  };
+
+  // o botão da barra lateral chama essa função
+  const handleUpdate = () => {
+    if (!nome || !msg) {
+        alert("Preencha o nome e a mensagem para atualizar.");
+        return;
+    }
+
+    if (selectedPino) {
+        // já passa o objeto pronto para onUpdate
+        const updatedPinoData = {
+            id: selectedPino._id || selectedPino.id, 
+            nome: nome,
+            msg: msg,
+            coordinates: selectedPino.localizacao?.coordinates || null, 
+        };
+        onUpdate(updatedPinoData); 
     }
   };
 
@@ -64,37 +104,55 @@ export default function Sidebar({
         </button>
       </div>
 
-      {tempPin && (
-        <p className="coordinates">
-          Coordenadas: Lat {tempPin.lat.toFixed(6)}, Lng{" "}
-          {tempPin.lng.toFixed(6)}
-        </p>
-      )}
-
-      {selectedPino && (
-        <p className="coordinates">Pino existente: {selectedPino.nome}</p>
-      )}
-
+      <label className="labelInput">Nome</label>
       <input
         type="text"
         placeholder="Nome do Local"
         value={nome}
         onChange={(e) => setNome(e.target.value)}
         className="input"
-        disabled={!!selectedPino} // Desabilita edição por enquanto
       />
+      <label className="labelInput">Descrição</label>
       <textarea
         placeholder="Descrição/Mensagem"
         value={msg}
         onChange={(e) => setMsg(e.target.value)}
         className="input"
-        disabled={!!selectedPino} // Desabilita edição por enquanto
+      />
+      <label className="labelInput">Latitude</label>
+      <input
+        type="number"
+        step="0.000001"
+        placeholder="Latitude"
+        value={lat}
+        onChange={(e) => setLat(e.target.value)}
+        className="input"
+        disabled={!!selectedPino || !!tempPin}
+      />
+      <label className="labelInput">Longitude</label>
+      <input
+        type="number"
+        step="0.000001"
+        placeholder="Longitude"
+        value={lng}
+        onChange={(e) => setLng(e.target.value)}
+        className="input"
+        disabled={!!selectedPino || !!tempPin}
       />
 
       <div className="buttonGroup">
         {tempPin && !selectedPino && (
           <button onClick={handleSave} className="saveButton">
             Salvar Ponto
+          </button>
+        )}
+
+        {selectedPino && (
+          <button
+          onClick={handleUpdate}
+          className={`updateButton ${!hasChanges ? "disabled" : ""}`}
+          disabled={!hasChanges}>
+            Atualizar Ponto
           </button>
         )}
 
