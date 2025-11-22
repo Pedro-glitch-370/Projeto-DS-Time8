@@ -7,11 +7,10 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 
 // No topo do Mapa.jsx, adicione:
 import "../../components/barra-superior/barra-superior.css";
-import { handleSavePino, handleDeletePino, handlePinoClick } from "./acoesPinos.js";
+import { handleSavePino, handleDeletePino, handleUpdatePino } from "./acoesPinos.js";
 import { MAP_CONFIG, ICONS } from "./constantesMapa.js";
 import usePinosManagement from "./usePinosManagement.js";
 import MapClickHandler from "./MapClickHandler.jsx";
-import LoadingSpinner from "./LoadingSpinner.jsx";
 import Sidebar from "../barra-lateral/barra-lateral.jsx";
 import { authService } from "../../services/authService.js";
 
@@ -21,12 +20,9 @@ delete L.Icon.Default.prototype._getIconUrl;
 
 // URLs corretas dos ícones dos pinos
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
 // =================================================================
@@ -39,8 +35,7 @@ export default function Mapa() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  const { pinos, loading, error, fetchPinos, addPino, removePino, updatePino } =
-    usePinosManagement();
+  const { pinos, loading, error, fetchPinos, addPino, removePino, updatePino } = usePinosManagement();
 
   // Efeito pra verificar autenticação
   useEffect(() => {
@@ -78,15 +73,19 @@ export default function Mapa() {
 
   // Função que atualiza um pino existente
   const onUpdatePino = useCallback(
-    (dados) => {
-      if (selectedPino && selectedPino._id) {
-        updatePino(selectedPino._id, dados);
-        setIsSidebarOpen(false);
-        setSelectedPino(null);
-      }
-    },
-    [selectedPino, updatePino]
-  );
+  (dados) => {
+    if (selectedPino && selectedPino._id) {
+      handleUpdatePino({  // ← Agora usando handleUpdatePino importado
+        pinoId: selectedPino._id,
+        dados,
+        updatePino,
+        setIsSidebarOpen,
+        setSelectedPino,
+      });
+    }
+  },
+  [selectedPino, updatePino]
+);
 
   // Função que deleta um pino e remove ele da configuração atual
   const onDeletePino = useCallback(

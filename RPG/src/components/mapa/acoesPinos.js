@@ -1,7 +1,35 @@
 import { pinoService } from "../../services/pinoService";
 import { authService } from "../../services/authService";
 
-// Função pra salvar o pino
+// Funções auxiliares
+const verificarPermissaoAdmin = () => {
+  if (!authService.isAdmin()) {
+    alert("Apenas administradores podem realizar esta ação.");
+    return false;
+  }
+  return true;
+};
+
+const formatarDadosPino = (dados) => ({
+  nome: dados.nome,
+  msg: dados.msg,
+  latitude: dados.coordinates[1], // lat
+  longitude: dados.coordinates[0], // lng
+});
+
+const finalizarOperacao = (setIsSidebarOpen, setTempPin, setSelectedPino) => {
+  setIsSidebarOpen(false);
+  setTempPin && setTempPin(null);
+  setSelectedPino(null);
+};
+
+const tratarErro = (operacao, error) => {
+  console.error(`❌ Erro ao ${operacao}:`, error);
+  const message = error.response?.data?.message || `Erro ao ${operacao}`;
+  alert(`Erro: ${message}`);
+};
+
+// Operações principais
 export async function handleSavePino({
   dados,
   addPino,
@@ -11,41 +39,26 @@ export async function handleSavePino({
 }) {
   console.log("💾 Salvando pino:", dados);
 
-  // Verifica se é admin
-  if (!authService.isAdmin()) {
-    alert("Apenas administradores podem adicionar pinos.");
-    return;
-  }
-
-  const pinoData = {
-    nome: dados.nome,
-    msg: dados.msg,
-    latitude: dados.coordinates[1], // lat
-    longitude: dados.coordinates[0], // lng
-  };
+  if (!verificarPermissaoAdmin()) return;
 
   try {
-    // Usa o pinoService em vez do api diretamente
+    const pinoData = formatarDadosPino(dados);
     const pinoSalvo = await pinoService.adicionarPino(pinoData);
-    console.log("✅ Pino salvo:", pinoSalvo);
+    
+    console.log("✅ Pino salvo com sucesso");
     
     if (pinoSalvo.localizacao?.coordinates) {
       addPino(pinoSalvo);
     }
     
-    setIsSidebarOpen(false);
-    setTempPin(null);
-    setSelectedPino(null);
+    finalizarOperacao(setIsSidebarOpen, setTempPin, setSelectedPino);
     alert("Ponto salvo com sucesso!");
+    
   } catch (error) {
-    console.error("❌ Erro ao salvar pino:", error);
-    const message = error.response?.data?.message || "Erro ao salvar pino";
-    alert(`Erro ao salvar: ${message}`);
+    tratarErro("salvar pino", error);
   }
 }
 
-// =================================================================
-// Função pra deletar pino
 export async function handleDeletePino({
   pinoId,
   removePino,
@@ -54,39 +67,25 @@ export async function handleDeletePino({
 }) {
   console.log("🗑️ Deletando pino:", pinoId);
 
-  // Verifica se é admin
-  if (!authService.isAdmin()) {
-    alert("Apenas administradores podem deletar pinos.");
-    return;
-  }
+  if (!verificarPermissaoAdmin()) return;
 
   if (!pinoId) {
     alert("ID do pino não encontrado");
     return;
   }
 
-  const confirmacao = window.confirm(
-    "Tem certeza que deseja deletar este pino?"
-  );
-  if (!confirmacao) return;
-
   try {
-    // Usa o pinoService em vez do api diretamente
     await pinoService.deletarPino(pinoId);
     
     removePino(pinoId);
-    setIsSidebarOpen(false);
-    setSelectedPino(null);
+    finalizarOperacao(setIsSidebarOpen, null, setSelectedPino);
     alert("Pino deletado com sucesso! ✅");
+    
   } catch (error) {
-    console.error("❌ Erro ao deletar pino:", error);
-    const message = error.response?.data?.message || "Erro ao deletar pino";
-    alert(`Erro ao deletar: ${message}`);
+    tratarErro("deletar pino", error);
   }
 }
 
-// =================================================================
-// Função pra atualizar pino (nova função)
 export async function handleUpdatePino({
   pinoId,
   dados,
@@ -96,46 +95,16 @@ export async function handleUpdatePino({
 }) {
   console.log("✏️ Atualizando pino:", pinoId, dados);
 
-  // Verifica se é admin
-  if (!authService.isAdmin()) {
-    alert("Apenas administradores podem atualizar pinos.");
-    return;
-  }
-
-  const pinoData = {
-    nome: dados.nome,
-    msg: dados.msg,
-    latitude: dados.coordinates[1], // lat
-    longitude: dados.coordinates[0], // lng
-  };
+  if (!verificarPermissaoAdmin()) return;
 
   try {
-    // Usa o pinoService
-    const pinoAtualizado = await pinoService.atualizarPino(pinoId, pinoData);
-    console.log("✅ Pino atualizado:", pinoAtualizado);
+    await updatePino(pinoId, dados);
     
-    if (updatePino) {
-      updatePino(pinoId, pinoAtualizado);
-    }
-    
-    setIsSidebarOpen(false);
-    setSelectedPino(null);
+    console.log("✅ Pino atualizado com sucesso!");
+    finalizarOperacao(setIsSidebarOpen, null, setSelectedPino);
     alert("Ponto atualizado com sucesso!");
+    
   } catch (error) {
-    console.error("❌ Erro ao atualizar pino:", error);
-    const message = error.response?.data?.message || "Erro ao atualizar pino";
-    alert(`Erro ao atualizar: ${message}`);
+    tratarErro("atualizar pino", error);
   }
-}
-
-// =================================================================
-// Função pra clicar em um pino existente
-export function handlePinoClick(pino, setSelectedPino, setIsSidebarOpen) {
-  // Apenas admins podem editar, mas qualquer um pode ver informações
-  if (authService.isAdmin()) {
-    setSelectedPino(pino);
-    setIsSidebarOpen(true);
-  }
-  // Se não for admin, pode mostrar informações básicas se quiser
-  // ou simplesmente não fazer nada (o popup já mostra as informações)
 }

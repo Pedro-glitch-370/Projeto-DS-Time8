@@ -62,45 +62,34 @@ export default function Sidebar({
   }
 
   if (selectedPino) {
-    // DEBUG: Verificar TODAS as possíveis localizações
-    console.log('🔍 DEBUG - Estrutura completa do pino:');
-    console.log('📋 Pino completo:', selectedPino);
-    console.log('📍 localizacao:', selectedPino.localizacao);
-    console.log('📍 coordinates:', selectedPino.localizacao?.coordinates);
-    console.log('📍 lat/lng direto:', selectedPino.lat, selectedPino.lng);
-    console.log('📍 latitude/longitude:', selectedPino.latitude, selectedPino.longitude);
+    console.log('🔍 DEBUG SIDEBAR handleUpdate:');
+    console.log('📍 selectedPino completo:', selectedPino);
+    console.log('📍 selectedPino.localizacao:', selectedPino.localizacao);
+    console.log('📍 selectedPino.localizacao.coordinates:', selectedPino.localizacao?.coordinates);
     
-    // Função para extrair coordenadas de qualquer formato
+    // Função para extrair coordenadas
     const extractCoordinates = (pino) => {
-      // Tentativa 1: Formato padrão com localizacao.coordinates
       if (pino.localizacao?.coordinates?.length === 2) {
         return pino.localizacao.coordinates;
       }
-      // Tentativa 2: Coordenadas diretas
       if (pino.coordinates?.length === 2) {
         return pino.coordinates;
       }
-      // Tentativa 3: Lat/Lng separados
-      if (pino.lat !== undefined && pino.lng !== undefined) {
-        return [pino.lng, pino.lat];
-      }
-      // Tentativa 4: Latitude/Longitude separados
-      if (pino.latitude !== undefined && pino.longitude !== undefined) {
-        return [pino.longitude, pino.latitude];
-      }
-      // Fallback: Coordenadas do Marco Zero do Recife
-      console.warn('⚠️ Nenhuma coordenada encontrada, usando padrão');
+      // Fallback
+      console.warn('Usando coordenadas padrão');
       return [-34.8713, -8.0631];
     };
 
     const coordinates = extractCoordinates(selectedPino);
     console.log('📍 Coordenadas extraídas:', coordinates);
+    console.log('📍 Tipo coordenada 0:', typeof coordinates[0], 'Valor:', coordinates[0]);
+    console.log('📍 Tipo coordenada 1:', typeof coordinates[1], 'Valor:', coordinates[1]);
 
-    // Atualizando pino existente
+    // Enviar como objeto com coordinates array
     onUpdate({
       nome: nome,
       msg: msg,
-      coordinates: coordinates.map(coord => Number(coord))
+      coordinates: coordinates
     });
   }
 };
