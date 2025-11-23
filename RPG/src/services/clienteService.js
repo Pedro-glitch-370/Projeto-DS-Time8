@@ -1,10 +1,6 @@
 import api from "/src/services/api.js";
 
 // Funções auxiliares
-const logRequisicao = (operacao, dados) => {
-  console.log(`🔍 ${operacao} - Dados:`, dados);
-};
-
 const logErro = (operacao, error) => {
   console.error(`❌ ERRO AO ${operacao}:`, error);
   if (error.response) {
@@ -13,13 +9,13 @@ const logErro = (operacao, error) => {
   }
 };
 
-// Serviço principal do Cliente
+// Serviço principal - agora suporta cliente e admin
 export const clienteService = {
-  // Buscar cliente por ID
-  getCliente: async (clienteId) => {
+  // Buscar usuário por ID (cliente ou admin)
+  getCliente: async (userId) => {
     try {
-      console.log(`👤 Buscando cliente: ${clienteId}`);
-      const response = await api.get(`/auth/clientes/${clienteId}`);
+      console.log(`👤 Buscando usuário: ${userId}`);
+      const response = await api.get(`/auth/clientes/${userId}`);
       return response.data;
     } catch (error) {
       logErro('BUSCAR CLIENTE', error);
@@ -27,10 +23,10 @@ export const clienteService = {
     }
   },
 
-  // Buscar cliente por email
+  // Buscar usuário por email (cliente ou admin)
   getClienteByEmail: async (email) => {
     try {
-      console.log(`📧 Buscando cliente por email: ${email}`);
+      console.log(`📧 Buscando usuário por email: ${email}`);
       const response = await api.get(`/auth/clientes/email/${email}`);
       return response.data;
     } catch (error) {
@@ -39,52 +35,45 @@ export const clienteService = {
     }
   },
 
-  // Concluir tarefa
-  concluirTarefa: async (clienteId, tarefaId, capibas) => {
+  // Buscar ADMIN por ID
+  getAdmin: async (adminId) => {
     try {
-      const dados = {
-        tarefaId: tarefaId,
-        capibas: capibas
-      };
-      
-      logRequisicao('CONCLUIR TAREFA', dados);
-      
-      // Se você já tem uma rota específica para tarefas
-      const response = await api.post(`/auth/clientes/${clienteId}/tarefas/concluir`, dados);
-      
-      console.log('✅ TAREFA CONCLUÍDA COM SUCESSO');
+      console.log(`👑 Buscando admin: ${adminId}`);
+      const response = await api.get(`/auth/admins/${adminId}`);
       return response.data;
+    } catch (error) {
+      logErro('BUSCAR ADMIN', error);
+      throw error;
+    }
+  },
 
+  // Buscar ADMIN por email
+  getAdminByEmail: async (email) => {
+    try {
+      console.log(`📧 Buscando admin por email: ${email}`);
+      const response = await api.get(`/auth/admins/email/${email}`);
+      return response.data;
+    } catch (error) {
+      logErro('BUSCAR ADMIN POR EMAIL', error);
+      throw error;
+    }
+  },
+
+  // Concluir tarefa (funciona para cliente e admin)
+  concluirTarefa: async (userId, tarefaId, capibas, userType = 'cliente') => {
+    try {
+      console.log(`🎯 ${userType.toUpperCase()} ${userId} concluindo tarefa ${tarefaId} por ${capibas} capibas`);
+      
+      const endpoint = userType === 'admin' ? 'admins' : 'clientes';
+      const response = await api.post(`/auth/${endpoint}/${userId}/tarefas/concluir`, {
+        tarefaId,
+        capibas
+      });
+      
+      console.log(`✅ Tarefa concluída com sucesso por ${userType}`);
+      return response.data;
     } catch (error) {
       logErro('CONCLUIR TAREFA', error);
-      throw error;
-    }
-  },
-
-  // Buscar tarefas concluídas do cliente
-  getTarefasConcluidas: async (clienteId) => {
-    try {
-      console.log(`📋 Buscando tarefas do cliente: ${clienteId}`);
-      const response = await api.get(`/auth/clientes/${clienteId}/tarefas`);
-      return response.data;
-    } catch (error) {
-      logErro('BUSCAR TAREFAS CLIENTE', error);
-      throw error;
-    }
-  },
-
-  // Atualizar dados do cliente (para capibas e tarefasCompletas)
-  atualizarCliente: async (clienteId, dadosAtualizados) => {
-    try {
-      logRequisicao('ATUALIZAR CLIENTE', dadosAtualizados);
-      
-      const response = await api.put(`/auth/clientes/${clienteId}`, dadosAtualizados);
-      
-      console.log('✅ CLIENTE ATUALIZADO COM SUCESSO');
-      return response.data;
-
-    } catch (error) {
-      logErro('ATUALIZAR CLIENTE', error);
       throw error;
     }
   }

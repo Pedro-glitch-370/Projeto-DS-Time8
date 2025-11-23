@@ -51,20 +51,17 @@ const startServer = async () => {
       console.log("SERVIDOR BACKEND INICIADO!")
       console.log(`Porta: ${PORT}`) // numero da porta que o server tá rodando
       console.log(`URL: http://localhost:${PORT}/api/pinos`) // rota que pega todos os pinos do mongoDB
-      console.log(`URL: http://localhost:${PORT}/api/pinos/adicionar`) // rota para adicioar pinos
-      console.log(`URL: http://localhost:${PORT}/api/pinos/deletar`) // rota para deletar os pinos
-      console.log(`URL: http://localhost:${PORT}/api/pinos/atualizar`) // rota para atualizar os pinos
       
       // Novas URLs para clientes
+      console.log(`URL: http://localhost:${PORT}/api/auth/clientes/`) // listar clientes
       console.log(`URL: http://localhost:${PORT}/api/auth/clientes/register`) // registrar cliente
       console.log(`URL: http://localhost:${PORT}/api/auth/clientes/login`) // login cliente
-      console.log(`URL: http://localhost:${PORT}/api/auth/clientes/`) // listar clientes
       console.log(`URL: http://localhost:${PORT}/api/auth/clientes/email/:email`) // buscar cliente por email
       
       // Novas URLs para admins
+      console.log(`URL: http://localhost:${PORT}/api/auth/admins/`) // listar admins
       console.log(`URL: http://localhost:${PORT}/api/auth/admins/register`) // registrar admin
       console.log(`URL: http://localhost:${PORT}/api/auth/admins/login`) // login admin
-      console.log(`URL: http://localhost:${PORT}/api/auth/admins/`) // listar admins
       console.log(`URL: http://localhost:${PORT}/api/auth/admins/email/:email`) // buscar admin por email
       
       console.log(

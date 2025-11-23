@@ -132,7 +132,6 @@ const criarPino = async (req, res) => {
     const { lng, lat } = validarCoordenadas(coordenadasExtraidas.coordinates);
     
     console.log("📍 Coordenadas processadas:", { longitude: lng, latitude: lat });
-    console.log("🪙 Capibas processados:", req.body.capibas);
 
     // Criar e salvar pino
     const dadosPino = formatarPinoParaBanco(req.body, lng, lat);
