@@ -260,21 +260,6 @@ html, body, #root {
 /* ==================================================
    NAVBAR FIXA - CORREÇÃO DE POSICIONAMENTO
    ================================================== */
-.barra-superior {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: #1449c0;
-  color: white;
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  z-index: 1000;
-  box-sizing: border-box;
-  min-height: 70px;
-  height: 70px;
-}
 
 .logo-img {
   height: 40px;

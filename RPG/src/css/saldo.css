@@ -136,49 +136,6 @@ body {
   font-weight: bold;
 }
 
-/* ==================================================
-   ESTILOS DA NAVBAR - CORRIGIDOS
-   ================================================== */
-.barra-superior {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: #1449c0;
-  color: white;
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  z-index: 1000;
-  box-sizing: border-box;
-  min-height: 70px;
-  height: 70px;
-}
-
-.barra-superior .esquerda,
-.barra-superior .meio,
-.barra-superior .direita {
-  display: flex;
-  align-items: center;
-}
-
-.barra-superior .esquerda {
-  flex: 1;
-  justify-content: flex-start;
-}
-
-.barra-superior .meio {
-  flex: 2;
-  justify-content: center;
-  gap: 20px;
-}
-
-.barra-superior .direita {
-  flex: 1;
-  justify-content: flex-end;
-  gap: 15px;
-}
-
 /* Logo clicável */
 .logo-img {
   height: 40px;
@@ -192,56 +149,6 @@ body {
 .logo-img:hover {
   transform: scale(1.05);
   background-color: rgba(255, 255, 255, 0.3);
-}
-
-/* Menu central - estilo cápsula */
-.barra-superior .meio {
-  padding: 6px 16px;
-  border-radius: 50px;
-  border: 2px solid white;
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
-  max-width: fit-content;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.barra-superior .meio a {
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 20px;
-  transition: all 0.3s ease;
-  font-size: 0.95rem;
-  position: relative;
-  white-space: nowrap;
-}
-
-.barra-superior .meio a:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
-}
-
-.barra-superior .meio a.ativo {
-  background-color: white;
-  color: #1449c0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.barra-superior .meio a.ativo::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 2px;
-  background: #1449c0;
-  border-radius: 1px;
 }
 
 /* Botão Entrar */
@@ -268,54 +175,6 @@ body {
 
 #login:active {
   transform: translateY(0);
-}
-
-/* Menu hamburger */
-.barra-superior .opcoes {
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 28px;
-  height: 20px;
-  margin-left: 15px;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.barra-superior .opcoes:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-.barra-superior .opcoes div {
-  background-color: white;
-  height: 3px;
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-
-.barra-superior .opcoes:hover div {
-  background-color: #4dc48a;
-}
-
-.barra-superior .opcoes div:nth-child(1) {
-  width: 100%;
-}
-
-.barra-superior .opcoes div:nth-child(2) {
-  width: 80%;
-  align-self: flex-end;
-}
-
-.barra-superior .opcoes div:nth-child(3) {
-  width: 60%;
-}
-
-/* Efeito de clique no menu */
-.barra-superior .opcoes:active {
-  transform: scale(0.95);
 }
 
 /* Loading state */
@@ -362,31 +221,6 @@ body {
     padding: 10px;
   }
   
-  .barra-superior {
-    padding: 10px 15px;
-    flex-wrap: wrap;
-    min-height: 60px;
-  }
-
-  .barra-superior .meio {
-    order: 3;
-    flex: 1 0 100%;
-    margin-top: 10px;
-    padding: 4px 12px;
-    gap: 8px;
-  }
-
-  .barra-superior .meio a {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-  }
-
-  .barra-superior .esquerda,
-  .barra-superior .direita {
-    flex: 1;
-  }
-}
-
 @media (max-width: 480px) {
   .saldo-container {
     margin-top: 85px;
@@ -429,16 +263,6 @@ body {
     font-size: 1.1rem;
   }
   
-  .barra-superior .meio {
-    gap: 4px;
-    padding: 3px 10px;
-  }
-
-  .barra-superior .meio a {
-    padding: 4px 8px;
-    font-size: 0.8rem;
-  }
-
   #login {
     padding: 6px 12px;
     font-size: 0.85rem;
@@ -446,11 +270,5 @@ body {
 
   .logo-img {
     height: 35px;
-  }
-
-  .barra-superior .opcoes {
-    width: 24px;
-    height: 18px;
-    margin-left: 10px;
   }
 }
