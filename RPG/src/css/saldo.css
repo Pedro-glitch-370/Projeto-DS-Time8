@@ -220,6 +220,7 @@ body {
     height: 40px;
     padding: 10px;
   }
+}
   
 @media (max-width: 480px) {
   .saldo-container {

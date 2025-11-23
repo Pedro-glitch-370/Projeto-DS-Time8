@@ -6,8 +6,8 @@ const { connectDB, disconnectDB, getDBStatus } = require("./config/db") // Impor
 
 // Importa as rotas
 const pinoRoutes = require("./routes/pinosRoutes") 
-const clienteAuthRoutes = require("./routes/clienteAuthRoutes.js")
-const adminAuthRoutes = require("./routes/adminAuthRoutes.js")
+const clienteRoutes = require("./routes/clienteRoutes.js")
+const adminRoutes = require("./routes/adminRoutes.js")
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -35,8 +35,8 @@ app.use(express.json()) // Middleware para interpretar dados JSON no corpo das r
 // ==================================================
 // Rotas da API
 app.use("/api/pinos", pinoRoutes)
-app.use("/api/auth/clientes", clienteAuthRoutes)
-app.use("/api/auth/admins", adminAuthRoutes)
+app.use("/api/auth/clientes", clienteRoutes)
+app.use("/api/auth/admins", adminRoutes)
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -54,6 +54,19 @@ const startServer = async () => {
       console.log(`URL: http://localhost:${PORT}/api/pinos/adicionar`) // rota para adicioar pinos
       console.log(`URL: http://localhost:${PORT}/api/pinos/deletar`) // rota para deletar os pinos
       console.log(`URL: http://localhost:${PORT}/api/pinos/atualizar`) // rota para atualizar os pinos
+      
+      // Novas URLs para clientes
+      console.log(`URL: http://localhost:${PORT}/api/auth/clientes/register`) // registrar cliente
+      console.log(`URL: http://localhost:${PORT}/api/auth/clientes/login`) // login cliente
+      console.log(`URL: http://localhost:${PORT}/api/auth/clientes/`) // listar clientes
+      console.log(`URL: http://localhost:${PORT}/api/auth/clientes/email/:email`) // buscar cliente por email
+      
+      // Novas URLs para admins
+      console.log(`URL: http://localhost:${PORT}/api/auth/admins/register`) // registrar admin
+      console.log(`URL: http://localhost:${PORT}/api/auth/admins/login`) // login admin
+      console.log(`URL: http://localhost:${PORT}/api/auth/admins/`) // listar admins
+      console.log(`URL: http://localhost:${PORT}/api/auth/admins/email/:email`) // buscar admin por email
+      
       console.log(
         `Banco de dados: ${
           getDBStatus().connected ? "Conectado" : "Desconectado"

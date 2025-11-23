@@ -3,11 +3,15 @@ const Schema = mongoose.Schema
 
 // esquema dos clientes
 const clienteSchema = new Schema({
-    nome: { type: String, requiered: true }, // nome do cliente
-    email: { type: String, requiered: true }, // email do cliente
+    nome: { type: String, required: true }, // nome do cliente
+    email: { type: String, required: true }, // email do cliente
     tipo: { type: String, enum: ['cliente', 'admin'], required: true },
-    capibas: { type:Number, requiered: true, default: 0 }, // cliente sempre começa com 0 capibas
+    capibas: { type:Number, required: true, default: 0 }, // cliente sempre começa com 0 capibas
     tarefasCompletas: { type: Number, default: 0 },
+    tarefasConcluidas: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Pino' 
+    }],
     ultimaAtividade: { type: Date, default: Date.now }
 }, {
     timestamps: true
