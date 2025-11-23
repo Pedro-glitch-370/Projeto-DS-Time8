@@ -218,9 +218,6 @@ function isValidEmail(email) {
     const domainParts = domainPart.split('.');
     const tld = domainParts[domainParts.length - 1];
     
-    // Lista de TLDs válidos (pode ser expandida)
-    const validTLDs = ['com', 'org', 'net', 'edu', 'gov', 'br', 'io', 'co', 'info', 'biz', 'me'];
-    
     // Verifica se o TLD tem entre 2 e 6 caracteres
     if (tld.length < 2 || tld.length > 6) {
         return false;

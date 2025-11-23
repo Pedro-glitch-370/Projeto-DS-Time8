@@ -96,7 +96,7 @@
   flex-direction: column;
   overflow-y: auto;
   gap: 16px;
-  min-height: 0; /* IMPORTANTE: Permite que o conteúdo encolha */
+  min-height: 0;
 }
 
 /* ==================================================
@@ -104,6 +104,8 @@
    ================================================== */
 .coordinates {
   margin: 0;
+  margin-left: 4px;
+  width: 95%;
   font-size: 0.875rem;
   color: #475569;
   padding: 12px 16px;
@@ -125,6 +127,7 @@
 .input-group label {
   display: block;
   margin-bottom: 8px;
+  margin-left: 4px;
   font-weight: 600;
   color: #1e293b;
   font-size: 0.875rem;
@@ -133,22 +136,20 @@
 }
 
 .input {
-  width: 100%;
+  margin-left: 4px;
+  width: 95%;
   padding: 12px 16px;
   border: 2px solid #e2e8f0;
   border-radius: var(--border-radius);
   font-size: 0.875rem;
   box-sizing: border-box;
-  transition: var(--transition);
   background-color: #ffffff;
   font-family: inherit;
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(20, 73, 192, 0.1);
-  transform: translateY(-1px);
 }
 
 .input:hover {
@@ -164,21 +165,6 @@
 /* ==================================================
    CAMPO DE CAPIBAS
    ================================================== */
-.capibas-info {
-  margin: 0;
-  padding: 12px;
-  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-  border: 1px solid #ffd43b;
-  border-radius: var(--border-radius);
-  font-size: 0.75rem;
-  color: #856404;
-  box-shadow: var(--shadow);
-}
-
-.capibas-info small {
-  font-size: 0.75rem;
-  line-height: 1.4;
-}
 
 /* Remove as setas dos inputs numéricos */
 .input-group input[type="text"][inputmode="numeric"] {
@@ -230,7 +216,7 @@
 }
 
 .buttonGroup button:hover {
-  transform: translateY(-2px);
+  transform: scale(1.03);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -274,37 +260,21 @@
 /* ==================================================
    SEÇÕES DE INFORMAÇÃO
    ================================================== */
+
 .infoBox {
-  padding: 20px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  margin: 0;
+  margin-bottom: 8px;
+  margin-left: 4px;
+  width: 95%;
+  font-size: 0.875rem;
+  color: #475569;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
   border-radius: var(--border-radius);
-  font-size: 0.75rem;
   border-left: 4px solid var(--info-color);
-  box-shadow: var(--shadow);
-}
-
-.infoBox p {
-  margin: 6px 0;
   font-family: 'Monaco', 'Consolas', monospace;
-}
-
-.infoBox strong {
-  color: var(--info-color);
-}
-
-.debug-info {
-  padding: 16px;
-  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-  border-radius: var(--border-radius);
-  font-size: 0.7rem;
-  color: #856404;
-  border-left: 4px solid #ffc107;
   box-shadow: var(--shadow);
-}
-
-.debug-info p {
-  margin: 4px 0;
-  font-family: 'Monaco', 'Consolas', monospace;
+  flex-shrink: 0;
 }
 
 /* ==================================================

@@ -6,7 +6,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4DC48A 0%, #2F7854 100%);
   min-height: 100vh;
   /* REMOVE padding-top daqui - agora controlado pela navbar */
 }
@@ -58,21 +58,21 @@ body {
 
 .pessoa .nome {
   font-size: 1.5rem;
-  color: #1449c0;
+  color: #1e293b;
   margin-bottom: 10px;
   font-weight: bold;
 }
 
 .pessoa .saldo {
   font-size: 1.1rem;
-  color: #ff6b35;
+  color: #1e293b;
   margin-bottom: 10px;
-  font-weight: bold;
+  font-weight: lighter;
 }
 
 .pessoa .pontos {
-  font-size: 2rem;
-  color: #2f7854;
+  font-size: 1.7rem;
+  color: #2F7854;
   font-weight: bold;
 }
 
@@ -80,15 +80,15 @@ body {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: #1449c0;
-  color: white;
+  background: none;
+  color: #2F7854;
   border: none;
-  padding: 15px;
+  padding: 16px;
   cursor: pointer;
   border-radius: 50%;
   font-size: 20px;
-  width: 50px;
-  height: 50px;
+  width: 5px;
+  height: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,81 +100,52 @@ body {
 .next { right: 10px; }
 
 .prev:hover, .next:hover {
-  background: #0d3a9c;
-  transform: translateY(-50%) scale(1.1);
+  background: none;
+  transform: translateY(-50%) scale(1.2);
 }
 
-.meu-saldo {
+.info-pessoal {
   background: white;
   border-radius: 15px;
-  padding: 25px;
+  padding: 20px 25px;
   margin-top: 30px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
-.meu-saldo h2 {
-  color: #1449c0;
-  margin-bottom: 15px;
-  font-size: 1.5rem;
-}
-
-.saldo-pessoal {
+.saldo-pessoal, .historico {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.valor {
-  font-size: 2rem;
-  color: #2f7854;
-  font-weight: bold;
+.saldo-pessoal {
+  margin-bottom: 16px;
 }
 
-.posicao {
-  font-size: 1.2rem;
-  color: #ff6b35;
-  font-weight: bold;
-}
-
-/* Logo clicável */
-.logo-img {
-  height: 40px;
-  width: auto;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 8px;
-  padding: 4px;
-}
-
-.logo-img:hover {
-  transform: scale(1.05);
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-/* Botão Entrar */
-#login {
-  border-radius: 20px;
-  padding: 8px 20px;
-  color: white;
-  text-decoration: none;
+.meu-saldo {
+  font-size: 1.1rem;
   font-weight: 600;
-  background-color: #2f7854;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  font-size: 0.95rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  color: #1e293b;
+  letter-spacing: 0.5px;
 }
 
-#login:hover {
-  background-color: #4dc48a;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.meus-capibas {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1e293b;
 }
 
-#login:active {
-  transform: translateY(0);
+.operacao {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #4DC48A;
+  letter-spacing: 0.4px;
+}
+
+.valor {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4DC48A;
 }
 
 /* Loading state */
@@ -256,11 +227,11 @@ body {
     padding: 20px;
   }
   
-  .valor {
+  .operacao {
     font-size: 1.7rem;
   }
   
-  .posicao {
+  .valor {
     font-size: 1.1rem;
   }
   

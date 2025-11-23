@@ -212,53 +212,45 @@ export default function Mapa() {
               }}
             >
               <Popup>
-  <div className="modal">
-    <h3 className="mensagem">{pino.nome}</h3>
+                <div className="modal">
+                  <h3 className="mensagem">{pino.nome}</h3>
 
-    {/* Upload da foto - CORRIGIDO */}
-    <label htmlFor={`foto-${pino._id || pino.id}`}>
-      <img
-        className="imagem"
-        src="/src/assets/AdicionarFoto.png"
-        alt="Adicionar Foto"
-        onError={(e) => {
-          // Fallback se a imagem não carregar
-          e.target.style.display = 'none';
-          const fallback = document.createElement('div');
-          fallback.textContent = '📷 Adicionar Foto';
-          fallback.style.fontSize = '2rem';
-          e.target.parentNode.appendChild(fallback);
-        }}
-      />
-      <span style={{ fontSize: '0.8rem', color: '#666' }}>Clique para adicionar foto</span>
-    </label>
-    <input
-      type="file"
-      id={`foto-${pino._id || pino.id}`}
-      accept="image/*"
-      title="Enviar Foto"
-      className="inputFoto"
-    />
+                  {/* Upload da foto - CORRIGIDO */}
+                  <label htmlFor={`foto-${pino._id || pino.id}`}>
+                    <img
+                      className="imagem"
+                      src="/src/assets/AdicionarFoto.png"
+                      alt="Adicionar Foto"
+                      onError={(e) => {
+                        // Fallback se a imagem não carregar
+                        e.target.style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.textContent = '📷 Adicionar Foto';
+                        fallback.style.fontSize = '2rem';
+                        e.target.parentNode.appendChild(fallback);
+                      }}
+                    />
+                  </label>
+                  <input
+                    type="file"
+                    id={`foto-${pino._id || pino.id}`}
+                    accept="image/*"
+                    title="Enviar Foto"
+                    className="inputFoto"
+                  />
 
-    {/* Descrição da atividade e recompensa */}
-    <p className="mensagem">{pino.msg}</p>
-    <p className="mensagem">
-      <strong>Recompensa: {pino.capibas || 0} capibas</strong>
-    </p>
+                  {/* Descrição da atividade e recompensa */}
+                  <p className="mensagem">{pino.msg}</p>
+                  <p className="mensagem">
+                    <strong>Recompensa: {pino.capibas || 0} capibas</strong>
+                  </p>
 
-    {/* Botão de confirmação - TODOS podem usar */}
-    <button className="botaoConfirmar">
-      Confirme sua presença
-    </button>
-
-    {/* Aviso para admin - apenas informativo */}
-    {isAdmin && (
-      <div className="admin-hint">
-        💡 Admin: Clique fora do popup para editar este pino
-      </div>
-    )}
-  </div>
-</Popup>
+                  {/* Botão de confirmação - TODOS podem usar */}
+                  <button className="botaoConfirmar">
+                    Confirme sua presença
+                  </button>
+                </div>
+              </Popup>
             </Marker>
           ))}
         </MapContainer>

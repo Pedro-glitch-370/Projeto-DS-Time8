@@ -48,8 +48,18 @@ export async function handleSavePino({
     
     console.log("✅ Pino salvo com sucesso");
     
-    if (pinoSalvo.localizacao?.coordinates) {
-      addPino(pinoSalvo);
+    const pinoNormalizado = {
+      ...pinoSalvo,
+      localizacao: {
+        coordinates: [
+          pinoSalvo.longitude ?? dados.coordinates[0],
+          pinoSalvo.latitude ?? dados.coordinates[1],
+        ],
+      },
+    };
+
+    if (pinoNormalizado.localizacao?.coordinates) {
+      addPino(pinoNormalizado);
     }
     
     finalizarOperacao(setIsSidebarOpen, setTempPin, setSelectedPino);

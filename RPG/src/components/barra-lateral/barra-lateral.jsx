@@ -18,7 +18,9 @@ const CoordinatesInfo = ({ tempPin, selectedPino }) => {
   if (tempPin) {
     return (
       <p className="coordinates">
-        📍 Coordenadas: Lat {tempPin.lat.toFixed(6)}, Lng {tempPin.lng.toFixed(6)}
+        <p><strong>Modo:</strong> {selectedPino ? "Edição" : "Criação"}</p>
+        <strong>Latitude:</strong> {tempPin.lat.toFixed(6)}<br>
+        </br><strong>Longitude:</strong> {tempPin.lng.toFixed(6)}
       </p>
     );
   }
@@ -26,7 +28,9 @@ const CoordinatesInfo = ({ tempPin, selectedPino }) => {
   if (selectedPino) {
     return (
       <p className="coordinates">
-        📌 Editando: {selectedPino.nome}
+        <p><strong>Modo:</strong> {selectedPino ? "Edição" : "Criação"}</p>
+        <strong>Selecionado:</strong> "{selectedPino.nome}"
+        <p><strong>ID:</strong> {selectedPino?._id || "Novo"}</p>
       </p>
     );
   }
@@ -80,7 +84,7 @@ const CapibasInput = ({ value, onChange }) => {
 
   return (
     <div className="input-group">
-      <label>🪙 Quantidade de Capibas (Recompensa):</label>
+      <label>Quantidade de Capibas (Recompensa):</label>
       <input
         type="text"
         inputMode="numeric"
@@ -96,7 +100,7 @@ const CapibasInput = ({ value, onChange }) => {
   );
 };
 
-const ActionButtons = ({ mode, onSave, onUpdate, onDelete, onCancel }) => {
+const ActionButtons = ({ mode, onSave, onUpdate, onDelete, onCancel, hasChanges }) => {
   const renderCreationMode = () => (
     <button onClick={onSave} className="saveButton">
       ✅ Salvar Novo Ponto
@@ -105,7 +109,7 @@ const ActionButtons = ({ mode, onSave, onUpdate, onDelete, onCancel }) => {
 
   const renderEditionMode = () => (
     <>
-      <button onClick={onUpdate} className="updateButton">
+      <button onClick={onUpdate} className="updateButton" disabled={!hasChanges}>
         🔄 Atualizar Ponto
       </button>
       <button onClick={onDelete} className="deleteButton">
@@ -130,24 +134,14 @@ const PinoInfo = ({ selectedPino }) => {
 
   return (
     <div className="infoBox">
-      <p><strong>📋 Informações do Pino:</strong></p>
-      <p><strong>ID:</strong> {selectedPino._id || selectedPino.id}</p>
-      <p><strong>🪙 Capibas:</strong> {selectedPino.capibas || 0}</p>
+      <label><strong>Coordenadas do Pino:</strong></label>
       <p>
-        <strong>📍 Coordenadas:</strong> [
-        {selectedPino.localizacao?.coordinates?.[1]?.toFixed(6)},{" "}
-        {selectedPino.localizacao?.coordinates?.[0]?.toFixed(6)}]
+        <strong>Latitude:</strong> {selectedPino.localizacao?.coordinates?.[1]?.toFixed(6)}<br>
+        </br><strong>Longitude:</strong> {selectedPino.localizacao?.coordinates?.[0]?.toFixed(6)}
       </p>
     </div>
   );
 };
-
-const DebugInfo = ({ selectedPino }) => (
-  <div className="debug-info">
-    <p><strong>💡 Modo:</strong> {selectedPino ? "EDIÇÃO" : "CRIAÇÃO"}</p>
-    <p><strong>🆔 Pino ID:</strong> {selectedPino?._id || "Novo"}</p>
-  </div>
-);
 
 // =================================================================
 // Funções auxiliares
@@ -206,6 +200,12 @@ export default function Sidebar({
       setCapibas("0");
     }
   }, [selectedPino]);
+
+  // Variáveis apenas para dar permissão de atualizar pino
+  const originalNome = selectedPino?.nome || "";
+  const originalMsg = selectedPino?.msg || "";
+  const originalCapibas = selectedPino?.capibas?.toString() || "0";
+  const hasChanges = nome !== originalNome || msg !== originalMsg || capibas !== originalCapibas;
 
   // Handlers
   const handleSave = () => {
@@ -288,7 +288,7 @@ export default function Sidebar({
   }
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
     <SidebarHeader selectedPino={selectedPino} onClose={onClose} />
     
     <div className="sidebar-content">
@@ -315,13 +315,7 @@ export default function Sidebar({
         onChange={handleCapibasChange}
       />
 
-      <div className="capibas-info">
-        <small>💡 Digite a quantidade de capibas que os usuários receberão ao completar esta atividade</small>
-      </div>
-
       <PinoInfo selectedPino={selectedPino} />
-
-      <DebugInfo selectedPino={selectedPino} />
     </div>
 
     <ActionButtons
@@ -330,6 +324,7 @@ export default function Sidebar({
       onUpdate={handleUpdate}
       onDelete={handleDelete}
       onCancel={handleCancel}
+      hasChanges={hasChanges}
     />
   </div>
   );

@@ -64,7 +64,6 @@
 
 .logo-img:hover {
   transform: scale(1.05);
-  background-color: var(--hover-white);
 }
 
 /* Menu central - estilo cápsula */
@@ -122,8 +121,8 @@
   color: var(--white);
   text-decoration: none;
   font-weight: 600;
-  background-color: var(--primary-green);
-  transition: all 0.3s ease;
+  background: var(--primary-green);
+  transition: background 0.3s ease, transform 0.1s ease;
   border: 2px solid transparent;
   font-size: 0.95rem;
   display: inline-flex;
@@ -134,7 +133,7 @@
 
 #login:hover {
   background-color: var(--hover-green);
-  transform: translateY(-2px);
+  transform: scale(1.03);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
@@ -149,22 +148,23 @@
   margin-left: 15px;
   padding: 4px;
   border-radius: 4px;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, transform 0.1s ease;
 }
 
 .barra-superior .opcoes:hover {
-  background-color: var(--hover-white);
+  transform: scale(1.03);
 }
 
 .barra-superior .opcoes div {
   background-color: var(--white);
   height: 3px;
   border-radius: 2px;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, transform 0.1s ease;
 }
 
 .barra-superior .opcoes:hover div {
   background-color: var(--hover-green);
+  transform: scale(1.03);
 }
 
 .barra-superior .opcoes div:nth-child(1) { width: 100%; }
