@@ -16,6 +16,7 @@ const connectDB = async () => {
       process.env.MONGODB_URI ||
       "mongodb://localhost:27017/RPG"
     //"mongodb+srv://pedroh7brito_db_user:Ew1L1igsu2ixWkVs@naxron.hba9ufc.mongodb.net/";
+    //"mongodb://localhost:27017/RPG"
 
     // Conecta ao MongoDB usando Mongoose
     const connection = await mongoose.connect(MONGODB_URI)
