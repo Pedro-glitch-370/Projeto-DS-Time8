@@ -1,59 +1,197 @@
-.msgCarregandoMapa {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* ==================================================
+   RESET E CONFIGURAÇÕES GLOBAIS
+   ================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* ==================================================
+   CONTAINER PRINCIPAL DO MAPA - SEM SCROLL
+   ================================================== */
+.mapa-container {
   height: 100vh;
-  font-size: 18px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.mapa-wrapper {
+  height: calc(100vh - 70px);
+  width: 100%;
+  margin-top: 70px;
+  position: relative;
 }
 
 .espacoMapa {
-  height: 100vh;
-  width: 100%;
+  height: 100% !important;
+  width: 100% !important;
 }
 
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* ==================================================
+   ESTILOS DO POPUP (CENTRALIZADO)
+   ================================================== */
 .mensagem {
   color: #1449c0;
+  margin: 4px 0;
+  line-height: 1.2;
+  font-size: 0.85rem;
+  text-align: center;
+  width: 100%;
 }
 
 .modal {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 200px;
+  padding: 8px;
+  text-align: center;
+  gap: 4px;
+  margin: 0 auto;
+}
+
+.modal h3.mensagem {
+  font-size: 0.95rem;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #1449c0;
+  text-align: center;
+  width: 100%;
+}
+
+/* Upload da foto centralizado */
+.modal label {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 4px 0;
+  padding: 8px;
+  border: 2px dashed #1449c0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.modal label:hover {
+  background-color: #f8f9fa;
 }
 
 .imagem {
-  opacity: 0.5;
-  padding: 20px;
-  width: 60px;
-  height: 46px;
-  cursor: pointer;
-  border-radius: 10px;
-  border-style: dotted;
-  border-color: #1449c0;
-}
-
-.botaoConfirmar {
-  opacity: 0.5;
-  color: #1449c0;
-  border-radius: 10px;
-  border: 2.5px solid transparent;
-  padding: 10px;
-  transition: opacity 0.5s ease-in-out;
-
-  background: linear-gradient(white, white) padding-box,
-    linear-gradient(to right, #4dc48a, #1449c0) border-box;
-
-  background-clip: padding-box, border-box;
-}
-
-.botaoConfirmar:hover {
-  opacity: 100%;
-  transition-duration: 0.5s;
+  width: 35px;
+  height: 35px;
+  object-fit: contain;
+  opacity: 0.6;
+  display: block;
+  margin: 0 auto;
 }
 
 .inputFoto {
   display: none;
+}
+
+/* Botão de confirmação centralizado */
+.botaoConfirmar {
+  width: 100%;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #2f7854 0%, #4dc48a 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 6px;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.botaoConfirmar:hover {
+  opacity: 1;
+}
+
+/* Aviso para admin centralizado */
+.admin-hint {
+  margin-top: 4px;
+  padding: 4px;
+  background: #e3f2fd;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  text-align: center;
+  color: #1449c0;
+  width: 100%;
+}
+
+/* ==================================================
+   POPUP DO PINO TEMPORÁRIO (CENTRALIZADO)
+   ================================================== */
+.popUpNovoPonto {
+  color: #1449c0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6px;
+  width: 160px;
+  margin: 0 auto;
+}
+
+.popUpNovoPonto strong {
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  width: 100%;
+}
+
+.popUpNovoPonto p {
+  margin: 3px 0;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  text-align: center;
+  width: 100%;
+}
+
+.popUpNovoPonto small {
+  font-size: 0.65rem;
+  margin-top: 3px;
+  opacity: 0.7;
+  color: #666;
+  text-align: center;
+  width: 100%;
+}
+
+/* ==================================================
+   ESTILOS DE ERRO E LOADING
+   ================================================== */
+.msgCarregandoMapa {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 18px;
 }
 
 .errorContainer {
@@ -67,36 +205,21 @@
 }
 
 .retryButton {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background-color: #3498db;
   color: white;
-  border: "none";
-  border-radius: "4px";
-  cursor: "pointer";
-  margin-top: "10px";
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
 }
 
-.popUpNovoPonto {
-  color: #1449c0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.retryButton:hover {
+  background-color: #2980b9;
 }
 
-/* Ajustes para barra superior fixa */
-.mapa-container {
-  height: 100vh;
-  width: 100%;
-}
-
-
-/* Garantir que o mapa fique abaixo da barra fixa */
-.leaflet-container {
-  height: 100% !important;
-  width: 100% !important;
-}
-
-/* Loading e error containers ajustados */
 .loading-container {
   height: 100vh;
   display: flex;
@@ -105,4 +228,106 @@
   justify-content: center;
   text-align: center;
   padding: 2rem;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1449c0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==================================================
+   CORREÇÃO DO ALINHAMENTO DO LEAFLET POPUP
+   ================================================== */
+.leaflet-popup-content {
+  margin: 8px !important;
+  text-align: center !important;
+}
+
+.leaflet-popup-content-wrapper {
+  text-align: center !important;
+}
+
+/* ==================================================
+   NAVBAR FIXA - CORREÇÃO DE POSICIONAMENTO
+   ================================================== */
+.barra-superior {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1449c0;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  z-index: 1000;
+  box-sizing: border-box;
+  min-height: 70px;
+  height: 70px;
+}
+
+.logo-img {
+  height: 40px;
+  width: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+}
+
+/* ==================================================
+   RESPONSIVIDADE
+   ================================================== */
+@media (max-width: 768px) {
+  .mapa-wrapper {
+    height: calc(100vh - 70px);
+    margin-top: 70px;
+  }
+  
+  .modal {
+    width: 180px;
+    padding: 6px;
+  }
+  
+  .mensagem {
+    font-size: 0.8rem;
+  }
+  
+  .botaoConfirmar {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mapa-wrapper {
+    height: calc(100vh - 70px);
+    margin-top: 70px;
+  }
+  
+  .modal {
+    width: 160px;
+    padding: 4px;
+  }
+  
+  .mensagem {
+    font-size: 0.75rem;
+  }
+  
+  .botaoConfirmar {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
 }

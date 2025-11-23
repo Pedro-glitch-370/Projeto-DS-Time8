@@ -3,42 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Saldo</title>
+    <title>Saldo - Recife Point Game</title>
     <link rel="stylesheet" href="/src/css/saldo.css" />
-    <link rel="stylesheet" href="/src/components/barra-superior/barra-superior.css" />
   </head>
   <body>
-    <!-- Navbar -->
-    <nav class="barra-superior">
-      <div class="esquerda">
-        <img 
-          src="/src/assets/LogoConecta.png" 
-          alt="Logo" 
-          class="logo-img"
-          onclick="window.location.href = 'index.html'"
-          style="cursor: pointer"
-        />
-      </div>
-      <div class="meio">
-        <a href="index.html">Mapa</a>
-        <a href="tarefa.html">Minhas Tarefas</a>
-        <a href="saldo.html" class="ativo">Capibas</a>
-      </div>
-      <div class="direita">
-        <a 
-          href="login.html"
-          id="login"
-        >
-          Entrar
-        </a>
-        <div class="opcoes" id="opcoes">
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      </div>
-    </nav>
-
     <div id="saldo">
       <div class="saldo-container">
         <h1>🏆 Ranking de Capibas</h1>
@@ -80,9 +48,11 @@
       </div>
     </div>
 
+    <script src="/src/components/barra-superior/barra-superior-loader.js"></script>
     <script>
       // Lógica do carrossel
       let slideIndex = 0;
+      let autoRotate;
       
       function mudarSlide(n) {
         const slides = document.querySelectorAll('.pessoa');
@@ -93,24 +63,46 @@
         
         const carrossel = document.querySelector('.carrossel');
         carrossel.style.transform = `translateX(-${slideIndex * 100}%)`;
+        
+        // Reiniciar auto-rotate
+        clearInterval(autoRotate);
+        iniciarAutoRotate();
       }
 
-      // Destacar link ativo na navbar
+      function iniciarAutoRotate() {
+        autoRotate = setInterval(() => {
+          mudarSlide(1);
+        }, 5000);
+      }
+
+      // Iniciar auto-rotate quando a página carregar
       document.addEventListener('DOMContentLoaded', function() {
-        const currentPage = window.location.pathname.split('/').pop();
-        const links = document.querySelectorAll('.meio a');
+        iniciarAutoRotate();
         
+        // Configurar eventos da navbar
+        const links = document.querySelectorAll('.barra-superior .meio a');
         links.forEach(link => {
-          if (link.getAttribute('href') === currentPage) {
-            link.classList.add('ativo');
-          }
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = link.getAttribute('href');
+          });
+        });
+
+        // Logo clicável
+        document.querySelector('.logo-img').addEventListener('click', () => {
+          window.location.href = 'index.html';
         });
       });
 
-      // Auto-rotate do carrossel
-      setInterval(() => {
-        mudarSlide(1);
-      }, 5000);
+      // Pausar auto-rotate quando o mouse estiver sobre o carrossel
+      document.querySelector('.carrossel-container').addEventListener('mouseenter', () => {
+        clearInterval(autoRotate);
+      });
+
+      // Retomar auto-rotate quando o mouse sair do carrossel
+      document.querySelector('.carrossel-container').addEventListener('mouseleave', () => {
+        iniciarAutoRotate();
+      });
     </script>
   </body>
 </html>

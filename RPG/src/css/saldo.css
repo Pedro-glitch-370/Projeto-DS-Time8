@@ -8,7 +8,7 @@ body {
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
-  padding-top: 70px;
+  /* REMOVE padding-top daqui - agora controlado pela navbar */
 }
 
 .saldo-container {
@@ -16,6 +16,8 @@ body {
   margin: 0 auto;
   padding: 30px 20px;
   text-align: center;
+  /* ADICIONA margin-top para compensar a navbar fixa */
+  margin-top: 70px;
 }
 
 .saldo-container h1 {
@@ -33,11 +35,13 @@ body {
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   background: white;
+  height: 200px;
 }
 
 .carrossel {
   display: flex;
   transition: transform 0.5s ease;
+  height: 100%;
 }
 
 .pessoa {
@@ -45,6 +49,11 @@ body {
   padding: 40px 30px;
   text-align: center;
   background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
 .pessoa .nome {
@@ -84,6 +93,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  z-index: 10;
 }
 
 .prev { left: 10px; }
@@ -126,9 +136,321 @@ body {
   font-weight: bold;
 }
 
-/* Link ativo na navbar */
+/* ==================================================
+   ESTILOS DA NAVBAR - CORRIGIDOS
+   ================================================== */
+.barra-superior {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1449c0;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  z-index: 1000;
+  box-sizing: border-box;
+  min-height: 70px;
+  height: 70px;
+}
+
+.barra-superior .esquerda,
+.barra-superior .meio,
+.barra-superior .direita {
+  display: flex;
+  align-items: center;
+}
+
+.barra-superior .esquerda {
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.barra-superior .meio {
+  flex: 2;
+  justify-content: center;
+  gap: 20px;
+}
+
+.barra-superior .direita {
+  flex: 1;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+/* Logo clicável */
+.logo-img {
+  height: 40px;
+  width: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Menu central - estilo cápsula */
+.barra-superior .meio {
+  padding: 6px 16px;
+  border-radius: 50px;
+  border: 2px solid white;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+  max-width: fit-content;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.barra-superior .meio a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  position: relative;
+  white-space: nowrap;
+}
+
+.barra-superior .meio a:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
 .barra-superior .meio a.ativo {
-  color: #ffd700;
-  font-weight: bold;
-  border-bottom: 2px solid #ffd700;
+  background-color: white;
+  color: #1449c0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.barra-superior .meio a.ativo::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: #1449c0;
+  border-radius: 1px;
+}
+
+/* Botão Entrar */
+#login {
+  border-radius: 20px;
+  padding: 8px 20px;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  background-color: #2f7854;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#login:hover {
+  background-color: #4dc48a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#login:active {
+  transform: translateY(0);
+}
+
+/* Menu hamburger */
+.barra-superior .opcoes {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  margin-left: 15px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.barra-superior .opcoes:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.barra-superior .opcoes div {
+  background-color: white;
+  height: 3px;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.barra-superior .opcoes:hover div {
+  background-color: #4dc48a;
+}
+
+.barra-superior .opcoes div:nth-child(1) {
+  width: 100%;
+}
+
+.barra-superior .opcoes div:nth-child(2) {
+  width: 80%;
+  align-self: flex-end;
+}
+
+.barra-superior .opcoes div:nth-child(3) {
+  width: 60%;
+}
+
+/* Efeito de clique no menu */
+.barra-superior .opcoes:active {
+  transform: scale(0.95);
+}
+
+/* Loading state */
+.carregando {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: white;
+  font-size: 1.2rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .saldo-container {
+    padding: 20px 15px;
+    margin-top: 70px;
+  }
+  
+  .saldo-container h1 {
+    font-size: 2rem;
+  }
+  
+  .carrossel-container {
+    max-width: 350px;
+    height: 180px;
+  }
+  
+  .pessoa {
+    padding: 30px 20px;
+  }
+  
+  .pessoa .nome {
+    font-size: 1.3rem;
+  }
+  
+  .pessoa .pontos {
+    font-size: 1.7rem;
+  }
+  
+  .prev, .next {
+    width: 40px;
+    height: 40px;
+    padding: 10px;
+  }
+  
+  .barra-superior {
+    padding: 10px 15px;
+    flex-wrap: wrap;
+    min-height: 60px;
+  }
+
+  .barra-superior .meio {
+    order: 3;
+    flex: 1 0 100%;
+    margin-top: 10px;
+    padding: 4px 12px;
+    gap: 8px;
+  }
+
+  .barra-superior .meio a {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .barra-superior .esquerda,
+  .barra-superior .direita {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .saldo-container {
+    margin-top: 85px;
+  }
+  
+  .saldo-container h1 {
+    font-size: 1.8rem;
+  }
+  
+  .carrossel-container {
+    max-width: 300px;
+    height: 160px;
+  }
+  
+  .pessoa {
+    padding: 25px 15px;
+  }
+  
+  .pessoa .nome {
+    font-size: 1.2rem;
+  }
+  
+  .pessoa .saldo {
+    font-size: 1rem;
+  }
+  
+  .pessoa .pontos {
+    font-size: 1.5rem;
+  }
+  
+  .meu-saldo {
+    padding: 20px;
+  }
+  
+  .valor {
+    font-size: 1.7rem;
+  }
+  
+  .posicao {
+    font-size: 1.1rem;
+  }
+  
+  .barra-superior .meio {
+    gap: 4px;
+    padding: 3px 10px;
+  }
+
+  .barra-superior .meio a {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+
+  #login {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .logo-img {
+    height: 35px;
+  }
+
+  .barra-superior .opcoes {
+    width: 24px;
+    height: 18px;
+    margin-left: 10px;
+  }
 }

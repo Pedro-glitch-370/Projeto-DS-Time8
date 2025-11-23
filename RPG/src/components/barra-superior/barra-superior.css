@@ -1,15 +1,284 @@
+.msgCarregandoMapa {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 18px;
+}
+
+.espacoMapa {
+  height: 100%;
+  width: 100%;
+}
+
+/* ==================================================
+   CORREÇÃO DO POSICIONAMENTO DO MAPA
+   ================================================== */
+.mapa-container {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+.mapa-wrapper {
+  height: calc(100vh - 70px);
+  width: 100%;
+  margin-top: 70px;
+}
+
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* ==================================================
+   ESTILOS DO POPUP (CENTRALIZADO)
+   ================================================== */
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  padding: 8px;
+  text-align: center;
+  gap: 4px;
+  margin: 0 auto;
+}
+
+.mensagem {
+  color: #1449c0;
+  margin: 4px 0;
+  line-height: 1.2;
+  font-size: 0.85rem;
+  text-align: center;
+  width: 100%;
+}
+
+.modal h3.mensagem {
+  font-size: 0.95rem;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #1449c0;
+  text-align: center;
+  width: 100%;
+}
+
+/* Upload da foto centralizado */
+.modal label {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 4px 0;
+  padding: 8px;
+  border: 2px dashed #1449c0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.modal label:hover {
+  background-color: #f8f9fa;
+}
+
+.imagem {
+  width: 35px;
+  height: 35px;
+  object-fit: contain;
+  opacity: 0.6;
+  display: block;
+  margin: 0 auto;
+}
+
+.inputFoto {
+  display: none;
+}
+
+/* Botão de confirmação centralizado */
+.botaoConfirmar {
+  width: 100%;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #2f7854 0%, #4dc48a 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 6px;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.botaoConfirmar:hover {
+  opacity: 1;
+}
+
+/* Aviso para admin centralizado */
+.admin-hint {
+  margin-top: 4px;
+  padding: 4px;
+  background: #e3f2fd;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  text-align: center;
+  color: #1449c0;
+  width: 100%;
+}
+
+/* ==================================================
+   POPUP DO PINO TEMPORÁRIO (CENTRALIZADO)
+   ================================================== */
+.popUpNovoPonto {
+  color: #1449c0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6px;
+  width: 160px;
+  margin: 0 auto;
+}
+
+.popUpNovoPonto strong {
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  width: 100%;
+}
+
+.popUpNovoPonto p {
+  margin: 3px 0;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  text-align: center;
+  width: 100%;
+}
+
+.popUpNovoPonto small {
+  font-size: 0.65rem;
+  margin-top: 3px;
+  opacity: 0.7;
+  color: #666;
+  text-align: center;
+  width: 100%;
+}
+
+/* ==================================================
+   ESTILOS DE ERRO E LOADING (mantidos)
+   ================================================== */
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+  text-align: center;
+}
+
+.retryButton {
+  padding: 8px 16px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.retryButton:hover {
+  background-color: #2980b9;
+}
+
+.loading-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1449c0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==================================================
+   CORREÇÃO DO ALINHAMENTO DO LEAFLET POPUP
+   ================================================== */
+.leaflet-popup-content {
+  margin: 8px !important;
+  text-align: center !important;
+}
+
+.leaflet-popup-content-wrapper {
+  text-align: center !important;
+}
+
+.logo-img {
+  height: 40px;
+  width: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+}
+
+/* ==================================================
+   NAVBAR GLOBAL - Design do Figma
+   ================================================== */
+:root {
+  --primary-blue: #1449c0;
+  --primary-green: #2f7854;
+  --hover-green: #4dc48a;
+  --white: #ffffff;
+  --hover-white: rgba(255, 255, 255, 0.3);
+  --shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .barra-superior {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #1449c0; /* cor do figma */
+  background-color: #1449c0;
   color: white;
   display: flex;
   align-items: center;
   padding: 10px 20px;
   z-index: 1000;
   box-sizing: border-box;
+  min-height: 70px;
+  height: 70px;
 }
 
 .barra-superior .esquerda,
@@ -36,78 +305,266 @@
   gap: 15px;
 }
 
-.barra-superior a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
+/* Logo clicável */
+.logo-img {
+  height: 40px;
+  width: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  padding: 4px;
 }
 
-.barra-superior a:hover {
-  text-decoration: underline;
+.logo-img:hover {
+  transform: scale(1.05);
+  background-color: var(--hover-white);
 }
 
-#login {
+/* Menu central - estilo cápsula */
+.barra-superior .meio {
+  padding: 6px 16px;
+  border-radius: 50px;
+  border: 2px solid var(--white);
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--shadow);
+  max-width: fit-content;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
 
-  border-radius: 12px;
-  padding: 6px 14px;
-  color: white;
+.barra-superior .meio a {
+  color: var(--white);
   text-decoration: none;
   font-weight: 600;
-  background-color: #2f7854;
-  transition: background-color 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  position: relative;
+  white-space: nowrap;
 }
 
-/* cores do prototipo do figma */
-/* #2F7854 */
-/* #4DC48A */
+.barra-superior .meio a:hover {
+  background-color: var(--hover-white);
+  transform: translateY(-1px);
+}
+
+.barra-superior .meio a.ativo {
+  background-color: var(--white);
+  color: var(--primary-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.barra-superior .meio a.ativo::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: var(--primary-blue);
+  border-radius: 1px;
+}
+
+/* Botão Entrar */
+#login {
+  border-radius: 20px;
+  padding: 8px 20px;
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 600;
+  background-color: var(--primary-green);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
 
 #login:hover {
-  background-color: #4dc48a;
+  background-color: var(--hover-green);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+#login:active {
+  transform: translateY(0);
+}
+
+/* Menu hamburger */
 .barra-superior .opcoes {
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 25px;
-  height: 18px;
-  margin-left: 10px;
+  width: 28px;
+  height: 20px;
+  margin-left: 15px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.barra-superior .opcoes:hover {
+  background-color: var(--hover-white);
 }
 
 .barra-superior .opcoes div {
-  background-color: white;
+  background-color: var(--white);
   height: 3px;
   border-radius: 2px;
+  transition: all 0.3s ease;
 }
 
-.barra-superior .meio {
-  padding: 6px 16px;
-  border-radius: 12px;
-  border: 2px solid white;
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
-  max-width: fit-content;
-}
-.barra-superior .meio a {
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
+.barra-superior .opcoes:hover div {
+  background-color: var(--hover-green);
 }
 
-.barra-superior .meio a:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+.barra-superior .opcoes div:nth-child(1) {
+  width: 100%;
 }
 
-/* Para ajeitar o tamanho do logo. Por sinal, ele vai ser clicavel ne? */
-/* Estilo aperta e vai para home. ? */
-.logo-img {
-  height: 40px;
-  width: auto;
+.barra-superior .opcoes div:nth-child(2) {
+  width: 80%;
+  align-self: flex-end;
+}
+
+.barra-superior .opcoes div:nth-child(3) {
+  width: 60%;
+}
+
+/* Efeito de clique no menu */
+.barra-superior .opcoes:active {
+  transform: scale(0.95);
+}
+
+/* Remove qualquer padding do body */
+body {
+  padding-top: 0;
+  margin: 0;
+}
+
+/* ==================================================
+   ANIMAÇÕES E ESTADOS
+   ================================================== */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.barra-superior .meio a.ativo {
+  animation: pulse 2s infinite;
+}
+
+/* ==================================================
+   RESPONSIVIDADE
+   ================================================== */
+@media (max-width: 768px) {
+  .barra-superior {
+    padding: 10px 15px;
+    flex-wrap: wrap;
+    min-height: 60px;
+  }
+
+  .barra-superior .meio {
+    order: 3;
+    flex: 1 0 100%;
+    margin-top: 10px;
+    padding: 4px 12px;
+    gap: 8px;
+  }
+
+  .barra-superior .meio a {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .barra-superior .esquerda,
+  .barra-superior .direita {
+    flex: 1;
+  }
+
+  .mapa-wrapper {
+    height: calc(100vh - 90px);
+    margin-top: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .barra-superior .meio {
+    gap: 4px;
+    padding: 3px 10px;
+  }
+
+  .barra-superior .meio a {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+
+  #login {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .logo-img {
+    height: 35px;
+  }
+
+  .barra-superior .opcoes {
+    width: 24px;
+    height: 18px;
+    margin-left: 10px;
+  }
+
+  .mapa-wrapper {
+    height: calc(100vh - 85px);
+    margin-top: 85px;
+  }
+}
+
+/* ==================================================
+   ACESSIBILIDADE
+   ================================================== */
+.barra-superior a:focus,
+.barra-superior button:focus,
+.logo-img:focus {
+  outline: 2px solid var(--hover-green);
+  outline-offset: 2px;
+}
+
+.barra-superior a:focus-visible,
+.barra-superior button:focus-visible {
+  outline: 2px solid var(--hover-green);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .barra-superior .meio {
+    border: 3px solid var(--white);
+  }
+  
+  .barra-superior .meio a.ativo {
+    background-color: var(--white);
+    color: var(--primary-blue);
+    border: 2px solid var(--white);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .barra-superior .meio a,
+  .barra-superior .opcoes,
+  .logo-img,
+  #login {
+    transition: none;
+    animation: none;
+  }
 }

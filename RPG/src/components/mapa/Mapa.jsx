@@ -167,12 +167,11 @@ export default function Mapa() {
           />
         </div>
         <div className="meio">
-          <a href="index.html">Mapa</a>
+          <a href="index.html" className="ativo">Mapa</a> {/* Adicione className="ativo" aqui */}
           <a href="tarefa.html">Minhas Tarefas</a>
           <a href="saldo.html">Capibas</a>
         </div>
         <div className="direita">
-          {/* SEMPRE mostra o botão ENTRAR, independente de estar logado ou não */}
           <a 
             href="#login"
             id="login"
@@ -191,8 +190,8 @@ export default function Mapa() {
         </div>
       </nav>
 
-      {/* Container do mapa - com margin-top para não ficar embaixo da barra fixa */}
-      <div style={{ marginTop: '70px', height: 'calc(100vh - 70px)' }}>
+      {/* Container do mapa - CORRIGIDO: sem margin-top, altura calculada */}
+      <div className="mapa-wrapper">
         <MapContainer
           scrollWheelZoom={false}
           className="espacoMapa"
@@ -223,14 +222,15 @@ export default function Mapa() {
 
           {/* Pino temporário (apenas para admin) */}
           {tempPin && isAdmin && (
-            <Marker position={[tempPin.lat, tempPin.lng]} icon={ICONS.temporary}>
-              <Popup>
-                <div className="popUpNovoPonto">
-                  <strong>Novo Ponto</strong>
-                  Preencha as informações ao lado para salvar.
-                </div>
-              </Popup>
-            </Marker>
+          <Marker position={[tempPin.lat, tempPin.lng]} icon={ICONS.temporary}>
+            <Popup>
+              <div className="popUpNovoPonto">
+                <strong>📍 Novo Ponto</strong>
+                <p>Preencha as informações na sidebar para salvar.</p>
+                <small>Lat: {tempPin.lat.toFixed(4)}<br/>Lng: {tempPin.lng.toFixed(4)}</small>
+              </div>
+            </Popup>
+          </Marker>
           )}
 
           {/* Pinos existentes - TODOS podem ver, mesmo sem login */}
@@ -246,51 +246,53 @@ export default function Mapa() {
               }}
             >
               <Popup>
-                <div className="modal">
-                  <h3 className="mensagem">{pino.nome}</h3>
+  <div className="modal">
+    <h3 className="mensagem">{pino.nome}</h3>
 
-                  {/* Upload da foto */}
-                  <label htmlFor={`foto-${pino.id}`}>
-                    <img
-                      className="imagem"
-                      src="/src/assets/AdicionarFoto.png"
-                      alt="Adicionar Foto"
-                    />
-                  </label>
-                  <input
-                    type="file"
-                    id={`foto-${pino.id}`}
-                    accept="image/*"
-                    title="Enviar Foto"
-                    className="inputFoto"
-                  />
+    {/* Upload da foto - CORRIGIDO */}
+    <label htmlFor={`foto-${pino._id || pino.id}`}>
+      <img
+        className="imagem"
+        src="/src/assets/AdicionarFoto.png"
+        alt="Adicionar Foto"
+        onError={(e) => {
+          // Fallback se a imagem não carregar
+          e.target.style.display = 'none';
+          const fallback = document.createElement('div');
+          fallback.textContent = '📷 Adicionar Foto';
+          fallback.style.fontSize = '2rem';
+          e.target.parentNode.appendChild(fallback);
+        }}
+      />
+      <span style={{ fontSize: '0.8rem', color: '#666' }}>Clique para adicionar foto</span>
+    </label>
+    <input
+      type="file"
+      id={`foto-${pino._id || pino.id}`}
+      accept="image/*"
+      title="Enviar Foto"
+      className="inputFoto"
+    />
 
-                  {/* Descrição da atividade e recompensa */}
-                  <p className="mensagem">{pino.msg}</p>
-                  <p className="mensagem">
-                    <strong>Recompensa: xx capibas</strong>
-                  </p>
+    {/* Descrição da atividade e recompensa */}
+    <p className="mensagem">{pino.msg}</p>
+    <p className="mensagem">
+      <strong>Recompensa: {pino.capibas || 0} capibas</strong>
+    </p>
 
-                  {/* Botão de confirmação - TODOS podem usar */}
-                  <button className="botaoConfirmar">
-                    Confirme sua presença
-                  </button>
+    {/* Botão de confirmação - TODOS podem usar */}
+    <button className="botaoConfirmar">
+      Confirme sua presença
+    </button>
 
-                  {/* Aviso para admin - apenas informativo */}
-                  {isAdmin && (
-                    <div style={{ 
-                      marginTop: '0.5rem', 
-                      padding: '0.5rem', 
-                      background: '#e3f2fd', 
-                      borderRadius: '5px',
-                      fontSize: '0.8rem',
-                      textAlign: 'center'
-                    }}>
-                      💡 Admin: Clique fora do popup para editar este pino
-                    </div>
-                  )}
-                </div>
-              </Popup>
+    {/* Aviso para admin - apenas informativo */}
+    {isAdmin && (
+      <div className="admin-hint">
+        💡 Admin: Clique fora do popup para editar este pino
+      </div>
+    )}
+  </div>
+</Popup>
             </Marker>
           ))}
         </MapContainer>
