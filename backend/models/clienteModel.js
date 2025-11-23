@@ -8,10 +8,7 @@ const clienteSchema = new Schema({
     tipo: { type: String, enum: ['cliente', 'admin'], required: true },
     capibas: { type:Number, required: true, default: 0 }, // cliente sempre começa com 0 capibas
     tarefasCompletas: { type: Number, default: 0 },
-    tarefasConcluidas: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Pino' 
-    }],
+    tarefasConcluidas: [{ type: String }],
     ultimaAtividade: { type: Date, default: Date.now }
 }, {
     timestamps: true

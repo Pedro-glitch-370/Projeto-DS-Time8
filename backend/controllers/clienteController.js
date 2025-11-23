@@ -28,7 +28,9 @@ class ClienteController {
                 nome,
                 email,
                 tipo: 'cliente',
-                capibas: 0
+                capibas: 0,
+                tarefasCompletas: 0,
+                tarefasConcluidas: []
             });
 
             await newCliente.save();
@@ -42,7 +44,8 @@ class ClienteController {
                     nome: newCliente.nome,
                     email: newCliente.email,
                     tipo: newCliente.tipo,
-                    capibas: newCliente.capibas
+                    capibas: newCliente.capibas,
+                    tarefasCompletas: newCliente.tarefasCompletas
                 }
             });
 
@@ -81,7 +84,9 @@ class ClienteController {
                     nome: cliente.nome,
                     email: cliente.email,
                     tipo: 'cliente',
-                    capibas: cliente.capibas
+                    capibas: cliente.capibas,
+                    tarefasCompletas: cliente.tarefasCompletas,
+                    tarefasConcluidas: cliente.tarefasConcluidas || []
                 }
             });
 
@@ -126,7 +131,9 @@ class ClienteController {
                     nome: cliente.nome,
                     email: cliente.email,
                     tipo: 'cliente',
-                    capibas: cliente.capibas
+                    capibas: cliente.capibas,
+                    tarefasCompletas: cliente.tarefasCompletas,
+                    tarefasConcluidas: cliente.tarefasConcluidas || []
                 }
             });
 
@@ -156,13 +163,74 @@ class ClienteController {
                     nome: cliente.nome,
                     email: cliente.email,
                     tipo: 'cliente',
-                    capibas: cliente.capibas
+                    capibas: cliente.capibas,
+                    tarefasCompletas: cliente.tarefasCompletas,
+                    tarefasConcluidas: cliente.tarefasConcluidas || []
                 }
             });
 
         } catch (error) {
             console.error("Erro ao buscar cliente por ID:", error);
             res.status(500).json({ message: "Erro interno do servidor" });
+        }
+    }
+
+    // Concluir tarefa
+    static async concluirTarefa(req, res) {
+        try {
+            const { id } = req.params;
+            const { tarefaId, capibas } = req.body;
+
+            console.log(`🎯 Cliente ${id} concluindo tarefa ${tarefaId} por ${capibas} capibas`);
+
+            // Validação
+            if (!tarefaId || !capibas) {
+                return res.status(400).json({ message: "tarefaId e capibas são obrigatórios" });
+            }
+
+            const cliente = await Cliente.findById(id);
+            if (!cliente) {
+                return res.status(404).json({ message: "Cliente não encontrado" });
+            }
+
+            // Inicializar arrays se não existirem
+            if (!cliente.tarefasConcluidas) {
+                cliente.tarefasConcluidas = [];
+            }
+
+            // Verificar se a tarefa já foi concluída
+            if (cliente.tarefasConcluidas.includes(tarefaId)) {
+                return res.status(400).json({ 
+                    message: "Tarefa já concluída",
+                    capibas: cliente.capibas,
+                    tarefasCompletas: cliente.tarefasCompletas,
+                    tarefasConcluidas: cliente.tarefasConcluidas
+                });
+            }
+
+            // Adicionar tarefa às concluídas
+            cliente.tarefasConcluidas.push(tarefaId);
+            
+            // Incrementar contador de tarefas completas
+            cliente.tarefasCompletas = (cliente.tarefasCompletas || 0) + 1;
+            
+            // Adicionar capibas ao cliente
+            cliente.capibas = (cliente.capibas || 0) + capibas;
+            
+            await cliente.save();
+            
+            console.log(`✅ Tarefa ${tarefaId} concluída por ${cliente.nome}. Total: ${cliente.tarefasCompletas} tarefas, ${cliente.capibas} capibas`);
+
+            res.json({ 
+                message: "Tarefa concluída com sucesso", 
+                capibas: cliente.capibas,
+                tarefasCompletas: cliente.tarefasCompletas,
+                tarefasConcluidas: cliente.tarefasConcluidas 
+            });
+
+        } catch (error) {
+            console.error("❌ Erro ao concluir tarefa:", error);
+            res.status(500).json({ message: "Erro interno do servidor", error: error.message });
         }
     }
 
