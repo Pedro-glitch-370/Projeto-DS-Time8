@@ -1,5 +1,5 @@
 /* ==================================================
-   NAVBAR GLOBAL - Design do Figma
+   NAVBAR GLOBAL - Design do Figma - VERSÃO OTIMIZADA
    ================================================== */
 :root {
   --primary-blue: #1449c0;
@@ -8,6 +8,11 @@
   --white: #ffffff;
   --hover-white: rgba(255, 255, 255, 0.3);
   --shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+  --error-color: #e74c3c;
+  --success-color: #27ae60;
+  --text-dark: #333;
+  --text-gray: #666;
+  --border-color: #ddd;
 }
 
 * {
@@ -16,18 +21,22 @@
   box-sizing: border-box;
 }
 
+/* ==================================================
+   COMPONENTES PRINCIPAIS
+   ================================================== */
+
+/* Navbar principal */
 .barra-superior {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #1449c0;
-  color: white;
+  background-color: var(--primary-blue);
+  color: var(--white);
   display: flex;
   align-items: center;
   padding: 10px 20px;
   z-index: 1000;
-  box-sizing: border-box;
   min-height: 70px;
   height: 70px;
 }
@@ -39,24 +48,11 @@
   align-items: center;
 }
 
-.barra-superior .esquerda {
-  flex: 1;
-  justify-content: flex-start;
-}
+.barra-superior .esquerda { flex: 1; justify-content: flex-start; }
+.barra-superior .meio { flex: 2; justify-content: center; gap: 20px; }
+.barra-superior .direita { flex: 1; justify-content: flex-end; gap: 15px; }
 
-.barra-superior .meio {
-  flex: 2;
-  justify-content: center;
-  gap: 20px;
-}
-
-.barra-superior .direita {
-  flex: 1;
-  justify-content: flex-end;
-  gap: 15px;
-}
-
-/* Logo clicável */
+/* Logo */
 .logo-img {
   height: 40px;
   width: auto;
@@ -78,12 +74,10 @@
   border: 2px solid var(--white);
   display: flex;
   gap: 16px;
-  justify-content: center;
-  align-items: center;
-  box-shadow: var(--shadow);
   max-width: fit-content;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
 }
 
 .barra-superior .meio a {
@@ -121,7 +115,7 @@
   border-radius: 1px;
 }
 
-/* Botão Entrar */
+/* Botões e controles */
 #login {
   border-radius: 20px;
   padding: 8px 20px;
@@ -144,10 +138,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-#login:active {
-  transform: translateY(0);
-}
-
 /* Menu hamburger */
 .barra-superior .opcoes {
   cursor: pointer;
@@ -160,7 +150,6 @@
   padding: 4px;
   border-radius: 4px;
   transition: all 0.3s ease;
-  position: relative;
 }
 
 .barra-superior .opcoes:hover {
@@ -178,34 +167,17 @@
   background-color: var(--hover-green);
 }
 
-.barra-superior .opcoes div:nth-child(1) {
-  width: 100%;
-}
-
-.barra-superior .opcoes div:nth-child(2) {
-  width: 80%;
-  align-self: flex-end;
-}
-
-.barra-superior .opcoes div:nth-child(3) {
-  width: 60%;
-}
-
-/* Efeito de clique no menu */
-.barra-superior .opcoes:active {
-  transform: scale(0.95);
-}
-
-/* Remove qualquer padding do body */
-body {
-  padding-top: 0;
-  margin: 0;
-}
+.barra-superior .opcoes div:nth-child(1) { width: 100%; }
+.barra-superior .opcoes div:nth-child(2) { width: 80%; align-self: flex-end; }
+.barra-superior .opcoes div:nth-child(3) { width: 60%; }
 
 /* ==================================================
-   POPUP DE LOGIN
+   POPUPS E MODAIS
    ================================================== */
-.login-popup {
+
+/* Popups centrais (Login e User Menu) */
+.login-popup,
+.user-menu {
   display: none;
   position: fixed;
   top: 0;
@@ -219,8 +191,9 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
-.login-popup-content {
-  background: white;
+.login-popup-content,
+.user-menu-content {
+  background: var(--white);
   padding: 2rem;
   border-radius: 15px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
@@ -230,57 +203,76 @@ body {
   animation: slideUp 0.3s ease;
 }
 
-.close-popup {
+/* Menu de configurações lateral */
+.settings-menu {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100%;
+  background: var(--white);
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  animation: slideInRight 0.3s ease;
+}
+
+.settings-menu-content {
+  padding: 2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+}
+
+/* Botões de fechar */
+.close-popup,
+.close-settings {
   position: absolute;
   top: 15px;
   right: 20px;
   font-size: 2rem;
-  color: #666;
+  color: var(--text-gray);
   cursor: pointer;
   line-height: 1;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  padding: 4px;
+  border-radius: 4px;
 }
 
-.close-popup:hover {
-  color: #333;
+.close-popup:hover,
+.close-settings:hover {
+  color: var(--text-dark);
+  background: #f8f9fa;
 }
 
-.login-popup .logo {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
+/* ==================================================
+   ESTILOS DE FORMULÁRIO
+   ================================================== */
 
-.login-popup .logo img {
-  max-width: 120px;
-  height: auto;
-}
-
-.login-popup h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #333;
-  font-size: 1.5rem;
-}
-
-.login-popup .form-group {
+.form-group {
   margin-bottom: 1rem;
 }
 
+/* Labels de formulário */
 .login-popup label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: var(--text-dark);
   font-weight: 600;
   font-size: 0.9rem;
 }
 
+/* Inputs de formulário */
 .login-popup input {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #ddd;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
+  background: var(--white);
+  color: var(--text-dark);
 }
 
 .login-popup input:focus {
@@ -289,11 +281,12 @@ body {
   box-shadow: 0 0 0 3px rgba(20, 73, 192, 0.1);
 }
 
-.login-popup button {
+/* Botões de formulário */
+.login-popup button[type="submit"] {
   width: 100%;
   padding: 0.75rem;
   background: linear-gradient(135deg, var(--primary-green) 0%, var(--hover-green) 100%);
-  color: white;
+  color: var(--white);
   border: none;
   border-radius: 8px;
   font-size: 1rem;
@@ -303,51 +296,343 @@ body {
   margin-top: 0.5rem;
 }
 
-.login-popup button:hover {
+.login-popup button[type="submit"]:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(47, 120, 84, 0.4);
 }
 
-.login-popup button:active {
-  transform: translateY(0);
+/* ==================================================
+   COMPONENTES ESPECÍFICOS
+   ================================================== */
+
+/* Logo nos popups */
+.login-popup .logo,
+.user-menu .logo {
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
 
-.login-popup .register-link {
-  display: block;
+.login-popup .logo img,
+.user-menu .logo img {
+  max-width: 120px;
+  height: auto;
+}
+
+/* Títulos */
+.login-popup h2,
+.user-menu h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--text-dark);
+  font-size: 1.5rem;
+}
+
+/* User type selection */
+.user-type {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.user-type label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--white);
+  margin: 0;
+  text-align: center;
+  min-height: 60px;
+}
+
+.user-type input[type="radio"] {
+  display: none;
+}
+
+.user-type span {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 10px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  background: var(--white);
+}
+
+.user-type input[type="radio"]:checked + span {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, #1e5fd9 100%) !important;
+  color: var(--white) !important;
+  box-shadow: 0 4px 12px rgba(20, 73, 192, 0.3);
+}
+
+.user-type label:has(input[type="radio"]:checked) {
+  border-color: var(--primary-blue);
+}
+
+.user-type label:hover {
+  border-color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(20, 73, 192, 0.15);
+}
+
+/* Mensagens de status */
+.error,
+.success,
+.loading {
   text-align: center;
   margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  display: none;
+}
+
+.error {
+  color: var(--error-color);
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.success {
+  color: #155724;
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.loading {
+  color: var(--primary-blue);
+  font-weight: 500;
+  background: none;
+  border: none;
+}
+
+/* Links de registro */
+.register-link-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.register-link {
+  display: inline-block;
+  text-align: center;
   color: var(--primary-blue);
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 6px;
 }
 
-.login-popup .register-link:hover {
+.register-link:hover {
   color: var(--primary-green);
   text-decoration: underline;
+  background-color: rgba(20, 73, 192, 0.05);
 }
 
-.login-popup .error {
-  color: #e74c3c;
-  text-align: center;
-  margin-top: 1rem;
-  display: none;
-  background: #f8d7da;
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #f5c6cb;
+/* ==================================================
+   COMPONENTES DO USUÁRIO LOGADO
+   ================================================== */
+
+.user-welcome {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.user-welcome:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--white);
+  transform: translateY(-1px);
+}
+
+.user-avatar-small,
+.user-avatar {
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--hover-green) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.user-avatar-small {
+  width: 35px;
+  height: 35px;
+  font-size: 0.85rem;
+}
+
+.user-avatar {
+  width: 70px;
+  height: 70px;
+  font-size: 1.4rem;
+}
+
+.user-name-small {
+  font-weight: 600;
   font-size: 0.9rem;
+  color: var(--white);
+  white-space: nowrap;
 }
 
-.login-popup .loading {
-  display: none;
-  text-align: center;
-  margin-top: 1rem;
+/* Info do usuário no menu */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.user-email {
+  font-size: 0.9rem;
+  color: var(--text-gray);
+  margin-bottom: 6px;
+}
+
+.user-type {
+  font-size: 0.8rem;
   color: var(--primary-blue);
-  font-weight: 500;
+  background: #e3f2fd;
+  padding: 4px 12px;
+  border-radius: 15px;
+  display: inline-block;
+  font-weight: 600;
 }
 
-/* Animações do popup */
+/* Botões de ação */
+.logout-btn,
+.settings-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.logout-btn:hover,
+.settings-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.settings-option {
+  background: var(--white);
+  border: 2px solid #e9ecef;
+  color: #2c3e50;
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.settings-option:hover {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, #1e5fd9 100%);
+  color: var(--white);
+  transform: translateX(8px);
+  border-color: var(--primary-blue);
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.settings-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.settings-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+/* ==================================================
+   VALIDAÇÃO E ESTADOS
+   ================================================== */
+
+.validation-message {
+  font-size: 12px;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: none;
+}
+
+.validation-message.error {
+  display: block;
+  background-color: #ffe6e6;
+  color: var(--error-color);
+  border: 1px solid #ff7675;
+}
+
+.validation-message.success {
+  display: block;
+  background-color: #e6f7e6;
+  color: var(--success-color);
+  border: 1px solid #2ecc71;
+}
+
+/* Estados de botão */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+}
+
+/* ==================================================
+   ANIMAÇÕES
+   ================================================== */
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -364,83 +649,83 @@ body {
   }
 }
 
-/* ==================================================
-   ANIMAÇÕES
-   ================================================== */
-.barra-superior .meio a,
-.barra-superior .opcoes,
-.logo-img,
-#login {
-  transition: all 0.3s ease;
-}
-
-/* Suporte para reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .barra-superior .meio a,
-  .barra-superior .opcoes,
-  .logo-img,
-  #login {
-    transition: none;
-    animation: none;
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
   }
-  
-  .login-popup {
-    animation: none;
-  }
-  
-  .login-popup-content {
-    animation: none;
+  to {
+    transform: translateX(0);
   }
 }
 
 /* ==================================================
    RESPONSIVIDADE
    ================================================== */
+
 @media (max-width: 768px) {
   .barra-superior {
     padding: 10px 15px;
     flex-wrap: wrap;
     min-height: 60px;
+    height: auto;
   }
 
   .barra-superior .meio {
     order: 3;
     flex: 1 0 100%;
     margin-top: 10px;
-    padding: 4px 12px;
-    gap: 8px;
+    padding: 6px 14px;
+    gap: 12px;
   }
 
   .barra-superior .meio a {
-    padding: 6px 12px;
-    font-size: 0.85rem;
+    padding: 7px 14px;
+    font-size: 0.9rem;
   }
 
-  .barra-superior .esquerda,
-  .barra-superior .direita {
-    flex: 1;
-  }
-  
-  .login-popup-content {
+  .login-popup-content,
+  .user-menu-content {
     padding: 1.5rem;
     margin: 20px;
     width: calc(100% - 40px);
+  }
+  
+  .user-type {
+    gap: 10px;
+  }
+  
+  .user-type label {
+    padding: 10px 6px;
+    min-height: 55px;
+  }
+  
+  .settings-menu {
+    width: 280px;
+  }
+  
+  .settings-menu-content {
+    padding: 1.5rem;
+  }
+  
+  .register-link {
+    padding: 12px 20px;
+    min-height: 44px;
   }
 }
 
 @media (max-width: 480px) {
   .barra-superior .meio {
-    gap: 4px;
-    padding: 3px 10px;
+    gap: 6px;
+    padding: 5px 12px;
   }
 
   .barra-superior .meio a {
-    padding: 4px 8px;
-    font-size: 0.8rem;
+    padding: 6px 10px;
+    font-size: 0.85rem;
   }
 
   #login {
-    padding: 6px 12px;
+    padding: 7px 14px;
     font-size: 0.85rem;
   }
 
@@ -449,20 +734,121 @@ body {
   }
 
   .barra-superior .opcoes {
-    width: 24px;
+    width: 26px;
     height: 18px;
-    margin-left: 10px;
+    margin-left: 12px;
   }
   
-  .login-popup-content {
+  .login-popup-content,
+  .user-menu-content {
     padding: 1.25rem;
   }
   
-  .login-popup .logo img {
+  .login-popup .logo img,
+  .user-menu .logo img {
     max-width: 100px;
   }
   
-  .login-popup h2 {
+  .login-popup h2,
+  .user-menu h2 {
     font-size: 1.3rem;
   }
+  
+  .user-welcome .user-name-small {
+    display: none;
+  }
+  
+  .user-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.2rem;
+  }
+  
+  .user-type {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .settings-menu {
+    width: 100%;
+  }
+}
+
+/* ==================================================
+   UTILITÁRIOS E CORREÇÕES
+   ================================================== */
+
+/* Reset do body */
+body {
+  padding-top: 0;
+  margin: 0;
+}
+
+/* Suporte para reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .barra-superior .meio a,
+  .barra-superior .opcoes,
+  .logo-img,
+  #login,
+  .logout-btn,
+  .settings-option,
+  .register-link,
+  .login-popup button[type="submit"] {
+    transition: none;
+    animation: none;
+  }
+  
+  .login-popup,
+  .user-menu,
+  .settings-menu,
+  .login-popup-content,
+  .user-menu-content {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .barra-superior {
+    border-bottom: 2px solid var(--white);
+  }
+  
+  .barra-superior .meio {
+    border: 3px solid var(--white);
+  }
+  
+  .barra-superior .meio a.ativo {
+    background: var(--white);
+    color: black;
+  }
+  
+  .user-type input[type="radio"]:checked + span {
+    background: black;
+    color: var(--white);
+  }
+}
+
+/* Garantir compatibilidade */
+.user-type input[type="radio"]:checked ~ span {
+  background: var(--primary-blue) !important;
+  color: var(--white) !important;
+}
+
+/* Overlay para fechar popups */
+.login-popup::before,
+.user-menu::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -1;
 }
