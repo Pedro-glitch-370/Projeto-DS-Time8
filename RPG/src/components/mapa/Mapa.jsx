@@ -6,7 +6,6 @@ import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leafl
 import { useEffect, useState, useCallback, useMemo } from "react";
 
 // No topo do Mapa.jsx, adicione:
-import "../../components/barra-superior/barra-superior.css";
 import { handleSavePino, handleDeletePino, handleUpdatePino } from "./acoesPinos.js";
 import { MAP_CONFIG, ICONS } from "./constantesMapa.js";
 import usePinosManagement from "./usePinosManagement.js";
@@ -155,40 +154,7 @@ export default function Mapa() {
   // Retorna mapa e cada pino
   return (
     <div className="mapa-container">
-      {/* SUA BARRA SUPERIOR PERSONALIZADA - SEMPRE com botão ENTRAR */}
-      <nav className="barra-superior">
-        <div className="esquerda">
-          <img 
-            src="/src/assets/LogoConecta.png" 
-            alt="Logo" 
-            className="logo-img"
-            onClick={() => window.location.href = 'index.html'}
-            style={{ cursor: 'pointer' }}
-          />
-        </div>
-        <div className="meio">
-          <a href="index.html" className="ativo">Mapa</a> {/* Adicione className="ativo" aqui */}
-          <a href="tarefa.html">Minhas Tarefas</a>
-          <a href="saldo.html">Capibas</a>
-        </div>
-        <div className="direita">
-          <a 
-            href="#login"
-            id="login"
-            onClick={(e) => {
-              e.preventDefault();
-              window.location.href = 'login.html';
-            }}
-          >
-            Entrar
-          </a>
-          <div className="opcoes" id="opcoes">
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-        </div>
-      </nav>
+      {/* REMOVA A NAVBAR DAQUI - ELA SERÁ CARREGADA AUTOMATICAMENTE */}
 
       {/* Container do mapa - CORRIGIDO: sem margin-top, altura calculada */}
       <div className="mapa-wrapper">
