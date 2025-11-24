@@ -50,6 +50,9 @@ export async function handleSavePino({
     
     const pinoNormalizado = {
       ...pinoSalvo,
+      nome: dados.nome,
+      msg: dados.msg,
+      capibas: dados.capibas,
       localizacao: {
         coordinates: [
           pinoSalvo.longitude ?? dados.coordinates[0],

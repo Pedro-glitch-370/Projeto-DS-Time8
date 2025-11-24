@@ -29,7 +29,11 @@ html, body {
 }
 
 .loading-content {
+  display: flex;
+  flex-direction: column;
   text-align: center;
+  align-items: center;
+  justify-content: center;
   z-index: 2;
 }
 
@@ -38,7 +42,6 @@ html, body {
   height: 120px;
   margin-bottom: 20px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;

@@ -194,11 +194,11 @@
         listaTarefas.innerHTML = todasTarefas.map(tarefa => `
           <div class="tarefa-item ${tarefa.concluida ? 'tarefa-concluida' : ''}" id="tarefa-${tarefa.id}">
             <span class="status ${tarefa.concluida ? 'status-concluida' : 'status-pendente'}">
-              ${tarefa.concluida ? '✅ Concluída' : '🔴 Pendente'}
+              ${tarefa.concluida ? 'Concluída' : 'Pendente'}
             </span>
             <h3>${tarefa.nome}</h3>
             <p>${tarefa.descricao}</p>
-            <p class="recompensa">🎯 Recompensa: ${tarefa.recompensa} capibas</p>
+            <p class="recompensa">Recompensa: ${tarefa.recompensa} capibas</p>
             <button class="btn-confirmar" 
               ${tarefa.concluida ? 'disabled' : ''}
               onclick="abrirPopupTarefa(this, ${tarefa.recompensa}, '${tarefa.nome.replace(/'/g, "\\'")}', '${tarefa.descricao.replace(/'/g, "\\'")}', '${tarefa.id}')">
