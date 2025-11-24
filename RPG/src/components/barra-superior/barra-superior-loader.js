@@ -133,7 +133,6 @@ function loadNavbar() {
         </div>
         <div class="user-menu-actions">
           <button id="logoutBtn" class="logout-btn">
-            <span>🚪</span>
             Sair
           </button>
         </div>

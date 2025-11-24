@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1449c0 0%, #2f7854 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -64,19 +64,26 @@
         }
 
         .logout-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: #d38b83;
+            text-decoration: none;
             font-weight: 500;
+            padding: 0.5rem 1rem;
+            border: 2px solid #d38b83;
+            border-radius: 8px;
             transition: all 0.3s ease;
+            background: none;
+            right: 0;
         }
 
         .logout-btn:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
+            background: #e74c3c;
+            border: 2px solid #e74c3c;
+            color: white;
+            cursor: pointer;
         }
 
         /* Navigation */
@@ -84,6 +91,11 @@
             display: flex;
             gap: 1rem;
             margin-bottom: 1rem;
+            width: 100%;
+            justify-content: space-between;
+            padding-left: 2%;
+            padding-right: 2%;
+            padding-top: 1%;
         }
 
         .back-link {
@@ -107,15 +119,20 @@
 
         /* Stats */
         .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
             gap: 1.5rem;
             margin-bottom: 2rem;
+            padding-left: 2%;
+            padding-right: 2%;
+            width: 100%;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1449c0 0%, #2f7854 100%);
             color: white;
+            width: 50%;
             padding: 1.5rem;
             border-radius: 12px;
             text-align: center;
@@ -485,9 +502,6 @@
             </div>
             <div class="user-info">
                 <div class="user-welcome" id="currentUser">Carregando...</div>
-                <button class="logout-btn" onclick="logout()">
-                    🚪 Sair
-                </button>
             </div>
         </div>
 
@@ -495,12 +509,17 @@
         <div class="content">
             <!-- Navigation -->
             <div class="nav-links">
-                <a href="index.html" class="back-link">
-                    ← Voltar ao Mapa
-                </a>
-                <a href="admin.html" class="back-link">
-                    ⚙️ Painel Admin
-                </a>
+                <div>
+                    <a href="index.html" class="back-link">
+                        ← Voltar ao Mapa
+                    </a>
+                    <a href="admin.html" class="back-link">
+                        Painel Admin
+                    </a>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    Sair
+                </button>
             </div>
 
             <!-- Statistics -->
@@ -606,7 +625,7 @@
                 return;
             }
 
-            elements.currentUser.textContent = `👋 Olá, ${currentUser.nome} (${currentUser.email})`;
+            elements.currentUser.innerHTML = `👋 Olá, ${currentUser.nome} (${currentUser.email})`;
         }
 
         // Load Users
@@ -699,7 +718,7 @@
                     </div>
                     <div class="user-actions">
                         <button class="delete-btn" onclick="confirmDelete('admin', '${admin._id}', '${admin.nome}')">
-                            🗑️ Excluir
+                            Excluir
                         </button>
                     </div>
                 </div>
@@ -733,7 +752,7 @@
                     </div>
                     <div class="user-actions">
                         <button class="delete-btn" onclick="confirmDelete('cliente', '${cliente._id}', '${cliente.nome}')">
-                            🗑️ Excluir
+                            Excluir
                         </button>
                     </div>
                 </div>
