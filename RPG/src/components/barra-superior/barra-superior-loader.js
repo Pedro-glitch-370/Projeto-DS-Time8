@@ -632,9 +632,6 @@ function setupLoginPopup() {
         });
     }
 
-    // REMOVIDA: Validação em tempo real do email no login
-    // Agora só valida quando o formulário é submetido
-
     // Login - apenas com email
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {

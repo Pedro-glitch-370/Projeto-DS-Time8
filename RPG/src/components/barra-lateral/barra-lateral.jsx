@@ -332,5 +332,5 @@ export default function Sidebar({
       onCancel={handleCancel}
     />
   </div>
-  );
+  )
 }
