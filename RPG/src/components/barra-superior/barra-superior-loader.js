@@ -24,9 +24,9 @@ function loadNavbar() {
         />
       </div>
       <div class="meio">
-        <a href="index.html">Mapa</a>
-        <a href="tarefa.html">Minhas Tarefas</a>
-        <a href="saldo.html">Capibas</a>
+        <a href="/index.html">Mapa</a>
+        <a href="/src/public/tarefa.html">Minhas Tarefas</a>
+        <a href="/src/public/saldo.html">Capibas</a>
       </div>
       <div class="direita">
         <div id="userSection">
@@ -219,17 +219,17 @@ function isValidEmail(email) {
     const tld = domainParts[domainParts.length - 1];
     
     // Lista de TLDs válidos (pode ser expandida)
-    const validTLDs = ['com', 'org', 'net', 'edu', 'gov', 'br', 'io', 'co', 'info', 'biz', 'me'];
+    const validTLDs = ['com', 'org', 'net', 'edu', 'gov', 'br']
     
     // Verifica se o TLD tem entre 2 e 6 caracteres
     if (tld.length < 2 || tld.length > 6) {
         return false;
     }
-    
-    // Verifica se é um TLD válido (opcional - pode comentar esta parte se quiser aceitar qualquer TLD)
-    // if (!validTLDs.includes(tld.toLowerCase())) {
-    //     return false;
-    // }
+
+    // Verifica se é um TLD válido
+    if (!validTLDs.includes(tld.toLowerCase())) {
+        return false;
+    }
     
     return true;
 }
@@ -257,7 +257,7 @@ function validateEmailField(email, validationElement) {
     }
     
     // Email válido
-    validationElement.textContent = '✓ Email válido';
+    validationElement.textContent = 'Email válido';
     validationElement.classList.add('success');
     email.classList.add('valid');
     return true;
@@ -454,7 +454,7 @@ function setupSettingsMenu() {
     if (manageUsersBtn) {
         manageUsersBtn.addEventListener('click', () => {
             if (isUserAdmin()) {
-                window.location.href = 'apagar.html';
+                window.location.href = '/src/public/apagar.html'
             } else {
                 alert('❌ Apenas administradores podem acessar o gerenciamento de usuários.');
             }
@@ -761,9 +761,6 @@ function setupRegisterPopup() {
         });
     }
 
-    // REMOVIDA: Validação em tempo real do email no registro
-    // Agora só valida quando o formulário é submetido
-
     // Inicializar botões quando o popup abrir
     if (registerPopup) {
         // Observar quando o popup de registro abrir
@@ -1033,16 +1030,16 @@ if (typeof window !== 'undefined' && !window.isReactApp) {
 }
 
 // Para React - disponibiliza as funções globalmente
-if (typeof window !== 'undefined') {
-    window.NavbarLoader = {
-        loadNavbar,
-        setupNavbarEvents,
-        updateNavbarForLoggedUser,
-        initializeUserTypeButtons,
-        isValidEmail,
-        validateEmailField
-    };
-}
+// if (typeof window !== 'undefined') {
+//     window.NavbarLoader = {
+//         loadNavbar,
+//         setupNavbarEvents,
+//         updateNavbarForLoggedUser,
+//         initializeUserTypeButtons,
+//         isValidEmail,
+//         validateEmailField
+//     };
+// }
 
 // Inicializar botões quando a página carregar
 document.addEventListener('DOMContentLoaded', function() {

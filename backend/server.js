@@ -51,24 +51,9 @@ const startServer = async () => {
       console.log("SERVIDOR BACKEND INICIADO!")
       console.log(`Porta: ${PORT}`) // numero da porta que o server tá rodando
       console.log(`URL: http://localhost:${PORT}/api/pinos`) // rota que pega todos os pinos do mongoDB
-      
-      // Novas URLs para clientes
       console.log(`URL: http://localhost:${PORT}/api/auth/clientes/`) // listar clientes
-      console.log(`URL: http://localhost:${PORT}/api/auth/clientes/register`) // registrar cliente
-      console.log(`URL: http://localhost:${PORT}/api/auth/clientes/login`) // login cliente
-      console.log(`URL: http://localhost:${PORT}/api/auth/clientes/email/:email`) // buscar cliente por email
-      
-      // Novas URLs para admins
       console.log(`URL: http://localhost:${PORT}/api/auth/admins/`) // listar admins
-      console.log(`URL: http://localhost:${PORT}/api/auth/admins/register`) // registrar admin
-      console.log(`URL: http://localhost:${PORT}/api/auth/admins/login`) // login admin
-      console.log(`URL: http://localhost:${PORT}/api/auth/admins/email/:email`) // buscar admin por email
-      
-      console.log(
-        `Banco de dados: ${
-          getDBStatus().connected ? "Conectado" : "Desconectado"
-        }`
-      ); // Indica se o banco de dados foi conectado
+      console.log(`Banco de dados: ${getDBStatus().connected ? "Conectado" : "Desconectado"}`); // Indica se o banco de dados foi conectado
       console.log("=".repeat(50))
     })
 

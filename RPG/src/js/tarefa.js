@@ -1,5 +1,5 @@
 // Importar os serviços
-import { pinoService } from '../services/pinoService.js';
+import { pinoService } from '../services/pinoService.js'
 import { clienteService } from '../services/clienteService.js';
 
 // Variáveis globais
