@@ -601,28 +601,6 @@
    VALIDAÇÃO E ESTADOS
    ================================================== */
 
-.validation-message {
-  font-size: 12px;
-  margin-top: 4px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  display: none;
-}
-
-.validation-message.error {
-  display: block;
-  background-color: #ffe6e6;
-  color: var(--error-color);
-  border: 1px solid #ff7675;
-}
-
-.validation-message.success {
-  display: block;
-  background-color: #e6f7e6;
-  color: var(--success-color);
-  border: 1px solid #2ecc71;
-}
-
 /* Estados de botão */
 button:disabled {
   opacity: 0.6;
