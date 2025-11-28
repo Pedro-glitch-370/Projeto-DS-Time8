@@ -1,6 +1,7 @@
 // Importar os serviços
 import { pinoService } from '../services/pinoService.js'
 import { clienteService } from '../services/clienteService.js';
+import { adminService } from '../services/adminService.js';
 
 // Variáveis globais
 let tarefaAtual = null;
@@ -30,6 +31,7 @@ function verificarLogin() {
 }
 
 // Função para carregar dados do usuário
+// Função para carregar dados do usuário - ATUALIZADA
 async function carregarDadosUsuario() {
   try {
     usuarioLogado = verificarLogin();
@@ -37,40 +39,95 @@ async function carregarDadosUsuario() {
 
     console.log('🔄 Carregando dados do usuário...');
     
-    // Buscar dados atualizados do cliente
-    // Tenta por ID primeiro, depois por email
-    let cliente;
-    try {
-      cliente = await clienteService.getCliente(usuarioLogado.id);
-    } catch (error) {
-      console.log('Tentando buscar por email...');
-      cliente = await clienteService.getClienteByEmail(usuarioLogado.email);
-    }
+    // INICIALIZAR DADOS BÁSICOS
+    usuarioLogado.tarefasCompletas = usuarioLogado.tarefasCompletas || 0;
+    usuarioLogado.capibas = usuarioLogado.capibas || 0;
+    usuarioLogado.tarefasConcluidas = usuarioLogado.tarefasConcluidas || [];
+    tarefasConcluidas = usuarioLogado.tarefasConcluidas;
     
-    // Atualizar dados do usuário
-    usuarioLogado.capibas = cliente.capibas || 0;
-    usuarioLogado.tarefasCompletas = cliente.tarefasCompletas || 0;
-    tarefasConcluidas = cliente.tarefasConcluidas || [];
+    if (usuarioLogado.tipo === 'admin') {
+      // Usar adminService para admin
+      try {
+        const admin = await adminService.getAdmin(usuarioLogado.id);
+        // Atualizar dados do admin
+        usuarioLogado.tarefasCompletas = admin.tarefasCompletas || usuarioLogado.tarefasCompletas;
+        usuarioLogado.tarefasConcluidas = admin.tarefasConcluidas || usuarioLogado.tarefasConcluidas;
+      } catch (error) {
+        console.log('❌ Erro ao buscar admin por ID, tentando por email...', error.message);
+        try {
+          const admin = await adminService.getAdminByEmail(usuarioLogado.email);
+          usuarioLogado.tarefasCompletas = admin.tarefasCompletas || usuarioLogado.tarefasCompletas;
+          usuarioLogado.tarefasConcluidas = admin.tarefasConcluidas || usuarioLogado.tarefasConcluidas;
+        } catch (emailError) {
+          console.warn('⚠️ Ambas as tentativas falharam, usando dados locais do admin:', emailError.message);
+          // Manter dados locais
+        }
+      }
+    } else {
+      // Usar clienteService para cliente
+      try {
+        let cliente;
+        try {
+          cliente = await clienteService.getCliente(usuarioLogado.id);
+        } catch (error) {
+          console.log('❌ Erro ao buscar cliente por ID, tentando por email...', error.message);
+          cliente = await clienteService.getClienteByEmail(usuarioLogado.email);
+        }
+        
+        // ATUALIZAR DADOS DO CLIENTE COM DADOS DO BACKEND
+        usuarioLogado.capibas = cliente.capibas || usuarioLogado.capibas;
+        usuarioLogado.tarefasCompletas = cliente.tarefasCompletas || usuarioLogado.tarefasCompletas;
+        usuarioLogado.tarefasConcluidas = cliente.tarefasConcluidas || usuarioLogado.tarefasConcluidas;
+
+      } catch (error) {
+        console.warn('⚠️ Ambas as tentativas falharam, usando dados locais do cliente:', error.message);
+        // Manter dados locais
+      }
+    }
+
+    // ATUALIZAR VARIÁVEL GLOBAL
+    tarefasConcluidas = usuarioLogado.tarefasConcluidas;
+
+    // Salvar dados atualizados no localStorage
+    localStorage.setItem('user', JSON.stringify(usuarioLogado));
 
     console.log('✅ Dados do usuário carregados:', {
+      tipo: usuarioLogado.tipo,
       capibas: usuarioLogado.capibas,
       tarefasCompletas: usuarioLogado.tarefasCompletas,
       tarefasConcluidas: tarefasConcluidas.length
     });
 
     // Atualizar interface
-    document.getElementById('userCapibas').textContent = usuarioLogado.capibas;
     document.getElementById('userTarefasCompletas').textContent = usuarioLogado.tarefasCompletas;
+    
+    // Apenas clientes mostram capibas
+    if (usuarioLogado.tipo !== 'admin') {
+      document.getElementById('userCapibas').textContent = usuarioLogado.capibas;
+    } else {
+      // Para admin, pode mostrar 0 ou esconder
+      document.getElementById('userCapibas').textContent = '0';
+    }
     
   } catch (error) {
     console.error('❌ Erro ao carregar dados do usuário:', error);
-    // Usar dados do localStorage como fallback
-    usuarioLogado.capibas = usuarioLogado.capibas || 0;
+    // Fallback mínimo em caso de erro crítico
+    usuarioLogado = usuarioLogado || {};
     usuarioLogado.tarefasCompletas = usuarioLogado.tarefasCompletas || 0;
+    usuarioLogado.capibas = usuarioLogado.capibas || 0;
     tarefasConcluidas = usuarioLogado.tarefasConcluidas || [];
     
-    document.getElementById('userCapibas').textContent = usuarioLogado.capibas;
-    document.getElementById('userTarefasCompletas').textContent = usuarioLogado.tarefasCompletas;
+    // Tentar atualizar interface mesmo com erro
+    try {
+      document.getElementById('userTarefasCompletas').textContent = usuarioLogado.tarefasCompletas;
+      if (usuarioLogado.tipo !== 'admin') {
+        document.getElementById('userCapibas').textContent = usuarioLogado.capibas;
+      } else {
+        document.getElementById('userCapibas').textContent = '0';
+      }
+    } catch (uiError) {
+      console.error('❌ Erro ao atualizar interface:', uiError);
+    }
   }
 }
 
@@ -163,52 +220,97 @@ function fecharPopupTarefa() {
 }
 
 // Função SIMPLIFICADA para concluir tarefa (usando localStorage como fallback)
+// tarefa.js - FUNÇÃO CONCLUIR TAREFA CORRIGIDA
 async function concluirTarefa() {
   if (!tarefaAtual || !botaoAtual || !usuarioLogado) return;
   
   try {
-    // Tentar salvar no backend
-    try {
-      const resultado = await clienteService.concluirTarefa(
-        usuarioLogado.id, 
-        tarefaAtual.id, 
-        tarefaAtual.capibas
-      );
+    let resultado;
+    
+    // VERIFICAR SE É ADMIN OU CLIENTE
+    if (usuarioLogado.tipo === 'admin') {
+      console.log('👨‍💼 Admin testando tarefa (sem capibas)');
       
-      // Atualizar com dados do backend
-      usuarioLogado.capibas = resultado.capibas;
-      usuarioLogado.tarefasCompletas = resultado.tarefasCompletas;
-      
-    } catch (backendError) {
-      console.warn('⚠️ Usando fallback localStorage:', backendError.message);
-      
-      // Fallback: salvar no localStorage
-      usuarioLogado.capibas = (usuarioLogado.capibas || 0) + tarefaAtual.capibas;
-      usuarioLogado.tarefasCompletas = (usuarioLogado.tarefasCompletas || 0) + 1;
-      
-      if (!usuarioLogado.tarefasConcluidas) {
-        usuarioLogado.tarefasConcluidas = [];
+      try {
+        // Admin usa adminService (não ganha capibas)
+        resultado = await adminService.concluirTarefa(
+          usuarioLogado.id, 
+          tarefaAtual.id
+        );
+        
+        // Atualizar apenas tarefas completas
+        usuarioLogado.tarefasCompletas = resultado.tarefasCompletas || (usuarioLogado.tarefasCompletas + 1);
+        
+      } catch (error) {
+        console.warn('⚠️ AdminService falhou, usando fallback local:', error.message);
+        // Fallback local para admin
+        usuarioLogado.tarefasCompletas = (usuarioLogado.tarefasCompletas || 0) + 1;
       }
-      usuarioLogado.tarefasConcluidas.push(tarefaAtual.id);
       
-      // Salvar no localStorage
-      localStorage.setItem('user', JSON.stringify(usuarioLogado));
+    } else {
+      console.log('👤 Cliente concluindo tarefa (ganha capibas)');
+      
+      try {
+        // Cliente usa clienteService (ganha capibas)
+        resultado = await clienteService.concluirTarefa(
+          usuarioLogado.id, 
+          tarefaAtual.id, 
+          tarefaAtual.capibas
+        );
+        
+        // Atualizar dados do cliente COM OS DADOS DO BACKEND
+        usuarioLogado.capibas = resultado.capibas;
+        usuarioLogado.tarefasCompletas = resultado.tarefasCompletas;
+        usuarioLogado.tarefasConcluidas = resultado.tarefasConcluidas || [];
+        
+      } catch (error) {
+        console.warn('⚠️ ClienteService falhou, usando fallback local:', error.message);
+        // Fallback para cliente
+        usuarioLogado.capibas = (usuarioLogado.capibas || 0) + tarefaAtual.capibas;
+        usuarioLogado.tarefasCompletas = (usuarioLogado.tarefasCompletas || 0) + 1;
+        
+        if (!usuarioLogado.tarefasConcluidas) {
+          usuarioLogado.tarefasConcluidas = [];
+        }
+        usuarioLogado.tarefasConcluidas.push(tarefaAtual.id);
+      }
     }
 
-    // Atualizar interface
+    // ATUALIZAR VARIÁVEL GLOBAL DE TAREFAS CONCLUÍDAS
+    tarefasConcluidas = usuarioLogado.tarefasConcluidas || [];
+
+    // Salvar dados atualizados no localStorage
+    localStorage.setItem('user', JSON.stringify(usuarioLogado));
+
+    // ATUALIZAR INTERFACE E ESTADO DA TAREFA
+    atualizarTarefaConcluida();
+
+  } catch (error) {
+    console.error('❌ Erro ao concluir tarefa:', error);
+    mostrarErroConclusao();
+  }
+}
+
+// Função para atualizar a tarefa concluída na interface
+function atualizarTarefaConcluida() {
+  try {
     const tarefaItem = botaoAtual.closest('.tarefa-item');
     const status = tarefaItem.querySelector('.status');
     
+    // Atualizar estado visual
     status.textContent = '✅ Concluída';
     status.className = 'status status-concluida';
-    
     botaoAtual.textContent = 'Tarefa Concluída';
     botaoAtual.disabled = true;
     tarefaItem.classList.add('tarefa-concluida');
 
-    // Atualizar estatísticas
-    document.getElementById('userCapibas').textContent = usuarioLogado.capibas;
+    // Atualizar estatísticas na interface
     document.getElementById('userTarefasCompletas').textContent = usuarioLogado.tarefasCompletas;
+    
+    // Apenas clientes veem capibas atualizados
+    if (usuarioLogado.tipo !== 'admin') {
+      document.getElementById('userCapibas').textContent = usuarioLogado.capibas;
+    }
 
     // Atualizar array local
     const tarefaIndex = todasTarefas.findIndex(t => t.id === tarefaAtual.id);
@@ -222,17 +324,41 @@ async function concluirTarefa() {
       tarefaItem.style.transform = 'scale(1)';
     }, 200);
 
-    // Mensagem de sucesso
-    alert(`🎉 Parabéns! Você ganhou ${tarefaAtual.capibas} capibas!\n\n` +
-          `💰 Total: ${usuarioLogado.capibas} capibas\n` +
-          `✅ Tarefas completas: ${usuarioLogado.tarefasCompletas}`);
+    // Mostrar mensagem de sucesso
+    mostrarMensagemSucesso();
 
     // Fechar popup
     fecharPopupTarefa();
-
   } catch (error) {
-    console.error('Erro ao concluir tarefa:', error);
-    alert('❌ Erro ao concluir tarefa. Tente novamente.');
+    console.error('❌ Erro ao atualizar tarefa concluída:', error);
+    fecharPopupTarefa();
+    mostrarMensagemSucesso();
+  }
+}
+
+// Função para mostrar mensagem de sucesso
+function mostrarMensagemSucesso() {
+  try {
+    if (usuarioLogado.tipo === 'admin') {
+      alert(`✅ Tarefa testada com sucesso!\n\n📊 Tarefas testadas: ${usuarioLogado.tarefasCompletas}`);
+    } else {
+      alert(`🎉 Parabéns! Você ganhou ${tarefaAtual.capibas} capibas!\n\n💰 Total: ${usuarioLogado.capibas} capibas\n✅ Tarefas completas: ${usuarioLogado.tarefasCompletas}`);
+    }
+  } catch (error) {
+    console.error('❌ Erro ao mostrar mensagem de sucesso:', error);
+  }
+}
+
+// Função para mostrar erro na conclusão
+function mostrarErroConclusao() {
+  try {
+    if (usuarioLogado.tipo === 'admin') {
+      alert('❌ Erro ao testar tarefa. Tente novamente.');
+    } else {
+      alert('❌ Erro ao concluir tarefa. Tente novamente.');
+    }
+  } catch (error) {
+    console.error('❌ Erro ao mostrar mensagem de erro:', error);
   }
 }
 

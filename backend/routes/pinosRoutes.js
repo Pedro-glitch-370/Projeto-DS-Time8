@@ -1,21 +1,21 @@
 const express = require("express")
 const router = express.Router()
-const pinoController = require("../controllers/pinoController")
+const PinoController = require("../controllers/pinoController")
 
 // ==================================================
 // Rotas para pinos
 // ==================================================
 
 // GET - Todos os pinos
-router.get("/", pinoController.getTodosPinos)
+router.get("/", PinoController.getTodosPinos)
 
 // POST - Criar novo pino
-router.post("/adicionar", pinoController.criarPino)
+router.post("/adicionar", PinoController.criarPino)
 
 // PUT - Atualizar pino
-router.put("/atualizar/:id", pinoController.atualizarPino)
+router.put("/atualizar/:id", PinoController.atualizarPino)
 
 // DELETE - Deletar pino
-router.delete("/deletar/:id", pinoController.deletarPino)
+router.delete("/deletar/:id", PinoController.deletarPino)
 
 module.exports = router

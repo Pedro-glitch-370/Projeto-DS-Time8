@@ -5,54 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Usuários - Recife Point Game</title>
     <link rel="stylesheet" href="../css/apagar.css">
-
 </head>
 <body>
+    <!-- 
+      CONTAINER PRINCIPAL DA PÁGINA ADMIN
+      Página exclusiva para administradores gerenciarem usuários do sistema
+    -->
     <div class="admin-container">
-        <!-- Header -->
+        <!-- 
+          CABEÇALHO DA PÁGINA
+          Contém logo, título da página e informações do usuário logado
+        -->
         <div class="header">
             <div class="logo">
+                <!-- Logo do aplicativo -->
                 <img src="../assets/LogoConecta.png" alt="Recife Point Game">
                 <h1>Gerenciar Usuários</h1>
             </div>
             <div class="user-info">
+                <!-- Exibe o usuário atualmente logado -->
                 <div class="user-welcome" id="currentUser">Carregando...</div>
+                <!-- Botão para logout do sistema -->
                 <button class="logout-btn" onclick="logout()">
                     🚪 Sair
                 </button>
             </div>
         </div>
 
-        <!-- Content -->
+        <!-- 
+          CONTEÚDO PRINCIPAL DA PÁGINA
+          Contém todas as funcionalidades de gerenciamento
+        -->
         <div class="content">
-            <!-- Navigation -->
+            <!-- 
+              LINKS DE NAVEGAÇÃO
+              Permite voltar para o mapa principal
+            -->
             <div class="nav-links">
                 <a href="../../index.html" class="back-link">
                     ← Voltar ao Mapa
                 </a>
             </div>
 
-            <!-- Statistics -->
+            <!-- 
+              SEÇÃO DE ESTATÍSTICAS
+              Mostra números resumidos do sistema em tempo real
+            -->
             <div class="stats">
+                <!-- Card de estatística: Administradores -->
                 <div class="stat-card">
                     <div class="stat-number" id="totalAdmins">0</div>
                     <div class="stat-label">Administradores</div>
                 </div>
+                <!-- Card de estatística: Clientes -->
                 <div class="stat-card">
                     <div class="stat-number" id="totalClientes">0</div>
                     <div class="stat-label">Clientes</div>
                 </div>
+                <!-- Card de estatística: Total de usuários -->
                 <div class="stat-card">
                     <div class="stat-number" id="totalUsers">0</div>
                     <div class="stat-label">Total de Usuários</div>
                 </div>
             </div>
 
-            <!-- Messages -->
+            <!-- 
+              SEÇÃO DE MENSAGENS DO SISTEMA
+              Exibe feedback para o usuário (erros e sucessos)
+            -->
             <div class="error" id="errorMessage"></div>
             <div class="success" id="successMessage"></div>
 
-            <!-- Tabs -->
+            <!-- 
+              ABA DE NAVEGAÇÃO
+              Permite alternar entre visualização de administradores e clientes
+            -->
             <div class="tabs">
                 <button class="tab active" onclick="openTab('admins')">
                     👨‍💼 Administradores
@@ -62,28 +89,48 @@
                 </button>
             </div>
 
-            <!-- Tab Contents -->
+            <!-- 
+              CONTEÚDO DA ABA DE ADMINISTRADORES
+              Lista todos os usuários com perfil de administrador
+            -->
             <div id="admins" class="tab-content active">
+                <!-- Estado de carregamento -->
                 <div class="loading" id="loadingAdmins">Carregando administradores...</div>
+                <!-- Grid onde os cards dos administradores serão renderizados -->
                 <div class="users-grid" id="adminsList"></div>
             </div>
 
+            <!-- 
+              CONTEÚDO DA ABA DE CLIENTES
+              Lista todos os usuários com perfil de cliente
+            -->
             <div id="clientes" class="tab-content">
+                <!-- Estado de carregamento -->
                 <div class="loading" id="loadingClientes">Carregando clientes...</div>
+                <!-- Grid onde os cards dos clientes serão renderizados -->
                 <div class="users-grid" id="clientesList"></div>
             </div>
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
+    <!-- 
+      MODAL DE CONFIRMAÇÃO DE EXCLUSÃO
+      Aparece quando administrador tenta excluir um usuário
+      Previne exclusões acidentais
+    -->
     <div class="modal" id="confirmModal">
         <div class="modal-content">
+            <!-- Título do modal -->
             <h3>⚠️ Confirmar Exclusão</h3>
+            <!-- Mensagem dinâmica com detalhes do usuário a ser excluído -->
             <p id="modalMessage">Tem certeza que deseja excluir este usuário?</p>
+            <!-- Ações do modal -->
             <div class="modal-buttons">
+                <!-- Botão de confirmação da exclusão -->
                 <button class="confirm-btn" id="confirmDelete">
                     🗑️ Excluir
                 </button>
+                <!-- Botão para cancelar a operação -->
                 <button class="cancel-btn" onclick="closeModal()">
                     ↩️ Cancelar
                 </button>
@@ -91,6 +138,14 @@
         </div>
     </div>
 
+    <!-- 
+      SCRIPT PRINCIPAL DA PÁGINA
+      Contém toda a lógica de:
+      - Carregamento de usuários
+      - Navegação por abas
+      - Exclusão de usuários
+      - Gerenciamento do modal
+    -->
     <script src="../js/apagar.js"></script>
 </body>
 </html>

@@ -1,62 +1,152 @@
 import api from './api';
 
+/**
+ * Serviço de autenticação - gerencia login, logout e estado do usuário
+ * Fornece métodos para verificar permissões e dados do usuário
+ */
 export const authService = {
-  // Login com email
+  /**
+   * Realiza o login do usuário no sistema
+   * @param {string} email - Email do usuário
+   * @param {string} nome - Nome do usuário
+   * @param {string} tipo - Tipo de usuário ('cliente' ou 'admin')
+   * @returns {Promise<Object>} Dados do usuário logado
+   * @throws {Error} Em caso de falha no login
+   */
   login: async (email, nome, tipo = 'cliente') => {
     try {
+      console.log(`🔐 Tentando login: ${email} (${tipo})`);
+      
+      // Faz requisição POST para endpoint de login
       const response = await api.post('/auth/login', {
         email,
         nome,
         tipo
       });
+      
+      console.log('✅ Login realizado com sucesso');
       return response.data;
     } catch (error) {
+      console.error('❌ Erro no login:', error);
+      // Propaga mensagem de erro específica da API ou mensagem genérica
       throw new Error(error.response?.data?.message || 'Erro no login');
     }
   },
 
-  // Verificar usuário atual
+  /**
+   * Busca dados do usuário atual na API
+   * @param {string} email - Email do usuário a ser buscado
+   * @returns {Promise<Object>} Dados atualizados do usuário
+   * @throws {Error} Em caso de falha na busca
+   */
   getCurrentUser: async (email) => {
     try {
+      console.log(`👤 Buscando dados do usuário: ${email}`);
+      
+      // Faz requisição GET para endpoint de dados do usuário
       const response = await api.get('/auth/me', {
         params: { email }
       });
+      
       return response.data;
     } catch (error) {
+      console.error('❌ Erro ao buscar usuário:', error);
       throw new Error(error.response?.data?.message || 'Erro ao buscar usuário');
     }
   },
 
-  // Verificar se está autenticado
+  /**
+   * Verifica se existe um usuário autenticado (baseado no localStorage)
+   * @returns {boolean} True se usuário está autenticado, false caso contrário
+   */
   isAuthenticated: () => {
     const user = localStorage.getItem('user');
-    return !!user;
+    const authenticated = !!user;
+    console.log(`🔍 Verificando autenticação: ${authenticated}`);
+    return authenticated;
   },
 
-  // Fazer logout
+  /**
+   * Realiza logout do usuário, limpando dados locais e redirecionando
+   */
   logout: () => {
+    console.log('🚪 Realizando logout do usuário');
+    // Remove dados do usuário do localStorage
     localStorage.removeItem('user');
+    // Redireciona para página de login
     window.location.href = 'login.html';
   },
 
-  // Obter dados do usuário
+  /**
+   * Obtém dados do usuário armazenados localmente
+   * @returns {Object|null} Dados do usuário ou null se não existir
+   */
   getUser: () => {
     const userData = localStorage.getItem('user');
-    return userData ? JSON.parse(userData) : null;
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        console.log('📋 Dados do usuário recuperados do localStorage');
+        return user;
+      } catch (error) {
+        console.error('❌ Erro ao parsear dados do usuário:', error);
+        // Limpa dados corrompidos
+        localStorage.removeItem('user');
+        return null;
+      }
+    }
+    return null;
   },
 
-  // No authService, adicione:
+  /**
+   * Verifica se o usuário atual é um convidado (guest)
+   * @returns {boolean} True se for usuário guest, false caso contrário
+   */
   isGuest: () => {
     const user = authService.getUser();
-    return user && user.id === 'guest';
+    const isGuest = user && user.id === 'guest';
+    console.log(`🎭 É usuário guest? ${isGuest}`);
+    return isGuest;
   },
 
-  // Verificar se é admin
+  /**
+   * Verifica se o usuário atual é um administrador
+   * @returns {boolean} True se for admin, false caso contrário
+   */
   isAdmin: () => {
     const user = authService.getUser();
-    console.log("🔍 authService - Usuário:", user);
-    console.log("🔍 authService - Tipo:", user?.tipo);
-    console.log("🔍 authService - É admin?", user && user.tipo === 'admin');
-    return user && user.tipo === 'admin';
+    const isAdmin = user && user.tipo === 'admin';
+    
+    // Logs detalhados para debugging
+    console.log("🔍 authService - Verificando permissões de admin:");
+    console.log("👤 Usuário:", user);
+    console.log("🎯 Tipo:", user?.tipo);
+    console.log("✅ É admin?", isAdmin);
+    
+    return isAdmin;
+  },
+
+  /**
+   * Verifica se o usuário atual é um cliente regular
+   * @returns {boolean} True se for cliente, false caso contrário
+   */
+  isCliente: () => {
+    const user = authService.getUser();
+    const isCliente = user && user.tipo === 'cliente';
+    console.log(`🛍️ É cliente? ${isCliente}`);
+    return isCliente;
+  },
+
+  /**
+   * Salva dados do usuário no localStorage
+   * @param {Object} userData - Dados do usuário a serem salvos
+   */
+  setUser: (userData) => {
+    try {
+      localStorage.setItem('user', JSON.stringify(userData));
+      console.log('💾 Dados do usuário salvos no localStorage');
+    } catch (error) {
+      console.error('❌ Erro ao salvar dados do usuário:', error);
+    }
   }
 };

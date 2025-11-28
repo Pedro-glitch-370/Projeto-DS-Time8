@@ -1,9 +1,9 @@
-// Configuration
+// Configuração
 const API_BASE_URL = 'http://localhost:5001/api/auth';
 let currentUser = null;
 let userToDelete = null;
 
-// UI Elements
+// Elementos da interface
 const elements = {
     currentUser: document.getElementById('currentUser'),
     errorMessage: document.getElementById('errorMessage'),
@@ -20,13 +20,73 @@ const elements = {
     confirmDelete: document.getElementById('confirmDelete')
 };
 
-// Initialize
+// ================== FUNÇÕES GLOBAIS (USADAS NO HTML) ==================
+// Estas funções são chamadas diretamente do HTML via onclick
+
+/**
+ * Alternar entre abas do painel de administração
+ * @param {string} tabName - Nome da aba a ser aberta
+ * @param {Event} event - Evento de clique
+ */
+function openTab(tabName, event) {
+    // Esconder todas as abas
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // Mostrar aba selecionada
+    document.getElementById(tabName).classList.add('active');
+    
+    // Marcar aba ativa
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
+}
+
+/**
+ * Abrir modal de confirmação para excluir usuário
+ * @param {string} type - Tipo de usuário ('admin' ou 'cliente')
+ * @param {string} id - ID do usuário
+ * @param {string} name - Nome do usuário
+ */
+function confirmDelete(type, id, name) {
+    userToDelete = { type, id, name };
+    elements.modalMessage.textContent = `Tem certeza que deseja excluir "${name}" (${type})? Esta ação não pode ser desfeita.`;
+    elements.confirmModal.style.display = 'flex';
+}
+
+/**
+ * Fechar modal de confirmação
+ */
+function closeModal() {
+    elements.confirmModal.style.display = 'none';
+    userToDelete = null;
+}
+
+/**
+ * Fazer logout do sistema
+ */
+function logout() {
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+}
+
+// ================== INICIALIZAÇÃO ==================
+
+// Inicializar quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
     loadUsers();
 });
 
-// Check Authentication
+// ================== AUTENTICAÇÃO ==================
+
+/**
+ * Verificar se o usuário está autenticado como administrador
+ */
 function checkAuth() {
     const userData = localStorage.getItem('user');
     if (!userData) {
@@ -44,11 +104,16 @@ function checkAuth() {
     elements.currentUser.textContent = `👋 Olá, ${currentUser.nome} (${currentUser.email})`;
 }
 
-// Load Users
+// ================== CARREGAMENTO DE USUÁRIOS ==================
+
+/**
+ * Carregar lista de administradores e clientes da API
+ */
 async function loadUsers() {
     try {
         console.log('🔄 Iniciando carregamento de usuários...');
         
+        // Carregar administradores
         const adminsResponse = await fetch(`${API_BASE_URL}/admins`);
         console.log('📊 Status da resposta admins:', adminsResponse.status);
         
@@ -63,6 +128,7 @@ async function loadUsers() {
             throw new Error(`Erro ${adminsResponse.status}: ${adminsResponse.statusText}`);
         }
 
+        // Carregar clientes
         const clientesResponse = await fetch(`${API_BASE_URL}/clientes`);
         console.log('📊 Status da resposta clientes:', clientesResponse.status);
         
@@ -77,7 +143,7 @@ async function loadUsers() {
             throw new Error(`Erro ${clientesResponse.status}: ${clientesResponse.statusText}`);
         }
 
-        // Update total
+        // Atualizar total geral
         elements.totalUsers.textContent = 
             parseInt(elements.totalAdmins.textContent) + 
             parseInt(elements.totalClientes.textContent);
@@ -104,11 +170,16 @@ async function loadUsers() {
                 <h3>⚠️ Erro ao carregar</h3>
                 <p>Não foi possível carregar os clientes.</p>
             </div>
-        `
+        `;
     }
 }
 
-// Display Admins
+// ================== EXIBIÇÃO DE USUÁRIOS ==================
+
+/**
+ * Exibir lista de administradores na interface
+ * @param {Array} admins - Lista de administradores
+ */
 function displayAdmins(admins) {
     elements.loadingAdmins.style.display = 'none';
     
@@ -141,7 +212,10 @@ function displayAdmins(admins) {
     `).join('');
 }
 
-// Display Clients
+/**
+ * Exibir lista de clientes na interface
+ * @param {Array} clientes - Lista de clientes
+ */
 function displayClientes(clientes) {
     elements.loadingClientes.style.display = 'none';
     
@@ -175,20 +249,11 @@ function displayClientes(clientes) {
     `).join('');
 }
 
-// Confirm Delete
-function confirmDelete(type, id, name) {
-    userToDelete = { type, id, name };
-    elements.modalMessage.textContent = `Tem certeza que deseja excluir "${name}" (${type})? Esta ação não pode ser desfeita.`;
-    elements.confirmModal.style.display = 'flex';
-}
+// ================== EXCLUSÃO DE USUÁRIOS ==================
 
-// Close Modal
-function closeModal() {
-    elements.confirmModal.style.display = 'none';
-    userToDelete = null;
-}
-
-// Delete User
+/**
+ * Excluir usuário (administrador ou cliente)
+ */
 elements.confirmDelete.addEventListener('click', async function() {
     if (!userToDelete) return;
 
@@ -216,58 +281,57 @@ elements.confirmDelete.addEventListener('click', async function() {
     }
 });
 
-// Tab Navigation
-function openTab(tabName) {
-    // Hide all tabs
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
+// ================== GERENCIAMENTO DE MENSAGENS ==================
 
-    // Show selected tab
-    document.getElementById(tabName).classList.add('active');
-    event.currentTarget.classList.add('active');
-}
-
-// Logout
-function logout() {
-    localStorage.removeItem('user');
-    window.location.href = 'index.html';
-}
-
-// Show Messages
+/**
+ * Exibir mensagem de erro
+ * @param {string} message - Mensagem de erro
+ */
 function showError(message) {
     elements.errorMessage.textContent = message;
     elements.errorMessage.style.display = 'block';
     elements.successMessage.style.display = 'none';
     
+    // Esconder mensagem após 5 segundos
     setTimeout(() => {
         elements.errorMessage.style.display = 'none';
     }, 5000);
 }
 
+/**
+ * Exibir mensagem de sucesso
+ * @param {string} message - Mensagem de sucesso
+ */
 function showSuccess(message) {
     elements.successMessage.textContent = message;
     elements.successMessage.style.display = 'block';
     elements.errorMessage.style.display = 'none';
     
+    // Esconder mensagem após 3 segundos
     setTimeout(() => {
         elements.successMessage.style.display = 'none';
     }, 3000);
 }
 
-// Close modal on outside click
+// ================== EVENT LISTENERS ==================
+
+// Fechar modal ao clicar fora dele
 window.addEventListener('click', function(event) {
     if (event.target === elements.confirmModal) {
         closeModal();
     }
 });
 
-// Fechar modal com ESC
+// Fechar modal com tecla ESC
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
         closeModal();
     }
 });
+
+// ================== EXPORTAÇÃO PARA ESCOPO GLOBAL ==================
+// Garantir que as funções sejam acessíveis pelo HTML
+window.openTab = openTab;
+window.confirmDelete = confirmDelete;
+window.closeModal = closeModal;
+window.logout = logout;

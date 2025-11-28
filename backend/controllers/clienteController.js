@@ -5,25 +5,29 @@ const Cliente = require("../models/clienteModel");
 class ClienteController {
     // ========== AUTENTICAÇÃO ==========
 
-    // Registrar cliente
+    /**
+     * Registrar novo cliente no sistema
+     * @param {Object} req - Objeto da requisição
+     * @param {Object} res - Objeto da resposta
+     */
     static async registrarCliente(req, res) {
         try {
             const { nome, email } = req.body;
 
             console.log("📝 Recebendo registro de cliente:", { nome, email });
 
-            // Validação
+            // Validação dos campos obrigatórios
             if (!nome || !email) {
                 return res.status(400).json({ message: "Nome e email são obrigatórios" });
             }
 
-            // Verifica se o cliente já existe
+            // Verificar se o cliente já existe
             const existingCliente = await Cliente.findOne({ email });
             if (existingCliente) {
                 return res.status(400).json({ message: "Cliente já existe com este email" });
             }
 
-            // Cria novo cliente
+            // Criar novo cliente com valores padrão
             const newCliente = new Cliente({
                 nome,
                 email,
@@ -55,18 +59,23 @@ class ClienteController {
         }
     }
 
-    // Login de cliente
+    /**
+     * Realizar login do cliente
+     * @param {Object} req - Objeto da requisição
+     * @param {Object} res - Objeto da resposta
+     */
     static async loginCliente(req, res) {
         try {
             const { email } = req.body;
 
             console.log("🔐 Recebendo login de cliente para email:", email);
 
+            // Validar email
             if (!email) {
                 return res.status(400).json({ message: "Email é obrigatório" });
             }
 
-            // Busca cliente pelo email
+            // Buscar cliente pelo email
             const cliente = await Cliente.findOne({ email });
             console.log("🔍 DEBUG: Cliente encontrado:", cliente);
             
@@ -76,7 +85,7 @@ class ClienteController {
 
             console.log("✅ Login de cliente bem-sucedido para:", cliente.email);
 
-            // Retorna dados do cliente
+            // Retornar dados do cliente
             res.json({
                 message: "Login realizado com sucesso",
                 user: {
@@ -96,9 +105,13 @@ class ClienteController {
         }
     }
 
-    // ========== GERENCIAMENTO ==========
+    // ========== GERENCIAMENTO DE CLIENTES ==========
 
-    // Listar todos os clientes
+    /**
+     * Listar todos os clientes cadastrados
+     * @param {Object} req - Objeto da requisição
+     * @param {Object} res - Objeto da resposta
+     */
     static async listarClientes(req, res) {
         try {
             console.log("📋 Buscando todos os clientes...");
@@ -111,7 +124,11 @@ class ClienteController {
         }
     }
 
-    // Buscar cliente por email
+    /**
+     * Buscar cliente específico por email
+     * @param {Object} req - Objeto da requisição
+     * @param {Object} res - Objeto da resposta
+     */
     static async buscarClientePorEmail(req, res) {
         try {
             const { email } = req.params;
@@ -143,7 +160,11 @@ class ClienteController {
         }
     }
 
-    // Buscar cliente por ID
+    /**
+     * Buscar cliente específico por ID
+     * @param {Object} req - Objeto da requisição
+     * @param {Object} res - Objeto da resposta
+     */
     static async buscarClientePorId(req, res) {
         try {
             const { id } = req.params;
@@ -175,7 +196,13 @@ class ClienteController {
         }
     }
 
-    // Concluir tarefa
+    // ========== GERENCIAMENTO DE TAREFAS ==========
+
+    /**
+     * Concluir tarefa e adicionar capibas ao cliente
+     * @param {Object} req - Objeto da requisição
+     * @param {Object} res - Objeto da resposta
+     */
     static async concluirTarefa(req, res) {
         try {
             const { id } = req.params;
@@ -183,17 +210,18 @@ class ClienteController {
 
             console.log(`🎯 Cliente ${id} concluindo tarefa ${tarefaId} por ${capibas} capibas`);
 
-            // Validação
-            if (!tarefaId || !capibas) {
-                return res.status(400).json({ message: "tarefaId e capibas são obrigatórios" });
+            // Validar dados obrigatórios
+            if (!tarefaId || capibas === undefined) {
+                return res.status(400).json({ message: 'tarefaId e capibas são obrigatórios' });
             }
 
+            // Buscar cliente pelo ID
             const cliente = await Cliente.findById(id);
             if (!cliente) {
                 return res.status(404).json({ message: "Cliente não encontrado" });
             }
 
-            // Inicializar arrays se não existirem
+            // Inicializar array de tarefas concluídas se não existir
             if (!cliente.tarefasConcluidas) {
                 cliente.tarefasConcluidas = [];
             }
@@ -208,13 +236,13 @@ class ClienteController {
                 });
             }
 
-            // Adicionar tarefa às concluídas
+            // Adicionar tarefa à lista de concluídas
             cliente.tarefasConcluidas.push(tarefaId);
             
             // Incrementar contador de tarefas completas
             cliente.tarefasCompletas = (cliente.tarefasCompletas || 0) + 1;
             
-            // Adicionar capibas ao cliente
+            // Adicionar capibas ao saldo do cliente
             cliente.capibas = (cliente.capibas || 0) + capibas;
             
             await cliente.save();
@@ -234,7 +262,13 @@ class ClienteController {
         }
     }
 
-    // Deletar cliente
+    // ========== OPERAÇÕES ADMINISTRATIVAS ==========
+
+    /**
+     * Excluir cliente do sistema
+     * @param {Object} req - Objeto da requisição
+     * @param {Object} res - Objeto da resposta
+     */
     static async deletarCliente(req, res) {
         try {
             const { id } = req.params;

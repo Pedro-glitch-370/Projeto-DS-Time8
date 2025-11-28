@@ -3,8 +3,8 @@ const Schema = mongoose.Schema
 
 // Json Schema que define a estrutura de um pino no MongoDB
 const PinoSchema = new Schema({
-  // nome do pino
-  nome: { type: String, required: true },
+
+  nome: { type: String, required: true , trim: true }, // nome do pino
 
   // localização do pino (longitude e latitude)
   localizacao: {
@@ -19,20 +19,16 @@ const PinoSchema = new Schema({
     },
   },
 
-  // mensagem que vai ter no pino
-  msg: { type: String, required: true },
-
-  capibas: { type: Number, required: true, default: 0 }, // capibas iniciais do pino
+  msg: { type: String, required: true , trim: true }, // mensagem que vai ter no pino
+  capibas: { type: Number, required: true, default: 0 , min: 0}, // capibas iniciais do pino
 
   // Data de criação do pino, sempre salva o a data atual
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  createdAt: {type: Date, default: Date.now}
+
 })
 
 // Índice para buscas geográficas
 PinoSchema.index({ localizacao: "2dsphere" })
 
-// Exporta o modelo Pino baseado no PinoSchema
+// Exporta o modelo Pino baseado no Schema
 module.exports = mongoose.model("pinos", PinoSchema)

@@ -2,18 +2,28 @@ const Admin = require("../models/adminModel");
 const mongoose = require("mongoose");
 
 // ================== CONTROLADOR ADMIN ==================
-
+/**
+ * Controlador responsável por gerenciar todas as operações relacionadas a administradores
+ * Inclui autenticação, CRUD e operações específicas de admin
+ */
 class AdminController {
-    // ========== AUTENTICAÇÃO ==========
+    // ========== OPERAÇÕES DE AUTENTICAÇÃO ==========
 
-    // Registrar admin
+    /**
+     * Registra um novo administrador no sistema
+     * @param {Object} req - Request do Express
+     * @param {Object} req.body - Corpo da requisição
+     * @param {string} req.body.nome - Nome do administrador
+     * @param {string} req.body.email - Email do administrador
+     * @param {Object} res - Response do Express
+     */
     static async registrarAdmin(req, res) {
         try {
             const { nome, email } = req.body;
 
             console.log("📝 Recebendo registro de admin:", { nome, email });
 
-            // Validação
+            // Validação de campos obrigatórios
             if (!nome?.trim()) {
                 return res.status(400).json({ message: "Nome é obrigatório" });
             }
@@ -22,13 +32,13 @@ class AdminController {
                 return res.status(400).json({ message: "Email é obrigatório" });
             }
 
-            // Verifica se o admin já existe
+            // Verifica se o admin já existe pelo email
             const existingAdmin = await Admin.findOne({ email });
             if (existingAdmin) {
                 return res.status(400).json({ message: "Admin já existe com este email" });
             }
 
-            // Cria novo admin (SEM capibas)
+            // Cria novo admin (SEM capibas - diferenciação importante)
             const newAdmin = new Admin({
                 nome: nome.trim(),
                 email: email.trim(),
@@ -40,6 +50,7 @@ class AdminController {
 
             console.log("✅ Admin registrado com sucesso:", newAdmin._id);
 
+            // Retorna dados do admin sem informações sensíveis
             res.status(201).json({ 
                 message: "Admin registrado com sucesso",
                 user: {
@@ -49,13 +60,14 @@ class AdminController {
                     tipo: newAdmin.tipo,
                     permissoes: newAdmin.permissoes,
                     tarefasCompletas: newAdmin.tarefasCompletas
-                    // SEM capibas no retorno
+                    // SEM capibas no retorno - diferenciação de cliente
                 }
             });
 
         } catch (error) {
             console.error("❌ Erro no registro do admin:", error);
             
+            // Tratamento específico para erro de duplicação
             if (error.code === 11000) {
                 return res.status(400).json({ message: "Email já está em uso" });
             }
@@ -64,13 +76,19 @@ class AdminController {
         }
     }
 
-    // Login de admin
+    /**
+     * Realiza login de um administrador existente
+     * @param {Object} req - Request do Express
+     * @param {string} req.body.email - Email do administrador
+     * @param {Object} res - Response do Express
+     */
     static async loginAdmin(req, res) {
         try {
             const { email } = req.body;
 
             console.log("🔐 Recebendo login de admin para email:", email);
 
+            // Validação básica
             if (!email?.trim()) {
                 return res.status(400).json({ message: "Email é obrigatório" });
             }
@@ -84,7 +102,7 @@ class AdminController {
 
             console.log("✅ Login de admin bem-sucedido para:", admin.email);
 
-            // Retorna dados do admin (SEM capibas)
+            // Retorna dados do admin (SEM capibas - diferenciação de cliente)
             res.json({
                 message: "Login realizado com sucesso",
                 user: {
@@ -104,13 +122,26 @@ class AdminController {
         }
     }
 
-    // ========== GERENCIAMENTO ==========
+    // ========== OPERAÇÕES DE GERENCIAMENTO ==========
 
-    // Listar todos os admins
+    /**
+     * Lista todos os administradores do sistema
+     * @param {Object} req - Request do Express
+     * @param {Object} res - Response do Express
+     */
     static async listarAdmins(req, res) {
         try {
             console.log("📋 Buscando todos os administradores...");
-            const admins = await Admin.find({}, { nome: 1, email: 1, permissoes: 1, tipo: 1, tarefasCompletas: 1 });
+            
+            // Busca todos os admins, selecionando apenas campos necessários
+            const admins = await Admin.find({}, { 
+                nome: 1, 
+                email: 1, 
+                permissoes: 1, 
+                tipo: 1, 
+                tarefasCompletas: 1 
+            });
+            
             console.log(`✅ ${admins.length} administradores encontrados`);
             res.json(admins);
         } catch (error) {
@@ -119,7 +150,12 @@ class AdminController {
         }
     }
 
-    // Buscar admin por email
+    /**
+     * Busca um administrador específico pelo email
+     * @param {Object} req - Request do Express
+     * @param {string} req.params.email - Email do administrador
+     * @param {Object} res - Response do Express
+     */
     static async buscarAdminPorEmail(req, res) {
         try {
             const { email } = req.params;
@@ -151,14 +187,19 @@ class AdminController {
         }
     }
 
-    // Buscar admin por ID
+    /**
+     * Busca um administrador específico pelo ID
+     * @param {Object} req - Request do Express
+     * @param {string} req.params.id - ID do administrador
+     * @param {Object} res - Response do Express
+     */
     static async buscarAdminPorId(req, res) {
         try {
             const { id } = req.params;
 
             console.log("🔍 Buscando admin por ID:", id);
 
-            // Validar ID
+            // Validar formato do ID do MongoDB
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return res.status(400).json({ message: "ID do admin inválido" });
             }
@@ -188,15 +229,23 @@ class AdminController {
         }
     }
 
-    // Testar tarefa (admin não ganha capibas)
+    /**
+     * Permite que um administrador teste uma tarefa
+     * DIFERENÇA CHAVE: Admin não recebe capibas, apenas registra o teste
+     * @param {Object} req - Request do Express
+     * @param {string} req.params.id - ID do administrador
+     * @param {Object} req.body - Corpo da requisição
+     * @param {string} req.body.tarefaId - ID da tarefa a ser testada
+     * @param {Object} res - Response do Express
+     */
     static async concluirTarefa(req, res) {
         try {
             const { id } = req.params;
-            const { tarefaId, capibas } = req.body;
+            const { tarefaId } = req.body;
 
-            console.log(`🎯 Admin ${id} TESTANDO tarefa ${tarefaId} (${capibas} capibas)`);
+            console.log(`🎯 Admin ${id} TESTANDO tarefa ${tarefaId}`);
 
-            // Validações
+            // Validações básicas
             if (!tarefaId?.trim()) {
                 return res.status(400).json({ message: "ID da tarefa é obrigatório" });
             }
@@ -211,7 +260,7 @@ class AdminController {
                 return res.status(404).json({ message: "Admin não encontrado" });
             }
 
-            // Verificar se a tarefa já foi testada
+            // Verificar se a tarefa já foi testada (evitar duplicação)
             if (admin.tarefasConcluidas.includes(tarefaId)) {
                 return res.status(400).json({ 
                     message: "Tarefa já testada",
@@ -240,7 +289,12 @@ class AdminController {
         }
     }
 
-    // Deletar admin
+    /**
+     * Remove um administrador do sistema
+     * @param {Object} req - Request do Express
+     * @param {string} req.params.id - ID do administrador a ser deletado
+     * @param {Object} res - Response do Express
+     */
     static async deletarAdmin(req, res) {
         try {
             const { id } = req.params;
