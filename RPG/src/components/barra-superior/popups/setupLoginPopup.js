@@ -1,6 +1,6 @@
 import { getUser } from "../utils/userUtils.js";
 import { validateEmailField } from "../utils/emailValidation.js";
-import { updateNavbarForLoggedUser } from "./updateNavbarForLoggedUser.js";
+import { updateNavbarForLoggedUser } from "../navbar/updateNavbarForLoggedUser.js";
 
 export function setupLoginPopup() {
     const loginBtn = document.getElementById('login');

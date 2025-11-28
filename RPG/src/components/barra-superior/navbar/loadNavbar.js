@@ -2,9 +2,10 @@ import { updateNavbarForLoggedUser } from "./updateNavbarForLoggedUser.js";
 import { getUserInitials, getUserName, getUserEmail, getUserType } from "../utils/userUtils.js";
 import { initializeUserTypeButtons } from "../utils/userTypeButtons.js";
 import { setupNavbarEvents } from "./setupNavbarEvents.js";
-import { setupLoginPopup } from "./setupLoginPopup.js";
-import { setupRegisterPopup } from "./setupRegisterPopup.js";
-import { setupUserMenu, setupSettingsMenu } from "./setupMenu.js";
+import { setupLoginPopup } from "../popups/setupLoginPopup.js";
+import { setupRegisterPopup } from "../popups/setupRegisterPopup.js";
+import { setupSettingsMenu } from "../menu/setupSettingsMenu.js";
+import { setupUserMenu } from "../menu/setupUserMenu.js";
 
 // Função principal para carregar a navbar
 export function loadNavbar() {
