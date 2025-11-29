@@ -1,10 +1,8 @@
-// src/services/localizacaoService.js
 import api from "./api.js";
 
 export const localizacaoService = {
   /**
-   * Solicita permissão de localização do usuário
-   * @returns {Promise<Object>} Coordenadas do usuário
+   * Solicita permissão de localização com fallbacks melhorados
    */
   solicitarLocalizacao: () => {
     return new Promise((resolve, reject) => {
@@ -13,60 +11,112 @@ export const localizacaoService = {
         return;
       }
 
-      const opcoes = {
+      // Configurações otimizadas
+      const opcoesHighAccuracy = {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
+        timeout: 10000, // Reduzido para 10s
+        maximumAge: 0
       };
 
+      const opcoesLowAccuracy = {
+        enableHighAccuracy: false, // Prioriza velocidade sobre precisão
+        timeout: 15000,
+        maximumAge: 60000 // Aceita localização de até 1 minuto atrás
+      };
+
+      console.log('📍 Solicitando localização (alta precisão)...');
+
+      // Primeira tentativa: alta precisão
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log('🎯 Localização obtida com alta precisão!');
           resolve({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             precisao: position.coords.accuracy
           });
         },
-        (error) => {
-          let mensagemErro = "Erro ao obter localização";
+        (errorHighAccuracy) => {
+          console.warn('⚠️ Falha na alta precisão, tentando baixa precisão...', errorHighAccuracy);
           
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              mensagemErro = "Permissão de localização negada. Por favor, permita o acesso à localização para confirmar atividades.";
-              break;
-            case error.POSITION_UNAVAILABLE:
-              mensagemErro = "Localização indisponível no momento.";
-              break;
-            case error.TIMEOUT:
-              mensagemErro = "Tempo limite para obter localização esgotado.";
-              break;
-            default:
-              mensagemErro = "Erro desconhecido ao obter localização.";
-          }
-          
-          reject(new Error(mensagemErro));
+          // Segunda tentativa: baixa precisão (fallback)
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              console.log('🎯 Localização obtida com baixa precisão!');
+              resolve({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                precisao: position.coords.accuracy
+              });
+            },
+            (errorLowAccuracy) => {
+              console.error('❌ Todas as tentativas de geolocalização falharam:', errorLowAccuracy);
+              
+              let mensagemErro;
+              switch(errorLowAccuracy.code) {
+                case errorLowAccuracy.PERMISSION_DENIED:
+                  mensagemErro = "Permissão de localização negada. Por favor, permita o acesso à localização nas configurações do seu navegador.";
+                  break;
+                case errorLowAccuracy.POSITION_UNAVAILABLE:
+                  mensagemErro = "Localização indisponível. Verifique sua conexão e tente novamente.";
+                  break;
+                case errorLowAccuracy.TIMEOUT:
+                  mensagemErro = "Tempo esgotado para obter localização. Verifique se o GPS está ativo e tente novamente.";
+                  break;
+                default:
+                  mensagemErro = "Erro ao obter localização. Tente novamente.";
+              }
+              
+              reject(new Error(mensagemErro));
+            },
+            opcoesLowAccuracy
+          );
         },
-        opcoes
+        opcoesHighAccuracy
       );
     });
   },
 
   /**
-   * Inicia o rastreamento contínuo da localização do usuário
-   * @param {Function} onSuccess - Callback para quando a localização é atualizada
-   * @param {Function} onError - Callback para erros
-   * @returns {number} ID do watch para parar o rastreamento
+   * Verifica se a geolocalização está disponível e se há permissão
    */
-  iniciarRastreamento: (onSuccess, onError) => {
+  verificarDisponibilidade: async () => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve({ disponivel: false, motivo: "Navegador não suporta geolocalização" });
+        return;
+      }
+
+      // Verifica permissão (não é 100% confiável em todos os navegadores)
+      navigator.permissions?.query({ name: 'geolocation' })
+        .then((permissionStatus) => {
+          resolve({
+            disponivel: permissionStatus.state !== 'denied',
+            permissao: permissionStatus.state,
+            motivo: permissionStatus.state === 'denied' ? 'Permissão negada' : 'Disponível'
+          });
+        })
+        .catch(() => {
+          // Fallback se a API de permissions não estiver disponível
+          resolve({ disponivel: true, permissao: 'unknown', motivo: 'Verificação de permissão indisponível' });
+        });
+    });
+  },
+
+  /**
+   * INICIA RASTREAMENTO CONTÍNUO
+   */
+  iniciarRastreamento: (onSuccess, onError, opcoes = {}) => {
     if (!navigator.geolocation) {
-      if (onError) onError(new Error("Geolocalização não suportada pelo navegador"));
+      if (onError) onError(new Error("Geolocalização não suportada"));
       return null;
     }
 
-    const opcoes = {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 10000
+    const opcoesPadrao = {
+      enableHighAccuracy: false,
+      timeout: 10000,
+      maximumAge: 30000,
+      ...opcoes
     };
 
     try {
@@ -76,84 +126,83 @@ export const localizacaoService = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             precisao: position.coords.accuracy,
-            heading: position.coords.heading,
-            speed: position.coords.speed,
             timestamp: position.timestamp
           };
+          console.log('📍 Localização atualizada (rastreamento):', coords);
           if (onSuccess) onSuccess(coords);
         },
         (error) => {
-          let mensagemErro = "Erro ao rastrear localização";
+          console.warn('⚠️ Erro no rastreamento:', error);
           
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              mensagemErro = "Permissão de localização negada.";
-              break;
-            case error.POSITION_UNAVAILABLE:
-              mensagemErro = "Localização indisponível.";
-              break;
-            case error.TIMEOUT:
-              mensagemErro = "Tempo limite para rastrear localização.";
-              break;
-            default:
-              mensagemErro = "Erro desconhecido ao rastrear localização.";
+          let mensagem = "Rastreamento interrompido";
+          if (error.code === error.TIMEOUT) {
+            mensagem = "Timeout no rastreamento - continuando tentativas";
+            // Não chamamos onError para timeouts, pois o watchPosition continua tentando
+            return;
           }
           
-          if (onError) onError(new Error(mensagemErro));
+          if (onError) onError(new Error(mensagem));
         },
-        opcoes
+        opcoesPadrao
       );
 
+      console.log('📍 Rastreamento iniciado com ID:', watchId);
       return watchId;
+
     } catch (error) {
+      console.error('❌ Erro ao iniciar rastreamento:', error);
       if (onError) onError(error);
       return null;
     }
   },
 
   /**
-   * Para o rastreamento da localização
-   * @param {number} watchId - ID do watch retornado por iniciarRastreamento
+   * PARA O RASTREAMENTO
    */
   pararRastreamento: (watchId) => {
     if (watchId && navigator.geolocation) {
       navigator.geolocation.clearWatch(watchId);
-      console.log('📍 Rastreamento de localização parado');
+      console.log('📍 Rastreamento parado');
     }
   },
 
   /**
-   * Valida se o usuário está próximo do pino
-   * @param {number} latitude - Latitude do usuário
-   * @param {number} longitude - Longitude do usuário
-   * @param {string} pinoId - ID do pino
-   * @param {number} raioMaximo - Raio máximo em metros (padrão: 50m)
-   * @returns {Promise<Object>} Resultado da validação
+   * Obtém localização com fallback para IP se disponível
+   */
+  obterLocalizacaoComFallback: async () => {
+    try {
+      // Primeiro tenta geolocalização precisa
+      return await localizacaoService.solicitarLocalizacao();
+    } catch (error) {
+      console.warn('⚠️ Geolocalização falhou, tentando fallback...', error);
+      
+      // Poderia adicionar fallback para geolocalização por IP aqui
+      // throw new Error("Não foi possível obter a localização precisa");
+      
+      throw error; // Mantém o erro original por enquanto
+    }
+  },
+
+  /**
+   * Valida proximidade com um pino específico
    */
   validarProximidadePino: async (latitude, longitude, pinoId, raioMaximo = 50) => {
     try {
-      console.log('📍 Validando proximidade do pino:', { latitude, longitude, pinoId, raioMaximo });
+      console.log('📍 Validando proximidade...');
       
       const payload = {
-        latitudePessoa: latitude,
-        longitudePessoa: longitude,
+        latitudeUsuario: latitude,
+        longitudeUsuario: longitude,
         pinoId: pinoId,
         raioMaximo: raioMaximo
       };
 
       const response = await api.post("/validar-localizacao/proximidade-pino", payload);
-      
-      console.log('✅ Validação de localização bem-sucedida:', response.data);
       return response.data;
 
     } catch (error) {
-      console.error('❌ ERRO NA VALIDAÇÃO DE LOCALIZAÇÃO:', error);
-      
-      if (error.response?.data?.message) {
-        throw new Error(error.response.data.message);
-      }
-      
-      throw new Error("Erro ao validar localização. Tente novamente.");
+      console.error('❌ Erro na validação:', error);
+      throw new Error(error.response?.data?.message || "Erro ao validar localização.");
     }
   }
-}
+};

@@ -1,4 +1,3 @@
-// adminService.js - CORRIGIDO
 import api from "/src/services/api.js";
 
 // Funções auxiliares
@@ -9,7 +8,6 @@ import api from "/src/services/api.js";
  */
 const logErro = (operacao, error) => {
   console.error(`❌ ERRO AO ${operacao}:`, error);
-  // Exibe detalhes adicionais se disponíveis na resposta
   if (error.response) {
     console.error('📊 Status:', error.response.status);
     console.error('📄 Mensagem:', error.response.data);
@@ -24,14 +22,12 @@ export const adminService = {
    */
   getAdmin: async (adminId) => {
     try {
-      console.log(`Buscando admin: ${adminId}`);
-      // Faz requisição GET para endpoint específico do admin
+      console.log(`👑 Buscando admin: ${adminId}`);
       const response = await api.get(`/auth/admins/${adminId}`);
-      // Retorna apenas a propriedade user dos dados da resposta
       return response.data.user;
     } catch (error) {
       logErro('BUSCAR ADMIN', error);
-      throw error; // Propaga o erro para o chamador
+      throw error;
     }
   },
 
@@ -43,9 +39,7 @@ export const adminService = {
   getAdminByEmail: async (email) => {
     try {
       console.log(`📧 Buscando admin por email: ${email}`);
-      // Faz requisição GET para endpoint de busca por email
       const response = await api.get(`/auth/admins/email/${email}`);
-      // Retorna apenas a propriedade user dos dados da resposta
       return response.data.user;
     } catch (error) {
       logErro('BUSCAR ADMIN POR EMAIL', error);
@@ -62,27 +56,44 @@ export const adminService = {
    */
   concluirTarefa: async (adminId, tarefaId) => {
     try {
-      console.log(`👑 Admin ${adminId} testando tarefa ${tarefaId})`);
+      console.log(`👑 Admin ${adminId} testando tarefa ${tarefaId}`);
       
-      // Prepara payload - admin só precisa do ID da tarefa (sem capibas)
       const payload = {
-        tarefaId: String(tarefaId) // Garante que é string
+        tarefaId: String(tarefaId)
       };
       
       console.log('📦 Payload admin:', payload);
       
-      // Faz requisição POST para endpoint específico de admin
       const response = await api.post(`/auth/admins/${adminId}/tarefas/concluir`, payload);
       
       console.log('✅ Tarefa testada com sucesso por admin');
       return response.data;
 
     } catch (error) {
-      // Log detalhado para debugging
       console.log('❌ ERRO AO TESTAR TAREFA (admins):');
       console.log('📊 Status:', error.response?.status);
       console.log('📄 Dados:', error.response?.data);
+      
+      // Se a tarefa já foi testada, trata como sucesso condicional
+      if (error.response?.data?.message?.includes('Tarefa já testada') || 
+          error.response?.data?.message?.includes('já testada')) {
+        console.log('ℹ️ Tarefa já foi testada anteriormente');
+        return {
+          message: "Tarefa já testada anteriormente",
+          tarefaId: tarefaId,
+          jaTestada: true,
+          tarefasCompletas: error.response?.data?.tarefasCompletas || 0,
+          timestamp: new Date().toISOString()
+        };
+      }
+      
+      // Se o endpoint não existir (404) ou erro 400, usa solução temporária
+      if (error.response?.status === 404 || error.response?.status === 400) {
+        console.log('🔄 Endpoint não disponível, usando solução temporária...');
+        return await adminService._concluirTarefaFallback(adminId, tarefaId);
+      }
+      
       throw error;
     }
-  }
+  },
 };

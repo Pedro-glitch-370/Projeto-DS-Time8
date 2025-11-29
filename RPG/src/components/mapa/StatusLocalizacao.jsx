@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 /**
  * Componente que mostra o status da localização do usuário
+ * AGORA MOSTRA PARA TODOS OS USUÁRIOS (ADMINS E CLIENTES)
  */
 export default function StatusLocalizacao({ 
   permissao, 
@@ -25,14 +26,26 @@ export default function StatusLocalizacao({
     }
   }, [mensagem]);
 
-  // Não mostra nada para admins ou se não há mensagem e permissão
-  if (isAdmin || (!mensagem && permissao === null)) {
+  // ✅ REMOVEMOS A RESTRIÇÃO DE ADMIN - agora mostra para todos
+  // Não mostra nada se não há mensagem e permissão é null (ainda não verificou)
+  if (!mensagem && permissao === null) {
     return null;
   }
 
   if (!mostrar && mensagem && mensagem.includes('✅')) {
     return null;
   }
+
+  // Determina a qualidade da localização baseada na precisão
+  const getQualidadeGPS = (precisao) => {
+    if (!precisao) return { texto: '', cor: '#6c757d' };
+    if (precisao < 20) return { texto: 'Excelente', cor: '#28a745' };
+    if (precisao < 50) return { texto: 'Boa', cor: '#ffc107' };
+    if (precisao < 100) return { texto: 'Regular', cor: '#fd7e14' };
+    return { texto: 'Ruim', cor: '#dc3545' };
+  };
+
+  const qualidadeGPS = getQualidadeGPS(precisao);
 
   // Determina a classe CSS baseada no estado
   const getStatusClass = () => {
@@ -44,7 +57,7 @@ export default function StatusLocalizacao({
   // Determina o ícone baseado no estado
   const getStatusIcon = () => {
     if (!permissao) return '❌';
-    if (rastreamentoAtivo) return '📍';
+    if (rastreamentoAtivo) return '🎯';
     return '📍';
   };
 
@@ -63,6 +76,7 @@ export default function StatusLocalizacao({
       <div className="status-content">
         <div className="status-title">
           {getStatusTitle()}
+          {isAdmin && <span className="admin-badge">👑 Admin</span>}
         </div>
         {mensagem && (
           <div className="status-message">
@@ -71,7 +85,15 @@ export default function StatusLocalizacao({
         )}
         {permissao && rastreamentoAtivo && precisao && (
           <div className="status-info">
-            Precisão: ~{Math.round(precisao)}m
+            <div>Precisão: ~{Math.round(precisao)}m</div>
+            {qualidadeGPS.texto && (
+              <div 
+                className="qualidade-gps"
+                style={{ color: qualidadeGPS.cor }}
+              >
+                {qualidadeGPS.texto}
+              </div>
+            )}
           </div>
         )}
         {permissao && !rastreamentoAtivo && onReiniciar && (
@@ -79,8 +101,9 @@ export default function StatusLocalizacao({
             <button 
               className="status-btn"
               onClick={onReiniciar}
+              title="Forçar atualização da localização"
             >
-              Atualizar
+              🔄 Atualizar
             </button>
           </div>
         )}

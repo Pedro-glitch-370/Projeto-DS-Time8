@@ -1,54 +1,59 @@
-const geolib = require('geolib'); // Biblioteca para cálculos geográficos
+const geolib = require('geolib');
+const Pino = require('../models/pinoModel.js');
 
 /**
  * VALIDA SE UMA PESSOA ESTÁ PRÓXIMA DE UM PINO ESPECÍFICO
- * Usado quando já se sabe qual pino verificar (ex: usuário clicou em um pino no mapa)
+ * Usa geolib para cálculos precisos de distância
  */
 const validarProximidadePino = async (req, res) => {
     try {
         // Extrai dados do corpo da requisição
         const { 
-            latitudePessoa,     // Latitude da localização da pessoa
-            longitudePessoa,    // Longitude da localização da pessoa
-            pinoId,             // ID do pino específico a ser verificado
-            raioMaximo = 100    // Raio máximo em metros (padrão: 100m)
+            latitudeUsuario,     // Latitude da pessoa
+            longitudeUsuario,    // Longitude da pessoa  
+            pinoId,              // ID do pino específico
+            raioMaximo = 50      // Raio máximo em metros (padrão: 50m)
         } = req.body;
 
-        // VALIDAÇÃO 1: Verifica se todos os campos obrigatórios foram enviados
-        if (latitudePessoa === undefined || longitudePessoa === undefined || !pinoId) {
+        console.log('📍 Dados recebidos para validação:', { 
+            latitudeUsuario, 
+            longitudeUsuario, 
+            pinoId, 
+            raioMaximo 
+        });
+
+        // VALIDAÇÃO 1: Campos obrigatórios
+        if (!latitudeUsuario || !longitudeUsuario || !pinoId) {
             return res.status(400).json({ 
                 valid: false, 
-                message: "Coordenadas da pessoa e ID do pino são obrigatórios." 
+                message: "Coordenadas e ID do pino são obrigatórios." 
             });
         }
 
-        // VALIDAÇÃO 2: Converte as coordenadas para números e verifica se são válidas
-        const latPessoa = parseFloat(latitudePessoa);
-        const lngPessoa = parseFloat(longitudePessoa);
+        // VALIDAÇÃO 2: Converte para números
+        const latUsuario = parseFloat(latitudeUsuario);
+        const lngUsuario = parseFloat(longitudeUsuario);
         
-        if (isNaN(latPessoa) || isNaN(lngPessoa)) {
+        if (isNaN(latUsuario) || isNaN(lngUsuario)) {
             return res.status(400).json({ 
                 valid: false, 
                 message: "Coordenadas devem ser números válidos." 
             });
         }
 
-        // VALIDAÇÃO 3: Verifica se as coordenadas estão dentro dos intervalos globais válidos
-        const isValidLatitude = latPessoa >= -90 && latPessoa <= 90;
-        const isValidLongitude = lngPessoa >= -180 && lngPessoa <= 180;
+        // VALIDAÇÃO 3: Coordenadas válidas globalmente
+        const isValidLatitude = latUsuario >= -90 && latUsuario <= 90;
+        const isValidLongitude = lngUsuario >= -180 && lngUsuario <= 180;
 
         if (!isValidLatitude || !isValidLongitude) {
             return res.status(400).json({ 
                 valid: false, 
-                message: "Coordenadas fora dos intervalos válidos." 
+                message: "Coordenadas fora dos intervalos válidos (Lat: -90 a 90, Lng: -180 a 180)." 
             });
         }
 
-        // BUSCA NO BANCO: Procura o pino específico no MongoDB usando o ID
-        const Pino = require('/api/Pinos'); // Importa o modelo de Pino
+        // BUSCA O PINO NO BANCO
         const pino = await Pino.findById(pinoId);
-
-        // Verifica se o pino foi encontrado
         if (!pino) {
             return res.status(404).json({ 
                 valid: false, 
@@ -56,152 +61,232 @@ const validarProximidadePino = async (req, res) => {
             });
         }
 
-        // PREPARA DADOS PARA CÁLCULO: Cria objetos de localização para a biblioteca geolib
-        const localizacaoPessoa = {
-            latitude: latPessoa,
-            longitude: lngPessoa
+        console.log('📍 Pino encontrado:', {
+            id: pino._id,
+            nome: pino.nome,
+            coords: pino.localizacao.coordinates
+        });
+
+        // PREPARA AS COORDENADAS PARA GEOLIB
+        const localizacaoUsuario = {
+            latitude: latUsuario,
+            longitude: lngUsuario
         };
 
         const localizacaoPino = {
-            latitude: pino.localizacao.coordinates[1], // Latitude está na posição 1 do array
-            longitude: pino.localizacao.coordinates[0] // Longitude está na posição 0 do array
+            latitude: pino.localizacao.coordinates[1], // Latitude na posição 1
+            longitude: pino.localizacao.coordinates[0]  // Longitude na posição 0
         };
 
-        // CÁLCULO DA DISTÂNCIA: Usa geolib para calcular distância em metros
-        const distancia = geolib.getDistance(localizacaoPessoa, localizacaoPino);
-        
-        // VERIFICA PROXIMIDADE: Compara com o raio máximo permitido
-        const estaProximo = distancia <= raioMaximo;
-
-        // RESPOSTA DA API: Retorna todos os detalhes da validação
-        res.status(200).json({ 
-            valid: estaProximo, // true se está próximo, false se não está
-            message: estaProximo ? 
-                "Pessoa está dentro do raio permitido do pino." : 
-                "Pessoa está fora do raio permitido do pino.",
-            distancia: {
-                metros: distancia,                    // Distância em metros
-                km: (distancia / 1000).toFixed(3)    // Distância em quilômetros
-            },
-            limites: {
-                raioMaximoMetros: raioMaximo,         // Raio máximo em metros
-                raioMaximoKm: (raioMaximo / 1000).toFixed(3) // Raio máximo em km
-            },
-            localizacoes: {
-                pessoa: {
-                    latitude: latPessoa,
-                    longitude: lngPessoa
-                },
-                pino: {
-                    latitude: localizacaoPino.latitude,
-                    longitude: localizacaoPino.longitude,
-                    nome: pino.nome,    // Nome do pino
-                    id: pino._id        // ID do pino
-                }
-            },
-            validatedAt: new Date().toISOString() // Timestamp da validação
+        console.log('📍 Coordenadas para cálculo:', {
+            usuario: localizacaoUsuario,
+            pino: localizacaoPino
         });
 
+        // CÁLCULO DA DISTÂNCIA COM GEOLIB (EM METROS)
+        const distanciaMetros = geolib.getDistance(localizacaoUsuario, localizacaoPino);
+        
+        console.log(`📏 Distância calculada com geolib: ${distanciaMetros}m`);
+
+        // VERIFICA SE ESTÁ DENTRO DO RAIO PERMITIDO
+        const estaProximo = distanciaMetros <= raioMaximo;
+
+        // RESPOSTA DETALHADA
+        const resposta = {
+            valid: estaProximo,
+            message: estaProximo ? 
+                "✅ Você está dentro da área permitida!" : 
+                `❌ Você está a ${distanciaMetros}m do local. Aproxime-se!`,
+            distancia: {
+                metros: distanciaMetros,
+                quilometros: (distanciaMetros / 1000).toFixed(3),
+                interpretacao: getInterpretacaoDistancia(distanciaMetros)
+            },
+            limites: {
+                raioMaximoMetros: raioMaximo,
+                raioMaximoKm: (raioMaximo / 1000).toFixed(1)
+            },
+            localizacoes: {
+                usuario: localizacaoUsuario,
+                pino: {
+                    ...localizacaoPino,
+                    nome: pino.nome,
+                    id: pino._id,
+                    capibas: pino.capibas || 0
+                }
+            },
+            calculadoCom: "geolib",
+            validatedAt: new Date().toISOString()
+        };
+
+        console.log('✅ Resposta da validação:', resposta);
+        res.status(200).json(resposta);
+
     } catch (error) {
-        // TRATAMENTO DE ERRO: Captura qualquer erro inesperado
-        console.error("Erro na validação de proximidade:", error);
+        console.error("❌ Erro crítico na validação:", error);
         res.status(500).json({ 
             valid: false, 
-            message: "Erro interno no servidor durante validação." 
+            message: "Erro interno no servidor durante validação.",
+            detalhes: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 }
 
 /**
- * ENCONTRA O PINO MAIS PRÓXIMO DA PESSOA ENTRE TODOS OS PINOS
- * Usado quando não se sabe qual pino verificar (ex: encontrar pino mais próximo automaticamente)
+ * ENCONTRA TODOS OS PINOS PRÓXIMOS DA PESSOA
+ * Usado para mostrar pinos disponíveis próximos
  */
-const validarProximidadeMultiplosPinos = async (req, res) => {
+const encontrarPinosProximos = async (req, res) => {
     try {
-        // Extrai dados do corpo da requisição
         const { 
-            latitudePessoa,     // Latitude da pessoa
-            longitudePessoa,    // Longitude da pessoa
-            raioMaximo = 100    // Raio máximo em metros (padrão: 100m)
+            latitudeUsuario,    
+            longitudeUsuario,   
+            raioMaximo = 100,   // Raio em metros
+            limite = 10         // Limite de resultados
         } = req.body;
 
-        // VALIDAÇÃO: Converte e verifica as coordenadas (igual à função anterior)
-        const latPessoa = parseFloat(latitudePessoa);
-        const lngPessoa = parseFloat(longitudePessoa);
+        // Validações básicas
+        const latUsuario = parseFloat(latitudeUsuario);
+        const lngUsuario = parseFloat(longitudeUsuario);
         
-        if (isNaN(latPessoa) || isNaN(lngPessoa)) {
+        if (isNaN(latUsuario) || isNaN(lngUsuario)) {
             return res.status(400).json({ 
-                valid: false, 
-                message: "Coordenadas devem ser números válidos." 
+                success: false,
+                message: "Coordenadas inválidas." 
             });
         }
 
-        // BUSCA TODOS OS PINOS: Obtém todos os pinos do banco de dados
-        const Pino = require('/api/Pinos');
-        const pinos = await Pino.find({});
-
-        // Prepara localização da pessoa para cálculos
-        const localizacaoPessoa = {
-            latitude: latPessoa,
-            longitude: lngPessoa
+        // Busca TODOS os pinos (poderia ser otimizado com consulta geoespacial)
+        const todosPinos = await Pino.find({});
+        
+        const localizacaoUsuario = {
+            latitude: latUsuario,
+            longitude: lngUsuario
         };
 
-        // ENCONTRA O PINO MAIS PRÓXIMO: Percorre todos os pinos calculando distâncias
-        let pinoMaisProximo = null;     // Armazena o pino mais próximo encontrado
-        let menorDistancia = Infinity;  // Inicia com valor infinito para comparação
-
-        for (const pino of pinos) {
-            // Prepara localização do pino atual
+        // Calcula distância para cada pino e filtra os próximos
+        const pinosComDistancia = todosPinos.map(pino => {
             const localizacaoPino = {
                 latitude: pino.localizacao.coordinates[1],
                 longitude: pino.localizacao.coordinates[0]
             };
 
-            // Calcula distância entre pessoa e pino atual
-            const distancia = geolib.getDistance(localizacaoPessoa, localizacaoPino);
+            const distancia = geolib.getDistance(localizacaoUsuario, localizacaoPino);
             
-            // Atualiza se encontrou um pino mais próximo
-            if (distancia < menorDistancia) {
-                menorDistancia = distancia;
-                pinoMaisProximo = {
-                    pino: pino,
-                    distancia: distancia
-                };
-            }
-        }
-
-        // VERIFICA SE ESTÁ DENTRO DO RAIO PERMITIDO
-        const estaProximo = menorDistancia <= raioMaximo;
-
-        // RESPOSTA DA API
-        res.status(200).json({ 
-            valid: estaProximo,
-            message: estaProximo ? 
-                "Pessoa está próxima de um pino." : 
-                "Pessoa não está próxima de nenhum pino.",
-            pinoMaisProximo: pinoMaisProximo ? {
-                id: pinoMaisProximo.pino._id,           // ID do pino mais próximo
-                nome: pinoMaisProximo.pino.nome,        // Nome do pino mais próximo
-                distancia: {
-                    metros: pinoMaisProximo.distancia,  // Distância em metros
-                    km: (pinoMaisProximo.distancia / 1000).toFixed(3) // Distância em km
-                }
-            } : null, // null se não encontrou nenhum pino
-            // Lista com distância para todos os pinos (útil para debug)
-            todosPinos: pinos.map(pino => ({
+            return {
                 id: pino._id,
                 nome: pino.nome,
-                distancia: geolib.getDistance(localizacaoPessoa, {
-                    latitude: pino.localizacao.coordinates[1],
-                    longitude: pino.localizacao.coordinates[0]
-                })
-            })),
-            validatedAt: new Date().toISOString()
+                msg: pino.msg,
+                capibas: pino.capibas || 0,
+                localizacao: localizacaoPino,
+                distancia: {
+                    metros: distancia,
+                    km: (distancia / 1000).toFixed(2)
+                },
+                estaProximo: distancia <= raioMaximo
+            };
+        });
+
+        // Ordena por distância (mais próximo primeiro)
+        const pinosOrdenados = pinosComDistancia.sort((a, b) => a.distancia.metros - b.distancia.metros);
+        
+        // Filtra apenas os que estão no raio e limita resultados
+        const pinosProximos = pinosOrdenados
+            .filter(pino => pino.estaProximo)
+            .slice(0, limite);
+
+        res.json({
+            success: true,
+            totalPinos: todosPinos.length,
+            pinosProximos: pinosProximos,
+            pinosEncontrados: pinosProximos.length,
+            localizacaoUsuario: localizacaoUsuario,
+            raioBusca: raioMaximo
         });
 
     } catch (error) {
-        // TRATAMENTO DE ERRO
-        console.error("Erro na validação de múltiplos pinos:", error);
+        console.error("❌ Erro ao buscar pinos próximos:", error);
+        res.status(500).json({ 
+            success: false,
+            message: "Erro ao buscar pinos próximos." 
+        });
+    }
+}
+
+/**
+ * VALIDAÇÃO OTIMIZADA USANDO CONSULTA GEOESPACIAL DO MONGODB + GEOLIB
+ * Combina a eficiência do MongoDB com a precisão do geolib
+ */
+const validarProximidadeOtimizada = async (req, res) => {
+    try {
+        const { 
+            latitudeUsuario,    
+            longitudeUsuario,   
+            raioMaximo = 100    
+        } = req.body;
+
+        const latUsuario = parseFloat(latitudeUsuario);
+        const lngUsuario = parseFloat(longitudeUsuario);
+        
+        if (isNaN(latUsuario) || isNaN(lngUsuario)) {
+            return res.status(400).json({ 
+                valid: false, 
+                message: "Coordenadas devem ser números válidos." 
+            });
+        }
+
+        // CONSULTA GEOESPACIAL DO MONGODB (RÁPIDA)
+        const pinosProximos = await Pino.find({
+            localizacao: {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [lngUsuario, latUsuario]
+                    },
+                    $maxDistance: raioMaximo
+                }
+            }
+        });
+
+        const localizacaoUsuario = { latitude: latUsuario, longitude: lngUsuario };
+
+        // USA GEOLIB PARA CÁLCULOS PRECISOS
+        const pinosComDistanciaPrecisa = pinosProximos.map(pino => {
+            const localizacaoPino = {
+                latitude: pino.localizacao.coordinates[1],
+                longitude: pino.localizacao.coordinates[0]
+            };
+
+            const distancia = geolib.getDistance(localizacaoUsuario, localizacaoPino);
+
+            return {
+                id: pino._id,
+                nome: pino.nome,
+                msg: pino.msg,
+                capibas: pino.capibas || 0,
+                distancia: {
+                    metros: distancia,
+                    km: (distancia / 1000).toFixed(3)
+                },
+                estaProximo: distancia <= raioMaximo
+            };
+        });
+
+        const encontrouPinos = pinosComDistanciaPrecisa.length > 0;
+
+        res.json({ 
+            valid: encontrouPinos,
+            message: encontrouPinos ? 
+                `🎯 Encontrado(s) ${pinosComDistanciaPrecisa.length} pino(s) próximo(s)!` : 
+                "📍 Nenhum pino encontrado próximo a você.",
+            pinos: pinosComDistanciaPrecisa,
+            totalEncontrados: pinosComDistanciaPrecisa.length,
+            localizacaoUsuario: localizacaoUsuario,
+            calculadoCom: "MongoDB + geolib"
+        });
+
+    } catch (error) {
+        console.error("❌ Erro na validação otimizada:", error);
         res.status(500).json({ 
             valid: false, 
             message: "Erro interno no servidor." 
@@ -210,87 +295,20 @@ const validarProximidadeMultiplosPinos = async (req, res) => {
 }
 
 /**
- * VALIDAÇÃO OTIMIZADA USANDO CONSULTA GEOESPACIAL DO MONGODB
- * MUITO MAIS RÁPIDO - usa índices do MongoDB para buscar pinos próximos
- * RECOMENDADO PARA USO EM PRODUÇÃO
+ * FUNÇÃO AUXILIAR: Retorna interpretação humana da distância
  */
-const validarProximidadeOtimizada = async (req, res) => {
-    try {
-        // Extrai dados do corpo da requisição
-        const { 
-            latitudePessoa,     // Latitude da pessoa
-            longitudePessoa,    // Longitude da pessoa
-            raioMaximo = 100    // Raio máximo em metros (padrão: 100m)
-        } = req.body;
-
-        // VALIDAÇÃO: Converte e verifica as coordenadas
-        const latPessoa = parseFloat(latitudePessoa);
-        const lngPessoa = parseFloat(longitudePessoa);
-        
-        if (isNaN(latPessoa) || isNaN(lngPessoa)) {
-            return res.status(400).json({ 
-                valid: false, 
-                message: "Coordenadas devem ser números válidos." 
-            });
-        }
-
-        // Importa modelo do Pino
-        const Pino = require('./models/Pino');
-
-        // CONSULTA GEOESPACIAL DO MONGODB - MUITO EFICIENTE
-        // Usa operador $near para buscar pinos dentro do raio especificado
-        const pinosProximos = await Pino.find({
-            localizacao: {
-                $near: {
-                    $geometry: {
-                        type: "Point",
-                        coordinates: [lngPessoa, latPessoa] // [longitude, latitude] - formato MongoDB
-                    },
-                    $maxDistance: raioMaximo // Raio máximo em metros
-                }
-            }
-        });
-
-        // Verifica se encontrou algum pino
-        const encontrouPinos = pinosProximos.length > 0;
-
-        // RESPOSTA DA API
-        res.status(200).json({ 
-            valid: encontrouPinos,
-            message: encontrouPinos ? 
-                `Encontrado(s) ${pinosProximos.length} pino(s) próximo(s).` : 
-                "Nenhum pino encontrado no raio especificado.",
-            // Lista detalhada de todos os pinos encontrados
-            pinosProximos: pinosProximos.map(pino => ({
-                id: pino._id,           // ID do pino
-                nome: pino.nome,        // Nome do pino
-                msg: pino.msg,          // Mensagem do pino
-                capibas: pino.capibas,  // Pontos/recursos do pino
-                localizacao: {
-                    latitude: pino.localizacao.coordinates[1], // Latitude
-                    longitude: pino.localizacao.coordinates[0]  // Longitude
-                }
-            })),
-            totalPinos: pinosProximos.length, // Quantidade total de pinos encontrados
-            limites: {
-                raioMaximoMetros: raioMaximo // Raio máximo usado na busca
-            },
-            validatedAt: new Date().toISOString()
-        });
-
-    } catch (error) {
-        // TRATAMENTO DE ERRO
-        console.error("Erro na validação otimizada:", error);
-        res.status(500).json({ 
-            valid: false, 
-            message: "Erro interno no servidor." 
-        });
-    }
+function getInterpretacaoDistancia(distanciaMetros) {
+    if (distanciaMetros < 10) return "Muito próximo";
+    if (distanciaMetros < 50) return "Próximo";
+    if (distanciaMetros < 100) return "Perto";
+    if (distanciaMetros < 500) return "Um pouco longe";
+    if (distanciaMetros < 1000) return "Longe";
+    return "Muito longe";
 }
 
-// EXPORTA TODAS AS FUNÇÕES PARA USO NAS ROTAS
+// EXPORTA AS FUNÇÕES
 module.exports = {
-    validarProximidadePino,           // Para validar pino específico
-    validarProximidadeMultiplosPinos, // Para encontrar pino mais próximo
-    validarProximidadeOtimizada       // Para busca otimizada (RECOMENDADO)
+    validarProximidadePino,
+    encontrarPinosProximos,
+    validarProximidadeOtimizada
 };

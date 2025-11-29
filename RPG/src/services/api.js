@@ -7,6 +7,9 @@ import axios from "axios";
 const api = axios.create({
   baseURL: "http://localhost:5001/api", // URL base da API
   timeout: 5000, // Timeout de 5 segundos para todas as requisições
+  headers: {
+    "Content-Type": "application/json",
+  }
 });
 
 /**

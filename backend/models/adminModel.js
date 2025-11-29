@@ -3,11 +3,11 @@ const Schema = mongoose.Schema
 
 // esquema dos admins
 const adminSchema = new Schema({
-    nome: { type: String, required: true , trim: true }, // nome do admin
+    nome: { type: String, required: true, unique: true, trim: true }, // nome do admin
     email: { type: String, required: true, unique: true , trim: true }, // email do admin
     tipo: { type: String, enum: ['cliente', 'admin'], required: true , default: 'admin' }, // tipo do usuário
-    tarefasCompletas: { type: Number, default: 0 }, // número de tarefas completas
-    tarefasConcluidas: [{ type: String }], // array de IDs das tarefas concluídas
+    tarefasCompletas: { type: Number, default: 0, min: 0 }, // número de tarefas completas
+    tarefasConcluidas: [{ type: String, unique: true }], // array de IDs das tarefas concluídas
     // Permissões específicas para o admin
     permissoes: { 
         type: [String], 
@@ -17,6 +17,10 @@ const adminSchema = new Schema({
 }, {
     timestamps: true // Adiciona automaticamente createdAt e updatedAt
 })
+
+// Índice para melhor performance nas buscas
+adminSchema.index({ email: 1 });
+adminSchema.index({ 'tarefasConcluidas': 1 });
 
 // Cria e exporta o modelo Cliente baseado no schema
 module.exports = mongoose.model("Admins", adminSchema)

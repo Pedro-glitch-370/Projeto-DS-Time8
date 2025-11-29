@@ -1,27 +1,30 @@
 import api from "./api.js";
 
-// Funções auxiliares
 /**
- * Registra erros de forma padronizada no console
+ * Funções auxiliares para logging padronizado de erros
  * @param {string} operacao - Nome da operação que falhou
  * @param {Error} error - Objeto de erro capturado
  */
 const logErro = (operacao, error) => {
   console.error(`❌ ERRO AO ${operacao}:`, error);
-  // Exibe detalhes adicionais se disponíveis na resposta
+  // Exibe detalhes adicionais se disponíveis na resposta da API
   if (error.response) {
     console.error('📊 Status:', error.response.status);
     console.error('📄 Mensagem:', error.response.data);
   }
 };
 
-// Serviço principal - agora suporta cliente e admin
+/**
+ * Serviço para gerenciamento de operações relacionadas a clientes
+ * Inclui busca de usuários e conclusão de tarefas com recompensas
+ */
 export const clienteService = {
   
   /**
    * Busca um usuário (cliente ou admin) pelo ID
-   * @param {string} userId - ID do usuário a ser buscado
-   * @returns {Promise<Object>} Dados do usuário encontrado
+   * @param {string} userId - ID único do usuário a ser buscado
+   * @returns {Promise<Object>} Dados completos do usuário encontrado
+   * @throws {Error} Se o usuário não for encontrado ou ocorrer erro na API
    */
   getCliente: async (userId) => {
     try {
@@ -31,14 +34,15 @@ export const clienteService = {
       return response.data;
     } catch (error) {
       logErro('BUSCAR CLIENTE', error);
-      throw error; // Propaga o erro para o chamador
+      throw error;
     }
   },
 
   /**
-   * Busca um usuário (cliente ou admin) pelo email
+   * Busca um usuário (cliente ou admin) pelo endereço de email
    * @param {string} email - Email do usuário a ser buscado
-   * @returns {Promise<Object>} Dados do usuário encontrado
+   * @returns {Promise<Object>} Dados completos do usuário encontrado
+   * @throws {Error} Se o usuário não for encontrado ou ocorrer erro na API
    */
   getClienteByEmail: async (email) => {
     try {
@@ -53,41 +57,60 @@ export const clienteService = {
   },
 
   /**
-   * Marca uma tarefa como concluída e adiciona capibas ao usuário
-   * @param {string} clienteId - ID do cliente/admin
-   * @param {string} tarefaId - ID da tarefa a ser concluída
-   * @param {number} capibas - Quantidade de capibas a serem adicionados
-   * @returns {Promise<Object>} Resultado da operação
+   * Marca uma tarefa como concluída e adiciona capibas (moeda virtual) ao usuário
+   * Esta função é usada exclusivamente por clientes (não admins) para ganhar recompensas
+   * @param {string} clienteId - ID do cliente que está concluindo a tarefa
+   * @param {string} tarefaId - ID da tarefa a ser marcada como concluída
+   * @param {number} capibas - Quantidade de capibas a serem creditados ao usuário
+   * @returns {Promise<Object>} Resultado da operação com detalhes da conclusão
+   * @throws {Error} Se a tarefa já foi concluída, cliente não existe ou ocorrer erro na API
    */
   concluirTarefa: async (clienteId, tarefaId, capibas) => {
     try {
-      console.log('🎯 Enviando conclusão de tarefa:', { clienteId, tarefaId, capibas });
+      console.log('🎯 Concluindo tarefa:', { 
+        clienteId, 
+        tarefaId, 
+        capibas 
+      });
       
-      // Prepara payload com tipos adequados para a API
+      // Prepara payload com tipos garantidos
       const payload = {
-        tarefaId: String(tarefaId),    // Garante que é string
-        capibas: Number(capibas)       // Garante que é número
+        tarefaId: String(tarefaId), // Garante que o ID seja string
+        capibas: Number(capibas)    // Garante que capibas seja número
       };
       
+      // 🔥 CORREÇÃO: Usando a rota correta que existe no backend
       // Faz requisição POST para endpoint de conclusão de tarefas
       const response = await api.post(`/auth/clientes/${clienteId}/tarefas/concluir`, payload);
       
-      console.log('✅ Tarefa concluída com sucesso');
+      console.log('✅ Tarefa concluída com sucesso:', response.data);
       return response.data;
 
     } catch (error) {
-      // Tratamento específico para tarefa já concluída
-      if (error.response?.status === 400 && error.response?.data?.message === 'Tarefa já concluída') {
-        console.log('⚠️ Tarefa já foi concluída anteriormente, retornando dados atualizados');
-        // Retorna os dados atualizados mesmo em caso de "erro"
-        return error.response.data;
+      // Tratamento específico para tarefa já concluída (erro 400)
+      if (error.response?.status === 400) {
+        const mensagemErro = error.response?.data?.message || "Tarefa já concluída";
+        console.log('⚠️ Tarefa já foi concluída:', mensagemErro);
+        throw new Error(mensagemErro);
       }
       
-      // Log detalhado para outros tipos de erro
+      // Tratamento para cliente não encontrado (erro 404)
+      if (error.response?.status === 404) {
+        console.error('❌ Cliente não encontrado:', clienteId);
+        throw new Error("Cliente não encontrado. Faça login novamente.");
+      }
+      
+      // Log detalhado para debugging de outros tipos de erro
       console.log('❌ ERRO AO CONCLUIR TAREFA:');
       console.log('📊 Status:', error.response?.status);
       console.log('📄 Mensagem:', error.response?.data);
-      throw error;
+      
+      // Cria mensagem de erro amigável para o usuário
+      const mensagemErro = error.response?.data?.message || 
+                          error.message || 
+                          "Erro ao concluir tarefa. Tente novamente.";
+      
+      throw new Error(mensagemErro);
     }
   }
 };
