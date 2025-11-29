@@ -65,6 +65,11 @@ export function loadNavbar() {
             <input type="email" id="popupEmail" name="email" placeholder="seu@email.com" required>
             <div class="validation-message" id="loginEmailValidation"></div>
           </div>
+
+          <div class="form-group">
+            <label for="popupSenha">Senha *</label>
+            <input type="password" id="popupSenha" name="senha" placeholder="sua senha" required>
+          </div>
           
           <button type="submit" id="loginSubmitBtn">Entrar</button>
         </form>

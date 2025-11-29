@@ -5,8 +5,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "geolib": "^3.3.3",
     "mongoose": "^8.19.3",
-    "geolib": "^3.3.3"
+    "node-fetch": "^2.7.0"
   },
   "scripts": {
     "start": "node server.js",

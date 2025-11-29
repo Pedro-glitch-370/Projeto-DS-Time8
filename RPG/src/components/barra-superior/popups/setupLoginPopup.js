@@ -1,6 +1,7 @@
 import { getUser } from "../utils/userUtils.js";
 import { validateEmailField } from "../utils/emailValidation.js";
 import { updateNavbarForLoggedUser } from "../navbar/updateNavbarForLoggedUser.js";
+import { authService } from "../../../services/authService.js";
 
 export function setupLoginPopup() {
     const loginBtn = document.getElementById('login');
@@ -11,6 +12,7 @@ export function setupLoginPopup() {
     const loading = document.getElementById('popupLoading');
     const openRegisterBtn = document.getElementById('openRegisterPopup');
     const loginEmailInput = document.getElementById('popupEmail');
+    const loginSenhaInput = document.getElementById('popupSenha');
     const loginEmailValidation = document.getElementById('loginEmailValidation');
     const loginSubmitBtn = document.getElementById('loginSubmitBtn');
 
@@ -69,10 +71,16 @@ export function setupLoginPopup() {
             e.preventDefault();
 
             const email = loginEmailInput.value.trim();
+            const senha = loginSenhaInput.value.trim();
 
             // Validação do email apenas quando o formulário é submetido
             if (!validateEmailField(loginEmailInput, loginEmailValidation)) {
                 showError('Por favor, insira um email válido');
+                return;
+            }
+
+            if (!senha) {
+                showError('Por favor, insira sua senha');
                 return;
             }
 
@@ -82,55 +90,31 @@ export function setupLoginPopup() {
             loginSubmitBtn.disabled = true;
 
             try {
-                // Tenta primeiro como admin, depois como cliente
-                let response = await fetch(`${API_BASE_URL}/auth/admins/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email })
-                });
+                const userData = await authService.login(email, senha);
 
-                if (response.status === 404 || !response.ok) {
-                    // Se não for admin, tenta como cliente
-                    response = await fetch(`${API_BASE_URL}/auth/clientes/login`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email })
-                    });
+                if (!userData || !userData.token) {
+                    showError('Falha no login: token não recebido');
+                    return;
                 }
 
-                const data = await response.json();
+                console.log(`Usuário logado: ${userData.email} (${userData.tipo})`);
 
-                if (response.ok) {
-                    // Login bem-sucedido
-                    localStorage.setItem('user', JSON.stringify(data.user || data));
+                // Fechar popup
+                loginPopup.style.display = 'none';
+                document.body.style.overflow = 'auto';
 
-                    // Fechar popup
-                    loginPopup.style.display = 'none';
-                    document.body.style.overflow = 'auto';
+                // Atualizar navbar
+                updateNavbarForLoggedUser();
+                
+                // Recarregar a página para atualizar o estado (especialmente no React)
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
                     
-                    // Atualizar navbar
-                    updateNavbarForLoggedUser();
-                    
-                    // Recarregar a página para atualizar o estado (especialmente no React)
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 500);
-                    
-                } else {
-                    throw new Error(data.message || 'Email não encontrado');
-                }
 
             } catch (error) {
-                console.error('Erro no login:', error);
-                if (error.message.includes('Failed to fetch')) {
-                    showError('Servidor offline. Verifique se o backend está rodando na porta 5001.');
-                } else {
-                    showError(error.message || 'Erro ao fazer login. Tente novamente.');
-                }
+                console.error('Erro no login via Conecta:', error);
+                showError(error.message || 'Erro ao fazer login. Tente novamente.');
             } finally {
                 loading.style.display = 'none';
                 loginSubmitBtn.disabled = false;

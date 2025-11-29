@@ -9,6 +9,7 @@ const pinoRoutes = require("./routes/pinosRoutes")
 const clienteRoutes = require("./routes/clienteRoutes.js")
 const adminRoutes = require("./routes/adminRoutes.js")
 const validarLocalizacaoRouter = require("./routes/validarLocalizacaoRouter.js")
+const conectaRoutes = require("./routes/conectaRoutes.js");
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -39,6 +40,7 @@ app.use("/api/pinos", pinoRoutes)
 app.use("/api/validar-localizacao", validarLocalizacaoRouter)
 app.use("/api/auth/clientes", clienteRoutes)
 app.use("/api/auth/admins", adminRoutes)
+app.use("/api/conecta", conectaRoutes);
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -55,6 +57,8 @@ const startServer = async () => {
       console.log(`URL: http://localhost:${PORT}/api/pinos`) // rota que pega todos os pinos do mongoDB
       console.log(`URL: http://localhost:${PORT}/api/auth/clientes/`) // listar clientes
       console.log(`URL: http://localhost:${PORT}/api/auth/admins/`) // listar admins
+      console.log(`URL: http://localhost:${PORT}/api/conecta/login`); // rota de login no Conecta
+      console.log(`URL: http://localhost:${PORT}/api/conecta/moedas/:document`); // rota de consulta de moedas
       console.log(`Banco de dados: ${getDBStatus().connected ? "Conectado" : "Desconectado"}`); // Indica se o banco de dados foi conectado
       console.log("=".repeat(50))
     })
