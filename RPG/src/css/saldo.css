@@ -8,7 +8,6 @@ body {
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
-  /* REMOVE padding-top daqui - agora controlado pela navbar */
 }
 
 .saldo-container {
@@ -16,7 +15,6 @@ body {
   margin: 0 auto;
   padding: 30px 20px;
   text-align: center;
-  /* ADICIONA margin-top para compensar a navbar fixa */
   margin-top: 70px;
 }
 

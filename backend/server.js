@@ -8,6 +8,7 @@ const { connectDB, disconnectDB, getDBStatus } = require("./config/db") // Impor
 const pinoRoutes = require("./routes/pinosRoutes") 
 const clienteRoutes = require("./routes/clienteRoutes.js")
 const adminRoutes = require("./routes/adminRoutes.js")
+const validarLocalizacaoRouter = require("./routes/validarLocalizacaoRouter.js")
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -35,8 +36,9 @@ app.use(express.json()) // Middleware para interpretar dados JSON no corpo das r
 // ==================================================
 // Rotas da API
 app.use("/api/pinos", pinoRoutes)
+app.use("/api/validar-localizacao", adminRoutes)
 app.use("/api/auth/clientes", clienteRoutes)
-app.use("/api/auth/admins", adminRoutes)
+app.use("/api/auth/admins", validarLocalizacaoRouter)
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
