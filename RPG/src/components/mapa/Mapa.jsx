@@ -5,81 +5,62 @@ import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 
-// Importações
+// Serviços e componentes
 import { handleSavePino, handleDeletePino, handleUpdatePino } from "./acoesPinos.js";
 import { MAP_CONFIG, ICONS } from "./constantesMapa.js";
 import usePinosManagement from "./usePinosManagement.js";
 import MapClickHandler from "./MapClickHandler.jsx";
 import Sidebar from "../barra-lateral/barra-lateral.jsx";
-
 import { authService } from "../../services/authService.js";
+
 import StatusLocalizacao from "./StatusLocalizacao.jsx";
 import { localizacaoService } from "../../services/localizacaoService.js";
 import { clienteService } from "../../services/clienteService.js";
 import { adminService } from "../../services/adminService.js";
 
-// =================================================================
-// Configuração do Leaflet
+// Configuração do Leaflet - remove URLs padrão
 delete L.Icon.Default.prototype._getIconUrl;
-
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-// =================================================================
 // Ícones personalizados para localização do usuário
-const createUserLocationIcon = () => {
-  return L.divIcon({
-    className: 'user-location-marker',
-    html: `
-      <div class="user-location-pulse">
-        <div class="user-location-dot"></div>
-      </div>
-    `,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-  });
-};
+const createUserLocationIcon = () => L.divIcon({
+  className: 'user-location-marker',
+  html: `<div class="user-location-pulse"><div class="user-location-dot"></div></div>`,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
+});
 
-const createUserLocationUpdatingIcon = () => {
-  return L.divIcon({
-    className: 'user-location-marker updating',
-    html: `
-      <div class="user-location-pulse updating">
-        <div class="user-location-dot updating"></div>
-      </div>
-    `,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-  });
-};
+const createUserLocationUpdatingIcon = () => L.divIcon({
+  className: 'user-location-marker updating',
+  html: `<div class="user-location-pulse updating"><div class="user-location-dot updating"></div></div>`,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
+});
 
-const createUserLocationFallbackIcon = () => {
-  return L.divIcon({
-    className: 'user-location-marker fallback',
-    html: `
-      <div class="user-location-pulse" style="border-color: #fdcb6e;">
-        <div class="user-location-dot" style="background: #fdcb6e;"></div>
-      </div>
-    `,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-  });
-};
+const createUserLocationFallbackIcon = () => L.divIcon({
+  className: 'user-location-marker fallback',
+  html: `<div class="user-location-pulse" style="border-color: #fdcb6e;"><div class="user-location-dot" style="background: #fdcb6e;"></div></div>`,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
+});
 
-// =================================================================
-// Componente principal
+// Componente principal do mapa
 export default function Mapa() {
+  // Estados da UI
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [tempPin, setTempPin] = useState(null);
   const [selectedPino, setSelectedPino] = useState(null);
+  
+  // Estados de autenticação
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-
-  // Estados para localização em tempo real
+  
+  // Estados de localização
   const [localizacaoUsuario, setLocalizacaoUsuario] = useState(null);
   const [permissaoLocalizacao, setPermissaoLocalizacao] = useState(null);
   const [validandoLocalizacao, setValidandoLocalizacao] = useState(false);
@@ -87,82 +68,59 @@ export default function Mapa() {
   const [rastreamentoAtivo, setRastreamentoAtivo] = useState(false);
   const [precisaoLocalizacao, setPrecisaoLocalizacao] = useState(null);
   const [atualizandoLocalizacao, setAtualizandoLocalizacao] = useState(false);
-
-  // ✅ NOVO ESTADO: Para controlar tarefas já concluídas
+  
+  // Estado de tarefas concluídas
   const [tarefasConcluidas, setTarefasConcluidas] = useState(new Set());
 
   const watchIdRef = useRef(null);
-
   const { pinos, loading, error, fetchPinos, addPino, removePino, updatePino } = usePinosManagement();
 
-  // Efeito pra verificar autenticação
+  // Verifica autenticação ao carregar
   useEffect(() => {
-    const checkAuth = () => {
-      const userData = authService.getUser();
-      if (userData) {
-        setUser(userData);
-        setIsAdmin(authService.isAdmin());
-        
-        // ✅ CARREGAR TAREFAS CONCLUÍDAS DO USUÁRIO
-        if (userData.tarefasConcluidas) {
-          setTarefasConcluidas(new Set(userData.tarefasConcluidas));
-        }
+    const userData = authService.getUser();
+    if (userData) {
+      setUser(userData);
+      setIsAdmin(authService.isAdmin());
+      if (userData.tarefasConcluidas) {
+        setTarefasConcluidas(new Set(userData.tarefasConcluidas));
       }
-      setIsCheckingAuth(false);
-    };
-
-    checkAuth();
+    }
+    setIsCheckingAuth(false);
   }, []);
 
-  // ✅ NOVA FUNÇÃO: Atualizar dados do usuário
+  // Atualiza dados do usuário (capibas e tarefas)
   const atualizarDadosUsuario = useCallback(async () => {
     try {
       const userData = authService.getUser();
-      if (userData && userData.id) {
-        console.log('🔄 Atualizando dados do usuário...');
-        
+      if (userData?.id) {
         const usuarioAtualizado = await clienteService.getCliente(userData.id);
-        
         if (usuarioAtualizado.user) {
-          // ✅ ATUALIZAR ESTADO LOCAL
           setUser(usuarioAtualizado.user);
-          
-          // ✅ ATUALIZAR TAREFAS CONCLUÍDAS
           if (usuarioAtualizado.user.tarefasConcluidas) {
             setTarefasConcluidas(new Set(usuarioAtualizado.user.tarefasConcluidas));
           }
-          
-          // ✅ ATUALIZAR NO LOCALSTORAGE (opcional)
           authService.updateUserData(usuarioAtualizado.user);
-          
-          console.log('✅ Dados do usuário atualizados:', {
-            capibas: usuarioAtualizado.user.capibas,
-            tarefasConcluidas: usuarioAtualizado.user.tarefasConcluidas?.length
-          });
         }
       }
     } catch (error) {
-      console.error('❌ Erro ao atualizar dados do usuário:', error);
+      console.error('Erro ao atualizar dados do usuário:', error);
     }
   }, []);
 
-  // ✅ NOVA FUNÇÃO: Verificar se tarefa já foi concluída
+  // Verifica se tarefa já foi concluída
   const isTarefaConcluida = useCallback((pinoId) => {
     return tarefasConcluidas.has(pinoId);
   }, [tarefasConcluidas]);
 
-  // Efeito para solicitar permissão de localização
+  // Solicita permissão de localização
   useEffect(() => {
     const solicitarPermissaoLocalizacao = async () => {
       try {
         setMensagemLocalizacao("📍 Obtendo sua localização...");
-        
         const coords = await localizacaoService.solicitarLocalizacao();
         setLocalizacaoUsuario(coords);
         setPermissaoLocalizacao(true);
         setMensagemLocalizacao("");
-        
-        console.log('📍 Localização do usuário obtida:', coords);
         
         if (coords.metodo !== 'fallback') {
           iniciarRastreamentoLocalizacao();
@@ -170,19 +128,12 @@ export default function Mapa() {
           setMensagemLocalizacao("📍 Usando localização padrão. Ative o GPS para melhor precisão.");
           setTimeout(() => setMensagemLocalizacao(""), 5000);
         }
-        
+      // eslint-disable-next-line no-unused-vars
       } catch (error) {
-        console.warn('⚠️ Erro ao obter localização:', error.message);
         setPermissaoLocalizacao(false);
+        setMensagemLocalizacao("📍 Permissão necessária. Clique em 'Atualizar' quando permitir.");
         
-        if (error.message.includes("negada")) {
-          setMensagemLocalizacao("📍 Permissão necessária. Clique em 'Atualizar' quando permitir.");
-        } else {
-          setMensagemLocalizacao("📍 Não foi possível obter localização. Clique em 'Atualizar' para tentar novamente.");
-        }
-        
-        // Fallback para localização padrão
-        console.log('📍 Usando localização padrão (Recife)...');
+        // Fallback para localização padrão (Recife)
         setLocalizacaoUsuario({
           latitude: -8.063163,
           longitude: -34.871139,
@@ -194,10 +145,6 @@ export default function Mapa() {
     };
 
     if (!isCheckingAuth) {
-      console.log('🎯 Iniciando solicitação de localização para usuário...', { 
-        isAdmin, 
-        user: user?.name || 'Não logado' 
-      });
       solicitarPermissaoLocalizacao();
     }
 
@@ -208,12 +155,8 @@ export default function Mapa() {
     };
   }, [isCheckingAuth]);
 
-  /**
-   * INICIA RASTREAMENTO CONTÍNUO DA LOCALIZAÇÃO
-   */
+  // Inicia rastreamento contínuo da localização
   const iniciarRastreamentoLocalizacao = () => {
-    console.log('📍 Iniciando rastreamento de localização...');
-    
     try {
       const watchId = localizacaoService.iniciarRastreamento(
         (coords) => {
@@ -221,37 +164,20 @@ export default function Mapa() {
           setLocalizacaoUsuario(coords);
           setPrecisaoLocalizacao(coords.precisao);
           setRastreamentoAtivo(true);
-          
-          console.log('📍 Localização atualizada:', coords);
-          
-          setTimeout(() => {
-            setAtualizandoLocalizacao(false);
-          }, 1000);
+          setTimeout(() => setAtualizandoLocalizacao(false), 1000);
         },
         (error) => {
-          console.error('❌ Erro no rastreamento:', error);
           setRastreamentoAtivo(false);
           setMensagemLocalizacao("Rastreamento interrompido: " + error.message);
         }
       );
-      
-      if (watchId) {
-        watchIdRef.current = watchId;
-        console.log('✅ Rastreamento iniciado com sucesso');
-      } else {
-        console.warn('⚠️ Não foi possível iniciar o rastreamento');
-        setMensagemLocalizacao("Não foi possível iniciar o rastreamento contínuo");
-      }
-      
+      watchIdRef.current = watchId;
     } catch (error) {
-      console.error('❌ Erro ao tentar iniciar rastreamento:', error);
       setMensagemLocalizacao("Erro ao iniciar rastreamento: " + error.message);
     }
   };
 
-  /**
-   * REINICIA O RASTREAMENTO DA LOCALIZAÇÃO
-   */
+  // Reinicia o rastreamento da localização
   const reiniciarRastreamentoLocalizacao = async () => {
     try {
       setMensagemLocalizacao("🔄 Obtendo localização...");
@@ -272,41 +198,27 @@ export default function Mapa() {
         iniciarRastreamentoLocalizacao();
       }
       
-      setTimeout(() => {
-        setMensagemLocalizacao("");
-      }, 3000);
-      
+      setTimeout(() => setMensagemLocalizacao(""), 3000);
     } catch (error) {
-      console.error('❌ Erro ao reiniciar localização:', error);
       setPermissaoLocalizacao(false);
       setMensagemLocalizacao("❌ " + error.message);
     }
   };
 
-  // Efeito pra buscar os pinos
+  // Busca pinos após verificação de autenticação
   useEffect(() => {
-    if (!isCheckingAuth) {
-      fetchPinos();
-    }
+    if (!isCheckingAuth) fetchPinos();
   }, [isCheckingAuth, fetchPinos]);
 
-  // Função que salva um pino
+  // Handlers para operações com pinos
   const onSavePino = useCallback(
-    (dados) =>
-      handleSavePino({
-        dados,
-        addPino,
-        setIsSidebarOpen,
-        setTempPin,
-        setSelectedPino,
-      }),
+    (dados) => handleSavePino({ dados, addPino, setIsSidebarOpen, setTempPin, setSelectedPino }),
     [addPino]
   );
 
-  // Função que atualiza um pino existente
   const onUpdatePino = useCallback(
     (dados) => {
-      if (selectedPino && selectedPino._id) {
+      if (selectedPino?._id) {
         handleUpdatePino({
           pinoId: selectedPino._id,
           dados,
@@ -319,19 +231,11 @@ export default function Mapa() {
     [selectedPino, updatePino]
   );
 
-  // Função que deleta um pino
   const onDeletePino = useCallback(
-    (pinoId) =>
-      handleDeletePino({
-        pinoId,
-        removePino,
-        setIsSidebarOpen,
-        setSelectedPino,
-      }),
+    (pinoId) => handleDeletePino({ pinoId, removePino, setIsSidebarOpen, setSelectedPino }),
     [removePino]
   );
 
-  // Função que lida com o clique em um pino
   const onPinoClick = useCallback(
     (pino) => {
       if (isAdmin) {
@@ -343,32 +247,28 @@ export default function Mapa() {
     [isAdmin]
   );
 
-  /**
-   * FUNÇÃO PARA CONFIRMAR ATIVIDADE NO PINO - CORRIGIDA
-   * Valida localização e marca tarefa como concluída
-   */
+  // Confirma atividade no pino (valida localização e marca tarefa)
   const confirmarAtividade = async (pino) => {
-    // Verifica se o usuário está logado
     const userData = authService.getUser();
-    if (!userData || !userData.id) {
+    if (!userData?.id) {
       setMensagemLocalizacao("❌ Você precisa estar logado para confirmar atividades.");
       return;
     }
 
-    // ✅ VERIFICA SE TAREFA JÁ FOI CONCLUÍDA
+    // Verifica se tarefa já foi concluída
     if (isTarefaConcluida(pino._id)) {
       setMensagemLocalizacao("✅ Você já completou esta tarefa!");
       setTimeout(() => setMensagemLocalizacao(""), 3000);
       return;
     }
 
-    // Verifica se o usuário permitiu localização
+    // Verifica permissão de localização
     if (!permissaoLocalizacao) {
       setMensagemLocalizacao("Permissão de localização necessária para confirmar atividades.");
       return;
     }
 
-    // Verifica se temos localização atual
+    // Obtém localização atual se não disponível
     if (!localizacaoUsuario) {
       setMensagemLocalizacao("Obtendo localização atual...");
       try {
@@ -381,33 +281,19 @@ export default function Mapa() {
     }
 
     // Evita múltiplos cliques
-    if (validandoLocalizacao) {
-      return;
-    }
+    if (validandoLocalizacao) return;
 
     setValidandoLocalizacao(true);
     setMensagemLocalizacao("Validando sua localização...");
 
     try {
-      console.log('📍 Iniciando validação de proximidade...', {
-        usuario: { lat: localizacaoUsuario.latitude, lng: localizacaoUsuario.longitude },
-        pino: {
-          id: pino._id,
-          nome: pino.nome,
-          coords: pino.localizacao?.coordinates
-        },
-        raio: 50
-      });
-
-      // VALIDAÇÃO DE LOCALIZAÇÃO
+      // Valida proximidade do usuário com o pino
       const validacao = await localizacaoService.validarProximidadePino(
         localizacaoUsuario.latitude,
         localizacaoUsuario.longitude,
         pino._id,
-        50
+        50 // raio em metros
       );
-
-      console.log('✅ Resposta da validação:', validacao);
 
       if (!validacao.valid) {
         setMensagemLocalizacao(`❌ Você está a ${validacao.distancia.metros}m do local. Aproxime-se!`);
@@ -415,63 +301,29 @@ export default function Mapa() {
         return;
       }
 
-      // SE ESTIVER PRÓXIMO, MARCA A TAREFA COMO CONCLUÍDA
       setMensagemLocalizacao("✅ Localização validada! Concluindo tarefa...");
 
-      let resultado;
-
+      // Marca tarefa como concluída
+      const capibasRecompensa = Number(pino.capibas) || 0;
+      
       if (isAdmin) {
-        console.log('👑 Admin testando tarefa...');
-        resultado = await adminService.concluirTarefa(userData.id, pino._id);
+        await adminService.concluirTarefa(userData.id, pino._id);
         setMensagemLocalizacao("✅ Tarefa testada com sucesso! (Modo Admin)");
       } else {
-        console.log('👤 Cliente concluindo tarefa...');
-        
-        // ✅ CORREÇÃO: Garantir que capibas seja número
-        const capibasRecompensa = Number(pino.capibas) || 0;
-        
-        resultado = await clienteService.concluirTarefa(
-          userData.id,
-          pino._id,
-          capibasRecompensa
-        );
-        
-        // ✅ CORREÇÃO CRÍTICA: ATUALIZAR DADOS DO USUÁRIO IMEDIATAMENTE
+        await clienteService.concluirTarefa(userData.id, pino._id, capibasRecompensa);
         await atualizarDadosUsuario();
-        
-        // ✅ MOSTRAR CAPIBAS ATUALIZADOS
-        const capibasAtuais = user?.capibas || resultado.capibas || 0;
-        setMensagemLocalizacao(`🎉 Parabéns! Você ganhou ${capibasRecompensa} capibas! Total: ${capibasAtuais} capibas`);
-        
-        // ✅ ADICIONAR TAREFA À LISTA DE CONCLUÍDAS
+        setMensagemLocalizacao(`🎉 Parabéns! Você ganhou ${capibasRecompensa} capibas!`);
         setTarefasConcluidas(prev => new Set([...prev, pino._id]));
       }
 
-      console.log('✅ Tarefa concluída com sucesso:', resultado);
-
-      // Feedback visual adicional
-      setTimeout(() => {
-        setMensagemLocalizacao("");
-      }, 5000);
+      setTimeout(() => setMensagemLocalizacao(""), 5000);
 
     } catch (error) {
-      console.error('❌ Erro ao confirmar atividade:', error);
+      console.error('Erro ao confirmar atividade:', error);
       
-      // Mensagens de erro específicas
       if (error.message.includes("Tarefa já concluída")) {
         setMensagemLocalizacao("✅ Você já completou esta tarefa anteriormente!");
-        // ✅ MARCAR COMO CONCLUÍDA MESMO NO ERRO (para evitar novas tentativas)
         setTarefasConcluidas(prev => new Set([...prev, pino._id]));
-      } else if (error.message.includes("muito longe")) {
-        setMensagemLocalizacao(error.message);
-      } else if (error.message.includes("Erro interno do servidor")) {
-        setMensagemLocalizacao("🔧 Serviço temporariamente indisponível. Tente novamente em alguns minutos.");
-      } else if (error.message.includes("Não autorizado")) {
-        setMensagemLocalizacao("🔒 Sessão expirada. Faça login novamente.");
-      } else if (error.message.includes("Sem resposta")) {
-        setMensagemLocalizacao("🌐 Problema de conexão. Verifique sua internet.");
-      } else if (error.message.includes("Pino não encontrado")) {
-        setMensagemLocalizacao("📍 Ponto não encontrado no sistema.");
       } else {
         setMensagemLocalizacao(`❌ ${error.message || "Erro ao confirmar atividade. Tente novamente."}`);
       }
@@ -480,39 +332,25 @@ export default function Mapa() {
     }
   };
 
-  // Pinos válidos memoizados
+  // Filtra pinos com coordenadas válidas
   const pinosValidos = useMemo(
     () => pinos.filter((pino) => pino.localizacao?.coordinates?.length === 2),
     [pinos]
   );
 
-  // Determina qual ícone usar baseado no estado da localização
+  // Determina ícone da localização do usuário
   const getUserLocationIcon = () => {
-    if (atualizandoLocalizacao) {
-      return createUserLocationUpdatingIcon();
-    }
-    if (localizacaoUsuario?.metodo === 'fallback') {
-      return createUserLocationFallbackIcon();
-    }
+    if (atualizandoLocalizacao) return createUserLocationUpdatingIcon();
+    if (localizacaoUsuario?.metodo === 'fallback') return createUserLocationFallbackIcon();
     return createUserLocationIcon();
   };
 
-  // Mostra loading enquanto verifica autenticação
-  if (isCheckingAuth) {
+  // Estados de loading
+  if (isCheckingAuth || loading) {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
         <p>Carregando...</p>
-      </div>
-    );
-  }
-
-  // Estados de carregamento e erro
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Carregando mapa...</p>
       </div>
     );
   }
@@ -522,15 +360,11 @@ export default function Mapa() {
       <div className="errorContainer">
         <h3>Erro ao carregar mapa</h3>
         <p>{error}</p>
-        <button onClick={fetchPinos} className="retryButton">
-          Tentar Novamente
-        </button>
+        <button onClick={fetchPinos} className="retryButton">Tentar Novamente</button>
       </div>
     );
   }
 
-  // =================================================================
-  // Retorna mapa e cada pino
   return (
     <div className="mapa-container">
       {/* Status da localização */}
@@ -543,7 +377,7 @@ export default function Mapa() {
         onReiniciar={reiniciarRastreamentoLocalizacao}
       />
 
-      {/* ✅ MOSTRAR CAPIBAS ATUAIS DO USUÁRIO (se estiver logado) */}
+      {/* Info de capibas e tarefas (apenas para clientes) */}
       {user && !isAdmin && (
         <div className="user-capibas-info">
           <div className="capibas-counter">
@@ -557,7 +391,7 @@ export default function Mapa() {
         </div>
       )}
 
-      {/* Container do mapa */}
+      {/* Mapa principal */}
       <div className="mapa-wrapper">
         <MapContainer
           scrollWheelZoom={false}
@@ -603,24 +437,12 @@ export default function Mapa() {
                   {localizacaoUsuario.precisao && (
                     <small>Precisão: ~{Math.round(localizacaoUsuario.precisao)} metros</small>
                   )}
-                  {localizacaoUsuario.metodo === 'fallback' && (
-                    <div style={{marginTop: '8px', padding: '5px', background: '#fff3cd', borderRadius: '4px'}}>
-                      <small>⚠️ Localização padrão</small>
-                    </div>
-                  )}
-                  <div className="location-status">
-                    {rastreamentoAtivo ? (
-                      <span className="status-active">● Ativo</span>
-                    ) : (
-                      <span className="status-inactive">● Inativo</span>
-                    )}
-                  </div>
                 </div>
               </Popup>
             </Marker>
           )}
 
-          {/* Só mostra MapClickHandler se for admin */}
+          {/* Handler de clique no mapa (apenas admin) */}
           {isAdmin && (
             <MapClickHandler
               setIsSidebarOpen={setIsSidebarOpen}
@@ -629,43 +451,36 @@ export default function Mapa() {
             />
           )}
 
-          {/* Pino temporário (apenas para admin) */}
+          {/* Pino temporário (apenas admin) */}
           {tempPin && isAdmin && (
-          <Marker position={[tempPin.lat, tempPin.lng]} icon={ICONS.temporary}>
-            <Popup>
-              <div className="popUpNovoPonto">
-                <strong>📍 Novo Ponto</strong>
-                <p>Preencha as informações na sidebar para salvar.</p>
-                <small>Lat: {tempPin.lat.toFixed(4)}<br/>Lng: {tempPin.lng.toFixed(4)}</small>
-              </div>
-            </Popup>
-          </Marker>
+            <Marker position={[tempPin.lat, tempPin.lng]} icon={ICONS.temporary}>
+              <Popup>
+                <div className="popUpNovoPonto">
+                  <strong>📍 Novo Ponto</strong>
+                  <p>Preencha as informações na sidebar para salvar.</p>
+                  <small>Lat: {tempPin.lat.toFixed(4)}<br/>Lng: {tempPin.lng.toFixed(4)}</small>
+                </div>
+              </Popup>
+            </Marker>
           )}
 
-          {/* Pinos existentes */}
+          {/* Pinos existentes no mapa */}
           {pinosValidos.map((pino) => (
             <Marker
               key={pino._id || pino.id}
-              position={[
-                pino.localizacao.coordinates[1],
-                pino.localizacao.coordinates[0],
-              ]}
-              eventHandlers={{ 
-                click: () => onPinoClick(pino)
-              }}
+              position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}
+              eventHandlers={{ click: () => onPinoClick(pino) }}
             >
               <Popup>
                 <div className="modal">
                   <h3 className="mensagem">{pino.nome}</h3>
 
-                  {/* ✅ BADGE DE TAREFA CONCLUÍDA */}
+                  {/* Badge de tarefa concluída */}
                   {isTarefaConcluida(pino._id) && (
-                    <div className="tarefa-concluida-badge">
-                      ✅ Concluída
-                    </div>
+                    <div className="tarefa-concluida-badge">✅ Concluída</div>
                   )}
 
-                  {/* Upload da foto */}
+                  {/* Upload de foto */}
                   <label htmlFor={`foto-${pino._id || pino.id}`}>
                     <img
                       className="imagem"
@@ -689,30 +504,23 @@ export default function Mapa() {
                     className="inputFoto"
                   />
 
-                  {/* Descrição da atividade e recompensa */}
+                  {/* Descrição e recompensa */}
                   <p className="mensagem">{pino.msg}</p>
-                  <p className="mensagem">
-                    <strong>Recompensa: {pino.capibas || 0} capibas</strong>
-                  </p>
+                  <p className="mensagem"><strong>Recompensa: {pino.capibas || 0} capibas</strong></p>
 
-                  {/* BOTÃO DE CONFIRMAÇÃO - ATUALIZADO */}
+                  {/* Botão de confirmação */}
                   <button 
                     className={`botaoConfirmar ${validandoLocalizacao ? 'loading' : ''} ${isTarefaConcluida(pino._id) ? 'concluida' : ''}`}
                     onClick={() => confirmarAtividade(pino)}
                     disabled={validandoLocalizacao || !permissaoLocalizacao || isTarefaConcluida(pino._id)}
                   >
-                    {validandoLocalizacao ? (
-                      <>⏳ Validando...</>
-                    ) : !permissaoLocalizacao ? (
-                      <>📍 Permitir Localização</>
-                    ) : isTarefaConcluida(pino._id) ? (
-                      <>✅ Já Concluída</>
-                    ) : (
-                      <>✅ Confirmar Presença</>
-                    )}
+                    {validandoLocalizacao ? '⏳ Validando...' :
+                     !permissaoLocalizacao ? '📍 Permitir Localização' :
+                     isTarefaConcluida(pino._id) ? '✅ Já Concluída' :
+                     '✅ Confirmar Presença'}
                   </button>
 
-                  {/* Mensagens de status da localização */}
+                  {/* Mensagens de status */}
                   {mensagemLocalizacao && (
                     <div className={`mensagem-status ${mensagemLocalizacao.includes('❌') ? 'erro' : mensagemLocalizacao.includes('✅') ? 'sucesso' : 'info'}`}>
                       {mensagemLocalizacao}
@@ -721,9 +529,7 @@ export default function Mapa() {
 
                   {/* Aviso para admin */}
                   {isAdmin && (
-                    <div className="admin-hint">
-                      💡 Admin: Clique fora do popup para editar este pino
-                    </div>
+                    <div className="admin-hint">💡 Admin: Clique fora do popup para editar este pino</div>
                   )}
                 </div>
               </Popup>
@@ -732,7 +538,7 @@ export default function Mapa() {
         </MapContainer>
       </div>
 
-      {/* Sidebar - APENAS para admins logados */}
+      {/* Sidebar (apenas para admin) */}
       {isAdmin && (
         <Sidebar
           isOpen={isSidebarOpen}
