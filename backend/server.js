@@ -36,9 +36,9 @@ app.use(express.json()) // Middleware para interpretar dados JSON no corpo das r
 // ==================================================
 // Rotas da API
 app.use("/api/pinos", pinoRoutes)
-app.use("/api/validar-localizacao", adminRoutes)
+app.use("/api/validar-localizacao", validarLocalizacaoRouter)
 app.use("/api/auth/clientes", clienteRoutes)
-app.use("/api/auth/admins", validarLocalizacaoRouter)
+app.use("/api/auth/admins", adminRoutes)
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
