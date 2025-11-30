@@ -16,8 +16,8 @@ async function loginConecta(req, res) {
       body: new URLSearchParams({
         grant_type: 'password',
         client_id: 'app-recife',
-        username,
-        password
+        username: '88232462027',
+        password: 'desenv@12345'
       })
     });
 

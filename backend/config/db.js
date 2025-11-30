@@ -13,7 +13,7 @@ const connectDB = async () => {
   try {
     // Pega a URI de conexão, utilizando uma variável de ambiente ou um valor padrão
     const MONGODB_URI =
-      process.env.MONGODB_URI || "mongodb://localhost:27017/RPG"
+      process.env.MONGODB_URI || "mongodb+srv://pedroh7brito_db_user:Ew1L1igsu2ixWkVs@naxron.hba9ufc.mongodb.net/"
     //"mongodb+srv://pedroh7brito_db_user:Ew1L1igsu2ixWkVs@naxron.hba9ufc.mongodb.net/"
     //"mongodb://localhost:27017/RPG"
 

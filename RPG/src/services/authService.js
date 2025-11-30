@@ -12,8 +12,12 @@ export const authService = {
    * @returns {Promise<Object>} Dados do usuário logado + token
    * @throws {Error} Em caso de falha no login
    */
-  login: async (email, senha = 'cliente') => {
+  login: async (email, senha) => {
     try {
+      if (!email || !senha) {
+        throw new Error('Email e senha são obrigatórios');
+      }
+
       console.log(`🔐 Tentando login no Conecta: ${email}`);
       
       // Faz requisição POST para endpoint de login
@@ -23,15 +27,18 @@ export const authService = {
       });
 
       const { token } = response.data;
+      if (!token) throw new Error('Token não recebido do Conecta');
 
-      // Recupera tipo já salvo no registro via banco/localStorage
-      const existingUser = authService.getCurrentUser(email);
-      const tipo = existingUser?.tipo || 'cliente'; // fallback para cliente
+      console.log('📨 Buscando tipo para email:', email);
+      // Buscar o tipo no MongoDB
+      const userResponse = await api.get('/usuarios/byEmail', {
+        params: { email }
+      });
+      const tipo = userResponse.data.tipo || 'admin'; // fallback para admin
 
       // Montar o objeto de usuário interno
       const userData = { email, tipo, token };
       // Salvar no localStorage
-      console.log('🧾 Dados do usuário antes de salvar:', userData);
       authService.setUser(userData);
       console.log('📦 Dados salvos no localStorage');
 

@@ -10,6 +10,7 @@ const clienteRoutes = require("./routes/clienteRoutes.js")
 const adminRoutes = require("./routes/adminRoutes.js")
 const validarLocalizacaoRouter = require("./routes/validarLocalizacaoRouter.js")
 const conectaRoutes = require("./routes/conectaRoutes.js");
+const usuariosRoutes = require("./routes/usuariosRoutes.js");
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -41,6 +42,7 @@ app.use("/api/validar-localizacao", validarLocalizacaoRouter)
 app.use("/api/auth/clientes", clienteRoutes)
 app.use("/api/auth/admins", adminRoutes)
 app.use("/api/conecta", conectaRoutes);
+app.use("/api/usuarios", usuariosRoutes);
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
