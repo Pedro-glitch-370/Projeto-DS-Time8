@@ -14,7 +14,7 @@ export const localizacaoService = {
       // Configurações otimizadas
       const opcoesHighAccuracy = {
         enableHighAccuracy: true,
-        timeout: 10000, // Reduzido para 10s
+        timeout: 15000, // ✅ Aumentado para 15s para melhor captura GPS
         maximumAge: 0
       };
 
@@ -30,11 +30,24 @@ export const localizacaoService = {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           console.log('🎯 Localização obtida com alta precisão!');
-          resolve({
+          
+          // ✅ NOVO: Valida se coordenadas são plausíveis para Recife
+          const coords = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            precisao: position.coords.accuracy
-          });
+            precisao: position.coords.accuracy,
+            metodo: 'gps'
+          };
+          
+          if (localizacaoService.validarCoordenadasRecife(coords.latitude, coords.longitude)) {
+            resolve(coords);
+          } else {
+            console.warn('⚠️ Coordenadas fora de Recife, usando fallback...', coords);
+            // ✅ FALLBACK: Tenta obter localização por IP
+            localizacaoService.obterLocalizacaoPorIP()
+              .then(resolve)
+              .catch(() => resolve(coords)); // Se IP falhar, usa GPS mesmo fora de área
+          }
         },
         (errorHighAccuracy) => {
           console.warn('⚠️ Falha na alta precisão, tentando baixa precisão...', errorHighAccuracy);
@@ -46,28 +59,36 @@ export const localizacaoService = {
               resolve({
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude,
-                precisao: position.coords.accuracy
+                precisao: position.coords.accuracy,
+                metodo: 'gps_low_accuracy'
               });
             },
             (errorLowAccuracy) => {
               console.error('❌ Todas as tentativas de geolocalização falharam:', errorLowAccuracy);
               
-              let mensagemErro;
-              switch(errorLowAccuracy.code) {
-                case errorLowAccuracy.PERMISSION_DENIED:
-                  mensagemErro = "Permissão de localização negada. Por favor, permita o acesso à localização nas configurações do seu navegador.";
-                  break;
-                case errorLowAccuracy.POSITION_UNAVAILABLE:
-                  mensagemErro = "Localização indisponível. Verifique sua conexão e tente novamente.";
-                  break;
-                case errorLowAccuracy.TIMEOUT:
-                  mensagemErro = "Tempo esgotado para obter localização. Verifique se o GPS está ativo e tente novamente.";
-                  break;
-                default:
-                  mensagemErro = "Erro ao obter localização. Tente novamente.";
-              }
-              
-              reject(new Error(mensagemErro));
+              // ✅ FALLBACK: Tenta localização por IP como último recurso
+              console.log('🔄 Tentando fallback por IP...');
+              localizacaoService.obterLocalizacaoPorIP()
+                .then(resolve)
+                .catch(() => {
+                  // Se tudo falhar, retorna erro original
+                  let mensagemErro;
+                  switch(errorLowAccuracy.code) {
+                    case errorLowAccuracy.PERMISSION_DENIED:
+                      mensagemErro = "Permissão de localização negada. Por favor, permita o acesso à localização nas configurações do seu navegador.";
+                      break;
+                    case errorLowAccuracy.POSITION_UNAVAILABLE:
+                      mensagemErro = "Localização indisponível. Verifique sua conexão e tente novamente.";
+                      break;
+                    case errorLowAccuracy.TIMEOUT:
+                      mensagemErro = "Tempo esgotado para obter localização. Verifique se o GPS está ativo e tente novamente.";
+                      break;
+                    default:
+                      mensagemErro = "Erro ao obter localização. Tente novamente.";
+                  }
+                  
+                  reject(new Error(mensagemErro));
+                });
             },
             opcoesLowAccuracy
           );
@@ -75,6 +96,54 @@ export const localizacaoService = {
         opcoesHighAccuracy
       );
     });
+  },
+
+  /**
+   * ✅ NOVO: Obter localização por IP como fallback
+   */
+  obterLocalizacaoPorIP: async () => {
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      
+      console.log('📍 Localização por IP obtida:', data);
+      
+      return {
+        latitude: data.latitude || -8.063163, // Fallback para Recife central
+        longitude: data.longitude || -34.871139,
+        precisao: 5000, // Baixa precisão para IP
+        cidade: data.city,
+        regiao: data.region,
+        metodo: 'ip_fallback',
+        source: 'ip'
+      };
+    } catch (error) {
+      console.error('❌ Erro ao obter localização por IP:', error);
+      throw new Error("Não foi possível obter localização por IP");
+    }
+  },
+
+  /**
+   * ✅ NOVO: Validar se coordenadas são plausíveis para Recife
+   */
+  validarCoordenadasRecife: (lat, lng) => {
+    // Limites aproximados de Recife e região metropolitana
+    const RECIFE_BOUNDS = {
+      minLat: -8.3,   // Sul
+      maxLat: -7.9,   // Norte  
+      minLng: -35.1,  // Oeste
+      maxLng: -34.8   // Leste
+    };
+    
+    const isValid = (
+      lat >= RECIFE_BOUNDS.minLat &&
+      lat <= RECIFE_BOUNDS.maxLat &&
+      lng >= RECIFE_BOUNDS.minLng &&
+      lng <= RECIFE_BOUNDS.maxLng
+    );
+    
+    console.log('📍 Validação coordenadas Recife:', { lat, lng, isValid });
+    return isValid;
   },
 
   /**
