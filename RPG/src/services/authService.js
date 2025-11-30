@@ -6,28 +6,50 @@ import api from './api';
  */
 export const authService = {
   /**
-   * Realiza o login do usuário no sistema
+   * Realiza o login do usuário via Conecta
    * @param {string} email - Email do usuário
-   * @param {string} nome - Nome do usuário
-   * @param {string} tipo - Tipo de usuário ('cliente' ou 'admin')
-   * @returns {Promise<Object>} Dados do usuário logado
+   * @param {string} senha - Senha do usuário
+   * @returns {Promise<Object>} Dados do usuário logado + token
    * @throws {Error} Em caso de falha no login
    */
-  login: async (email, nome, tipo = 'cliente') => {
+  login: async (email, senha) => {
     try {
-      console.log(`🔐 Tentando login: ${email} (${tipo})`);
+      if (!email || !senha) {
+        throw new Error('Email e senha são obrigatórios');
+      }
+
+      console.log(`🔐 Tentando login no Conecta: ${email}`);
       
       // Faz requisição POST para endpoint de login
-      const response = await api.post('/auth/login', {
-        email,
-        nome,
-        tipo
+      const response = await api.post('/conecta/login', {
+        username: email,
+        password: senha
       });
+
+      const { token } = response.data;
+      if (!token) throw new Error('Token não recebido do Conecta');
+
+      console.log('📨 Buscando tipo para email:', email);
+      // Buscar o tipo no MongoDB
+      const userResponse = await api.get('/usuarios/byEmail', {
+        params: { email }
+      });
+      const tipo = userResponse.data.tipo || 'admin'; // fallback para admin
+
+      // Montar o objeto de usuário interno
+      const userData = { email, tipo, token };
+      // Salvar no localStorage
+      authService.setUser(userData);
+      console.log('📦 Dados salvos no localStorage');
+
+      if (!token) {
+        throw new Error('Token não recebido do Conecta');
+      }
       
-      console.log('✅ Login realizado com sucesso');
-      return response.data;
+      console.log('✅ Login realizado com sucesso via Conecta');
+      return userData;
     } catch (error) {
-      console.error('❌ Erro no login:', error);
+      console.error('❌ Erro no login via Conecta:', error);
       // Propaga mensagem de erro específica da API ou mensagem genérica
       throw new Error(error.response?.data?.message || 'Erro no login');
     }
