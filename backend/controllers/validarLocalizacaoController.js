@@ -52,6 +52,15 @@ const validarProximidadePino = async (req, res) => {
             });
         }
 
+        // Validação adicional para coordenadas de Recife
+        const isValidRecifeCoords = 
+            latUsuario >= -8.3 && latUsuario <= -7.9 &&
+            lngUsuario >= -35.1 && lngUsuario <= -34.8;
+
+        if (!isValidRecifeCoords) {
+            console.warn('⚠️ Coordenadas fora da área de Recife:', { latUsuario, lngUsuario });
+        }
+
         // BUSCA O PINO NO BANCO
         const pino = await Pino.findById(pinoId);
         if (!pino) {
@@ -73,9 +82,10 @@ const validarProximidadePino = async (req, res) => {
             longitude: lngUsuario
         };
 
+        // Ordem das coordenadas - GeoJSON usa [longitude, latitude]
         const localizacaoPino = {
-            latitude: pino.localizacao.coordinates[1], // Latitude na posição 1
-            longitude: pino.localizacao.coordinates[0]  // Longitude na posição 0
+            latitude: pino.localizacao.coordinates[1], // ✅ Latitude na posição 1 (CORRETO)
+            longitude: pino.localizacao.coordinates[0]  // ✅ Longitude na posição 0 (CORRETO)
         };
 
         console.log('📍 Coordenadas para cálculo:', {
@@ -166,9 +176,10 @@ const encontrarPinosProximos = async (req, res) => {
 
         // Calcula distância para cada pino e filtra os próximos
         const pinosComDistancia = todosPinos.map(pino => {
+            // Ordem das coordenadas - GeoJSON usa [longitude, latitude]
             const localizacaoPino = {
-                latitude: pino.localizacao.coordinates[1],
-                longitude: pino.localizacao.coordinates[0]
+                latitude: pino.localizacao.coordinates[1], // ✅ Latitude na posição 1
+                longitude: pino.localizacao.coordinates[0]  // ✅ Longitude na posição 0
             };
 
             const distancia = geolib.getDistance(localizacaoUsuario, localizacaoPino);
@@ -241,7 +252,7 @@ const validarProximidadeOtimizada = async (req, res) => {
                 $near: {
                     $geometry: {
                         type: "Point",
-                        coordinates: [lngUsuario, latUsuario]
+                        coordinates: [lngUsuario, latUsuario] // ✅ CORRETO: [lng, lat]
                     },
                     $maxDistance: raioMaximo
                 }
@@ -252,9 +263,10 @@ const validarProximidadeOtimizada = async (req, res) => {
 
         // USA GEOLIB PARA CÁLCULOS PRECISOS
         const pinosComDistanciaPrecisa = pinosProximos.map(pino => {
+            // Ordem das coordenadas - GeoJSON usa [longitude, latitude]
             const localizacaoPino = {
-                latitude: pino.localizacao.coordinates[1],
-                longitude: pino.localizacao.coordinates[0]
+                latitude: pino.localizacao.coordinates[1], // ✅ Latitude na posição 1
+                longitude: pino.localizacao.coordinates[0]  // ✅ Longitude na posição 0
             };
 
             const distancia = geolib.getDistance(localizacaoUsuario, localizacaoPino);
