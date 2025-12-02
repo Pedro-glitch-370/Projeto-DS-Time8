@@ -194,7 +194,7 @@ router.get('/conecta/questions/challenge/:challengeId', async (req, res) => {
   await proxyGET(req, res, url);
 });
 
-// ================== ROTAS DE CHENK IN ==================
+// ================== ROTAS DE CHECK IN ==================
 
 // POST /api/check-in
 router.post('/conecta/check-in', async (req, res) => {

@@ -7,7 +7,8 @@ import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 
 // Serviços e componentes
 import { handleSavePino, handleDeletePino, handleUpdatePino } from "./acoesPinos.js";
-import { MAP_CONFIG, ICONS } from "./constantesMapa.js";
+import { MAP_CONFIG, ICONS } from "./constantes/constantesMapa.js";
+import { createUserLocationIcon, createUserLocationUpdatingIcon, createUserLocationFallbackIcon } from "./constantes/iconsLeaflet.js";
 import usePinosManagement from "./usePinosManagement.js";
 import MapClickHandler from "./MapClickHandler.jsx";
 import Sidebar from "../barra-lateral/barra-lateral.jsx";
@@ -24,28 +25,6 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-});
-
-// Ícones personalizados para localização do usuário
-const createUserLocationIcon = () => L.divIcon({
-  className: 'user-location-marker',
-  html: `<div class="user-location-pulse"><div class="user-location-dot"></div></div>`,
-  iconSize: [20, 20],
-  iconAnchor: [10, 10],
-});
-
-const createUserLocationUpdatingIcon = () => L.divIcon({
-  className: 'user-location-marker updating',
-  html: `<div class="user-location-pulse updating"><div class="user-location-dot updating"></div></div>`,
-  iconSize: [20, 20],
-  iconAnchor: [10, 10],
-});
-
-const createUserLocationFallbackIcon = () => L.divIcon({
-  className: 'user-location-marker fallback',
-  html: `<div class="user-location-pulse" style="border-color: #fdcb6e;"><div class="user-location-dot" style="background: #fdcb6e;"></div></div>`,
-  iconSize: [20, 20],
-  iconAnchor: [10, 10],
 });
 
 // Componente principal do mapa
