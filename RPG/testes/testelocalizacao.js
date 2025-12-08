@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { localizacaoService } from '../src/services/localizacaoService.js';
 
-// Mock global fetch para testar obterLocalizacaoPorIP
+// Mock global fetch para testar
 globalThis.fetch = async (url) => {
   if (url === 'https://ipapi.co/json/') {
     return {
@@ -13,12 +13,14 @@ globalThis.fetch = async (url) => {
   throw new Error("Falha no fetch");
 };
 
+// Teste para coordenadas dentro e fora de Recife
 async function testeValidarCoordenadasRecife() {
   assert.strictEqual(localizacaoService.validarCoordenadasRecife(-8.05, -34.9), true, 'Dentro de Recife deve ser válido');
   assert.strictEqual(localizacaoService.validarCoordenadasRecife(-10, -40), false, 'Fora de Recife deve ser inválido');
   console.log('✅ Teste validarCoordenadasRecife passou');
 }
 
+// Teste para obter localização por IP
 async function testeObterLocalizacaoPorIP() {
   const loc = await localizacaoService.obterLocalizacaoPorIP();
   assert.strictEqual(loc.metodo, 'ip_fallback');
@@ -26,6 +28,7 @@ async function testeObterLocalizacaoPorIP() {
   console.log('✅ Teste obterLocalizacaoPorIP passou');
 }
 
+// Teste para falhar na obtenção da localização por IP
 async function testeObterLocalizacaoPorIPFalha() {
   // Mock fetch para falhar
   globalThis.fetch = async () => { throw new Error("Falha simulada"); };
