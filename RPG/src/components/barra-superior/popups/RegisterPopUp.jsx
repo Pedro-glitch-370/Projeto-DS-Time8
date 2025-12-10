@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { isValidEmail } from "../para-react/isValidEmail";
+import "./registerPopUp.css";
 
 export default function RegisterPopup({ onClose, abrirLogin }) {
   const [nome, setNome] = useState("");
