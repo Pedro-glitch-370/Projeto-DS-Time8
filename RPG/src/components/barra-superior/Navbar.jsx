@@ -6,7 +6,7 @@ import UserMenu from "./menu/UserMenu";
 import SettingsMenu from "./menu/SettingsMenu";
 import { NavLink, useNavigate } from "react-router-dom";
 
-import "./barra-superior.css";
+import "./navbar.css";
 
 export default function Navbar() {
     const [loginPopupAberto, setLoginPopupAberto] = useState(false);

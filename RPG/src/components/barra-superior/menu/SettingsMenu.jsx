@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { isUserAdmin } from "../para-react/userUtils";
+import "./settingsMenu.css";
 
 export default function SettingsMenu({ onClose }) {
   useEffect(() => {
@@ -35,13 +36,13 @@ export default function SettingsMenu({ onClose }) {
   }
 
   return (
-    <div className="settings-menu" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="settings-menu-content">
+    <div className="settings-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="settings-menu">
         <div className="settings-header">
           <h3>⚙️ Configurações</h3>
           <span className="close-settings" onClick={onClose}>&times;</span>
         </div>
-        <div className="settings-options">
+        <div className="settings-menu-content">
           <button className="settings-option" onClick={handleManageUsers}>👥 Gerenciar Usuários</button>
           <button className="settings-option" onClick={handleSystemSettings}>🔧 Configurações do Sistema</button>
           <button className="settings-option" onClick={handleBackup}>💾 Backup de Dados</button>

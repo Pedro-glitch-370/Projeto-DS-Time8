@@ -31,14 +31,15 @@
   top: 0;
   left: 0;
   width: 100%;
+  min-height: 70px;
+  height: 70px;
   background-color: var(--primary-blue);
   color: var(--white);
   display: flex;
   align-items: center;
   padding: 10px 20px;
   z-index: 1000;
-  min-height: 70px;
-  height: 70px;
+  overflow: visible;
 }
 
 .barra-superior .esquerda,

@@ -1,0 +1,79 @@
+/* ==================================================
+   COMPONENTES PRINCIPAIS
+   ================================================== */
+
+/* Navbar principal */
+.barra-superior {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 70px;
+  height: 70px;
+  background-color: var(--primary-blue);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  z-index: 1000;
+  overflow: visible;
+}
+
+.barra-superior .esquerda,
+.barra-superior .meio,
+.barra-superior .direita {
+  display: flex;
+  align-items: center;
+}
+
+.barra-superior .esquerda { flex: 1; justify-content: flex-start; }
+.barra-superior .meio { flex: 2; justify-content: center; gap: 20px; }
+.barra-superior .direita { flex: 1; justify-content: flex-end; gap: 15px; }
+
+/* Menu central - estilo cápsula */
+.barra-superior .meio {
+  padding: 6px 16px;
+  border-radius: 50px;
+  border: 2px solid var(--white);
+  display: flex;
+  gap: 16px;
+  max-width: fit-content;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+.barra-superior .meio a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  position: relative;
+  white-space: nowrap;
+}
+
+.barra-superior .meio a:hover {
+  background-color: var(--hover-white);
+  transform: translateY(-1px);
+}
+
+.barra-superior .meio a.ativo {
+  background-color: var(--white);
+  color: var(--primary-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.barra-superior .meio a.ativo::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: var(--primary-blue);
+  border-radius: 1px;
+}
