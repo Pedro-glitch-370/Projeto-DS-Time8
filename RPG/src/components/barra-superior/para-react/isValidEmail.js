@@ -46,32 +46,3 @@ export function isValidEmail(email) {
     
     return true;
 }
-
-export function validateEmailField(email, validationElement) {
-    const emailValue = email.value.trim();
-    
-    // Limpa validação anterior
-    validationElement.textContent = '';
-    validationElement.className = 'validation-message';
-    email.classList.remove('invalid', 'valid');
-    
-    if (!emailValue) {
-        validationElement.textContent = 'Email é obrigatório';
-        validationElement.classList.add('error');
-        email.classList.add('invalid');
-        return false;
-    }
-    
-    if (!isValidEmail(emailValue)) {
-        validationElement.textContent = 'Por favor, insira um email válido (ex: nome@provedor.com)';
-        validationElement.classList.add('error');
-        email.classList.add('invalid');
-        return false;
-    }
-    
-    // Email válido
-    validationElement.textContent = 'Email válido';
-    validationElement.classList.add('success');
-    email.classList.add('valid');
-    return true;
-}

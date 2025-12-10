@@ -12,5 +12,7 @@ export default defineConfig({
         secure: false,
       },
     },
+    // fallback
+    spaFallback: true
   },
 })

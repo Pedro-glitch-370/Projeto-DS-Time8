@@ -17,7 +17,8 @@ function Home() {
   return (
     <div>
       {/* A navbar é carregada automaticamente pelo navbar.js */}
-      {carregando ? <Loading /> : <div className="mapa-container"><Mapa /></div>}
+      {/* tirei o <div className="mapa-container"> de Mapa por enquanto */}
+      {carregando ? <Loading /> : <Mapa />}
     </div>
   )
 }
