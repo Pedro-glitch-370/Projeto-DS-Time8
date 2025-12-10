@@ -22,65 +22,7 @@
       #root é o elemento onde o React/Vue.js normalmente monta a aplicação
       Neste caso, está sendo usado para a página inicial
     -->
-    <div id="root">
-      <!-- 
-        TELA DE CARREGAMENTO
-        Exibida enquanto a aplicação está inicializando e buscando dados
-        Proporciona feedback visual ao usuário durante o carregamento
-      -->
-      <div id="loading">
-        <!-- 
-          EFEITO DE PARTÍCULAS DE FUNDO
-          Elemento decorativo para criar uma experiência visual mais imersiva
-          durante o carregamento
-        -->
-        <div class="particles" id="particles"></div>
-        
-        <!-- 
-          CONTEÚDO DA TELA DE CARREGAMENTO
-          Contém todos os elementos visuais do estado de loading
-        -->
-        <div class="loading-content">
-          <!-- Logo visual do jogo (representado por emoji) -->
-          <div class="logo-loading">
-            🎯
-          </div>
-          <!-- 
-            INDICADOR DE PROGRESSO ANIMADO
-            Animação CSS que gira continuamente para indicar atividade
-          -->
-          <div class="loading-spinner"></div>
-          <!-- Título principal da aplicação -->
-          <h1 class="loading-text">Recife Point Game</h1>
-          <!-- 
-            TEXTO DESCRITIVO DO CARREGAMENTO
-            Fornece contexto sobre o que está acontecendo e mantém o usuário engajado
-          -->
-          <p class="loading-subtext">
-            Carregando sua aventura pelos pontos turísticos do Recife...
-          </p>
-          <!-- 
-            BARRA DE PROGRESSO
-            Indica visualmente o andamento do carregamento
-            Pode ser animada ou controlada via JavaScript
-          -->
-          <div class="progress-bar">
-            <div class="progress"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 
-      SCRIPTS DA APLICAÇÃO
-      
-      Ordem de carregamento importante:
-      1. main.jsx: Possível aplicação React (se estiver usando JSX)
-      2. barra-superior-loader.js: Componente que carrega a navbar
-      3. index.js: Lógica específica da página inicial
-    -->
+    <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script type="module" src="/src/components/barra-superior/barra-superior-loader.js"></script>
-    <script src="/src/js/index.js"></script>
   </body>
 </html>

@@ -23,32 +23,7 @@ export function loadNavbar() {
     document.head.appendChild(link);
 
     // Adiciona a navbar - SEMPRE MOSTRA OS TRÊS TRACINHOS
-    const navbarHTML = `
-    <nav class="barra-superior">
-      <div class="esquerda">
-        <img 
-          src="/src/assets/LogoConecta.png" 
-          alt="Logo" 
-          class="logo-img"
-        />
-      </div>
-      <div class="meio">
-        <a href="/index.html">Mapa</a>
-        <a href="/src/public/tarefa.html">Minhas Tarefas</a>
-        <a href="/src/public/saldo.html">Capibas</a>
-      </div>
-      <div class="direita">
-        <div id="userSection">
-          <a href="#" id="login">Entrar</a>
-        </div>
-        <div class="opcoes" id="opcoes">
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      </div>
-    </nav>
-    
+    const navbarHTML = `    
     <!-- Popup de Login -->
     <div id="loginPopup" class="login-popup">
       <div class="login-popup-content">
