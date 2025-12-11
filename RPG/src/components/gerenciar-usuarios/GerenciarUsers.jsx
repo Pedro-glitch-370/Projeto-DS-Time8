@@ -48,21 +48,18 @@ const GerenciarUsers = () => {
   return (
     <div className="admin-container">
       {/* Header */}
-      <div className="headerGerenciar">
-        <div className="logo">
-          <img src="../assets/LogoConecta.png" alt="Recife Point Game" />
-          <h1>Gerenciar Usuários</h1>
-        </div>
-        <div className="user-info">
-          <div className="user-welcome-gerenciar">{currentUser}</div>
-          <button className="logout-btn" onClick={logout}>🚪 Sair</button>
+      <div className="header-gerenciar">
+        <h1>Gerenciar Usuários</h1>
+        <div className="user-info-gerenciar">
+          <p className="user-welcome-gerenciar">Administrador atual: {currentUser}</p>
         </div>
       </div>
 
       {/* Content */}
       <div className="content">
         <div className="nav-links">
-          <a href="/">← Voltar ao Mapa</a>
+          <a className="back-link-gerenciar" href="/">Voltar ao Mapa</a>
+          <button className="logout-btn-gerenciar" onClick={logout}>Sair</button>
         </div>
 
         {/* Stats */}
@@ -77,7 +74,7 @@ const GerenciarUsers = () => {
           </div>
           <div className="stat-card">
             <div className="stat-number">{totalUsers}</div>
-            <div className="stat-label">Total de Usuários</div>
+            <div className="stat-label">Usuários ao Total</div>
           </div>
         </div>
 

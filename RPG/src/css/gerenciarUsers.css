@@ -6,14 +6,15 @@ box-sizing: border-box;
 
 body {
 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+background: linear-gradient(135deg, #4DC48A 0%, #1e5fd9 100%);
 min-height: 100vh;
 padding: 20px;
 }
 
 .admin-container {
-max-width: 1200px;
-margin: 0 auto;
+max-width: 100%;
+margin: 15px;
+margin-top: 80px;
 background: white;
 border-radius: 15px;
 box-shadow: 0 20px 40px rgba(0,0,0,0.1);
@@ -21,81 +22,78 @@ overflow: hidden;
 }
 
 /* Header */
-.headerGerenciar {
+.header-gerenciar {
 background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
 color: white;
 padding: 2rem;
-display: flex;
-justify-content: space-between;
-align-items: center;
+text-align: center;
 border-bottom: 4px solid #667eea;
 }
 
-.logo {
-display: flex;
-align-items: center;
-gap: 1rem;
-}
-
-.logo img {
-max-width: 60px;
-border-radius: 10px;
-}
-
-.logo h1 {
+.header-gerenciar h1 {
 font-size: 1.8rem;
 font-weight: 600;
+margin: 0;
 }
 
 .user-info {
+grid-column: 3;
 text-align: right;
 }
 
 .user-welcome-gerenciar {
-font-size: 1.1rem;
-margin-bottom: 0.5rem;
-}
-
-.logout-btn {
-background: #e74c3c;
-color: white;
-border: none;
-padding: 0.6rem 1.2rem;
-border-radius: 8px;
-cursor: pointer;
-font-weight: 500;
-transition: all 0.3s ease;
-}
-
-.logout-btn:hover {
-background: #c0392b;
-transform: translateY(-2px);
+font-size: 1rem;
+margin-top: 0.5rem;
+opacity: 0.75;
 }
 
 /* Navigation */
 .nav-links {
 display: flex;
-gap: 1rem;
-margin-bottom: 1rem;
+gap: 0.5rem;
+align-items: center;
+margin: 1rem;
+justify-content: flex-start;
 }
 
-.back-link {
-display: inline-flex;
-align-items: center;
-gap: 0.5rem;
-margin-bottom: 1.5rem;
+.back-link-gerenciar {
 color: #667eea;
 text-decoration: none;
 font-weight: 500;
-padding: 0.5rem 1rem;
+padding: 0.4rem 0.8rem;
 border: 2px solid #667eea;
 border-radius: 8px;
+cursor: pointer;
 transition: all 0.3s ease;
+max-width: 220px;
+height: 40px;
+font-size: small;
 }
 
-.back-link:hover {
+.back-link-gerenciar:hover {
 background: #667eea;
 color: white;
+transform: translateY(-2px);
+}
+
+.logout-btn-gerenciar {
+color: #e74c3c;
+text-decoration: none;
+font-weight: 500;
+padding: 0.4rem 0.8rem;
+border: 2px solid #e74c3c;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.3s ease;
+max-width: 220px;
+height: 40px;
+font-size: small;
+}
+
+.logout-btn-gerenciar:hover {
+background: #c0392b;
+color: white;
+transform: translateY(-2px);
 }
 
 /* Stats */
@@ -104,10 +102,11 @@ display: grid;
 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 gap: 1.5rem;
 margin-bottom: 2rem;
+margin: 15px;
 }
 
 .stat-card {
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+background: linear-gradient(135deg, #4DC48A 0%, #1e5fd9 100%);
 color: white;
 padding: 1.5rem;
 border-radius: 12px;
