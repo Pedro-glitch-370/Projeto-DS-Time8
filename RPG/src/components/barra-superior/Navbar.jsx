@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { getUserInitials } from "./para-react/userUtils";
+import { useState, useEffect } from "react";
+import { getUserInitials, isUserAdmin } from "./para-react/userUtils";
 import LoginPopup from "./popups/LoginPopUp";
 import RegisterPopup from "./popups/RegisterPopUp";
 import UserMenu from "./menu/UserMenu";
@@ -16,6 +16,13 @@ export default function Navbar() {
     const [usuarioLogado, setUsuarioLogado] = useState(null);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const savedUser = localStorage.getItem("user");
+        if (savedUser) {
+            setUsuarioLogado(JSON.parse(savedUser));
+        }
+    }, []);
 
     return (
         <nav className="barra-superior">
@@ -53,14 +60,32 @@ export default function Navbar() {
             </div>
         </div>
 
-        <div className="opcoes" id="opcoes" onClick={() => setSettingsMenuAberto(true)}>
+        <div className="opcoes" id="opcoes" onClick={() => {
+            if (isUserAdmin()) {
+                setSettingsMenuAberto(true);
+            } else {
+                alert("❌ Apenas administradores podem acessar o menu de configurações.");
+            }
+        }}>
             <div></div><div></div><div></div>
         </div>
 
         {loginPopupAberto && (
             <LoginPopup
                 onClose={() => setLoginPopupAberto(false)}
-                onLoginSuccess={(userData) => setUsuarioLogado(userData)}
+                onLoginSuccess={(userData) => {
+                    const nomeDerivado = userData.nome && userData.nome.trim() !== ""
+                    ? userData.nome : userData.email.split("@")[0];
+
+                    const usuario = {
+                        ...userData,
+                        nome: nomeDerivado,
+                        iniciais: nomeDerivado[0].toUpperCase(),
+                    };
+
+                    setUsuarioLogado(usuario);
+                    localStorage.setItem("user", JSON.stringify(usuario));
+                }}
                 abrirRegistro={() => { setLoginPopupAberto(false); setRegisterPopupAberto(true); }}
             />
         )}

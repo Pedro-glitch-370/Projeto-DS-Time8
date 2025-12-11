@@ -5,7 +5,9 @@ const Loading = () => (
   <div id="loading">
     <div className="particles" id="particles"></div>
     <div className="loading-content">
-      <div className="logo-loading">🎯</div>
+      <div className="logo-loading">
+        <img src="\src\assets\LogoConecta.png" alt="Logo Conecta" />
+      </div>
       <div className="loading-spinner"></div>
       <h1 className="loading-text">Recife Point Game</h1>
       <p className="loading-subtext">

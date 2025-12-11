@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Loading from './components/loading/Loading.jsx'
 import Mapa from './components/mapa/Mapa.jsx'
-import TarefasCarrossel from './components/tarefas/TarefasCarrossel.jsx';
+import TarefasCarrossel from './components/tarefas/tarefasCarrossel/TarefasCarrossel.jsx';
 import Navbar from './components/barra-superior/Navbar.jsx';
 import './css/App.css'
 

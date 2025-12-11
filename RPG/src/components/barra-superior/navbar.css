@@ -112,10 +112,6 @@
   transition: all 0.3s ease;
 }
 
-.barra-superior .opcoes:hover {
-  background-color: var(--hover-white);
-}
-
 .barra-superior .opcoes div {
   background-color: var(--white);
   height: 3px;
@@ -143,7 +139,6 @@
 
 .logo-img:hover {
   transform: scale(1.05);
-  background-color: var(--hover-white);
 } 
 
 /* Botões e controles */

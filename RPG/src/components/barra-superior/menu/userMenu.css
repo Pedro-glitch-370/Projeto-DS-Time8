@@ -1,13 +1,14 @@
 .user-menu {
   position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.7);
   z-index: 2000;
-  align-items: center;
-  justify-content: center;
   animation: fadeIn 0.3s ease;
 }
 
@@ -39,18 +40,34 @@
   border-bottom: 2px solid #f0f0f0;
 }
 
+.user-avatar {
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4DC48A 0%, #2F7854 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  width: 70px;
+  height: 70px;
+  font-size: 1.4rem;
+}
+
 .user-details {
   flex: 1;
 }
 
 .user-name {
+  padding-left: 12px;
+  padding-right: 12px;
   font-weight: bold;
   font-size: 1.2rem;
   color: black;
-  margin-bottom: 6px;
 }
 
 .user-email {
+  padding: 4px 12px;
   font-size: 0.9rem;
   color: gray;
   margin-bottom: 6px;
@@ -61,7 +78,7 @@
   color: blue;
   background: #e3f2fd;
   padding: 4px 12px;
-  border-radius: 15px;
+  border-radius: 10px;
   display: inline-block;
   font-weight: 600;
 }
@@ -80,4 +97,27 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Botões de ação */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  justify-content: center;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }

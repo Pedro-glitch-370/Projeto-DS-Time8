@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import "./userMenu.css";
 
 export default function UserMenu({ usuarioLogado, onClose, onLogout }) {
   // fecha com ESC
@@ -25,7 +26,7 @@ export default function UserMenu({ usuarioLogado, onClose, onLogout }) {
         </div>
         <div className="user-menu-actions">
           <button className="logout-btn" onClick={onLogout}>
-            <span>🚪</span> Sair
+            <span>Sair</span>
           </button>
         </div>
       </div>

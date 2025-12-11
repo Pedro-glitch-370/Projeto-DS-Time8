@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-//import "../../css/tarefa.css";
-import { pinoService } from "../../services/pinoService";
-import { clienteService } from "../../services/clienteService";
-import { adminService } from "../../services/adminService";
+import "./tarefasDisponiveis.css";
+import { pinoService } from "../../../services/pinoService";
+import { clienteService } from "../../../services/clienteService";
+import { adminService } from "../../../services/adminService";
 
 export default function TarefasDisponiveis() {
   const [usuarioLogado, setUsuarioLogado] = useState(null); 
@@ -202,17 +202,10 @@ export default function TarefasDisponiveis() {
           key={tarefa.id}
           className={`tarefa-item ${tarefa.concluida ? "tarefa-concluida" : ""}`}
         >
-          <span
-            className={`status ${
-              tarefa.concluida ? "status-concluida" : "status-pendente"
-            }`}
-          >
-            {tarefa.concluida ? "✅ Concluída" : "🔴 Pendente"}
-          </span>
           <h3>{tarefa.nome}</h3>
           <p>{tarefa.descricao}</p>
           <p className="recompensa">
-            🎯 Recompensa: {tarefa.recompensa} capibas
+            Recompensa: {tarefa.recompensa} capibas
           </p>
           <button
             className="btn-confirmar"
@@ -231,19 +224,19 @@ export default function TarefasDisponiveis() {
             <span className="close-popup" onClick={fecharPopupTarefa}>
               &times;
             </span>
-            <h2>🎯 Confirmar Tarefa</h2>
+            <h2>Confirmar Tarefa</h2>
             {tarefaAtual && (
               <>
                 <p>📍 Local: {tarefaAtual.nome}</p>
-                <p>📝 {tarefaAtual.descricao}</p>
+                <p>📝 Descrição: {tarefaAtual.descricao}</p>
                 <p>💰 Recompensa: {tarefaAtual.recompensa} capibas</p>
               </>
             )}
             <div className="popup-actions">
-              <button onClick={fecharPopupTarefa}>Cancelar</button>
-              <button onClick={concluirTarefa}>
-                ✅ Confirmar Conclusão
+              <button className="btn-concluir" onClick={concluirTarefa}>
+                Confirmar Conclusão
               </button>
+              <button className="btn-cancelar" onClick={fecharPopupTarefa}>Cancelar</button>
             </div>
           </div>
         </div>

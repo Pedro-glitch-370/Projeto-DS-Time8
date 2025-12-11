@@ -4,24 +4,28 @@
   display: flex;
   justify-content: flex-end;
   background: rgba(0,0,0,0.3);
-  z-index: 2000; /* maior que a navbar */
+  z-index: 9999;
 }
 
 .settings-menu {
   width: 320px;
   height: 100%;
-  background: var(--white);
+  background: white;
   box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
   animation: slideInRight 0.3s ease;
   position: relative;
 }
 
 .settings-menu-content {
-  padding: 2rem;
-  height: 100%;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
   display: flex;
   flex-direction: column;
-  background: var(--white);
+  justify-content: center;
+  gap: 1.5rem;
+  background: white;
 }
 
 /* Botões de fechar */
@@ -30,16 +34,15 @@
   top: 15px;
   right: 20px;
   font-size: 2rem;
-  color: var(--text-gray);
+  color: gray;
   cursor: pointer;
   line-height: 1;
   transition: all 0.3s ease;
-  padding: 4px;
   border-radius: 4px;
 }
 
 .close-settings:hover {
-  color: var(--text-dark);
+  color: black;
   background: #f8f9fa;
 }
 
@@ -49,16 +52,16 @@
   align-items: center;
   gap: 10px;
   padding: 14px 20px;
-  color: var(--white);
+  color: white;
   border: none;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
-  justify-content: center;
+  justify-content: flex-start;
   font-size: 1rem;
-  background: var(--white);
+  background: white;
   border: 2px solid #e9ecef;
   color: #2c3e50;
   text-align: left;
@@ -68,10 +71,10 @@
 .settings-option:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, var(--primary-blue) 0%, #1e5fd9 100%);
-  color: var(--white);
+  background: linear-gradient(135deg, #4DC48A 0%, #1e5fd9 100%);
+  color: white;
   transform: translateX(8px);
-  border-color: var(--primary-blue);
+  border-color: #4DC48A;
 }
 
 .settings-header {
@@ -79,7 +82,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  padding: 1rem;
   border-bottom: 2px solid #e9ecef;
 }
 
