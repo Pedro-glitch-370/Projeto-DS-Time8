@@ -379,7 +379,7 @@ color: #2c3e50;
 }
 
 /* Modal */
-.modal {
+.modal-gerenciar {
 display: none;
 position: fixed;
 top: 0;

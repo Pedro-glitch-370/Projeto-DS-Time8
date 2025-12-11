@@ -47,6 +47,7 @@ html, body, #root {
 /* ==================================================
    ESTILOS DO POPUP (CENTRALIZADO)
    ================================================== */
+
 .mensagem {
   color: #1449c0;
   margin: 4px 0;
@@ -185,7 +186,7 @@ html, body, #root {
   right: 20px;
   padding: 12px 15px;
   border-radius: 8px;
-  z-index: 1000;
+  z-index: 500;
   font-size: 14px;
   background: white;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);

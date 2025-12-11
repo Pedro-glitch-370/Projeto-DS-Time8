@@ -7,11 +7,13 @@ export default function LoginPopup({ onClose, onLoginSuccess, abrirRegistro }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mensagemErro, setMensagemErro] = useState("");
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
     setMensagemErro("");
+    setMensagemSucesso("");
     setLoading(true);
 
     if (!isValidEmail(email)) {
@@ -37,6 +39,7 @@ export default function LoginPopup({ onClose, onLoginSuccess, abrirRegistro }) {
 
       // avisa o Navbar que o login deu certo
       if (onLoginSuccess) onLoginSuccess(userData);
+      setMensagemSucesso("Login realizado com sucesso!");
 
       // fecha popup
       onClose();
@@ -77,6 +80,7 @@ export default function LoginPopup({ onClose, onLoginSuccess, abrirRegistro }) {
         </form>
 
         {mensagemErro && <div className="error">{mensagemErro}</div>}
+        {mensagemSucesso && <div className="success">{mensagemSucesso}</div>}
         {loading && <div className="loading">Entrando...</div>}
 
         <div className="register-link-container">

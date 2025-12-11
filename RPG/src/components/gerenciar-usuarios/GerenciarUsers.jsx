@@ -292,7 +292,7 @@ const GerenciarUsers = () => {
 
         {/* Modal */}
         {userToDelete && (
-            <div className="modal" id="confirmModal">
+            <div className="modal-gerenciar" id="confirmModal">
                 <div className="modal-content">
                 <h3>⚠️ Confirmar Exclusão</h3>
                 <p>Tem certeza que deseja excluir "{userToDelete.name}" ({userToDelete.type})?<br></br>Esta ação não pode ser desfeita.</p>

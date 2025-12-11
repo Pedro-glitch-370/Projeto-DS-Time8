@@ -34,7 +34,7 @@ export const authService = {
       const userResponse = await api.get('/usuarios/byEmail', {
         params: { email }
       });
-      const tipo = userResponse.data.tipo || 'cliente'; // fallback para admin
+      const tipo = userResponse.data.tipo || 'cliente'; // fallback para cliente
 
       // Montar o objeto de usuário interno
       const userData = { email, tipo, token };

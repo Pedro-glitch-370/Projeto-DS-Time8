@@ -151,3 +151,15 @@
   text-decoration: underline;
   background-color: rgba(20, 73, 192, 0.05);
 }
+
+.success {
+  color: #2F7854;
+  font-size: 0.95rem;
+  font-weight: 600; 
+  text-align: center;
+  margin: 8px 0;
+  padding: 6px 10px; 
+  background: rgba(47, 120, 84, 0.1);
+  border: 1px solid #2F7854;
+  border-radius: 6px;
+}

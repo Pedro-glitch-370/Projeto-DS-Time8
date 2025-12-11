@@ -447,12 +447,13 @@ export default function Mapa() {
           {pinosValidos.map((pino) => (
             <Marker
               key={pino._id || pino.id}
-              // ✅ CORRIGIDO: Leaflet usa [lat, lng] mas GeoJSON é [lng, lat] - invertemos a ordem
+              // Leaflet usa [lat, lng] mas GeoJSON é [lng, lat] - invertemos a ordem
               position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}
               eventHandlers={{ click: () => onPinoClick(pino) }}
+              //icon={defaultIcon}
             >
               <Popup>
-                <div className="modal">
+                <div className="modal"> 
                   <h3 className="mensagem">{pino.nome}</h3>
 
                   {/* Badge de tarefa concluída */}
