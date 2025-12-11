@@ -59,6 +59,9 @@ const GerenciarUsers = () => {
         try {
         console.log("🔄 Iniciando carregamento de usuários...");
 
+        let adminsData = [];
+        let clientesData = [];
+
         // Carregar administradores
         const adminsResponse = await fetch(`${API_BASE_URL}/admins`);
         console.log("📊 Status da resposta admins:", adminsResponse.status);
@@ -130,6 +133,39 @@ const GerenciarUsers = () => {
 
     const confirmDelete = (type, id, name) => {
         setUserToDelete({ type, id, name });
+    };
+
+    const handleDeleteUser = async () => {
+        if (!userToDelete) return;
+
+        try {
+            const response = await fetch(
+            `${API_BASE_URL}/${userToDelete.type}s/${userToDelete.id}`,
+            { method: "DELETE" }
+            );
+
+            if (response.ok) {
+            setSuccessMessage(`✅ ${userToDelete.name} excluído com sucesso!`);
+
+            // Atualizar lista local
+            if (userToDelete.type === "admin") {
+                setAdmins((prev) => prev.filter((a) => a._id !== userToDelete.id));
+                setTotalAdmins((prev) => prev - 1);
+            } else {
+                setClientes((prev) => prev.filter((c) => c._id !== userToDelete.id));
+                setTotalClientes((prev) => prev - 1);
+            }
+
+            setTotalUsers((prev) => prev - 1);
+            } else {
+            const errorText = await response.text();
+            setErrorMessage(`❌ Erro ao excluir: ${errorText}`);
+            }
+        } catch (err) {
+            setErrorMessage(`❌ Erro de rede: ${err.message}`);
+        } finally {
+            setUserToDelete(null); // fecha o modal
+        }
     };
 
     return (
@@ -274,7 +310,7 @@ const GerenciarUsers = () => {
                 <h3>⚠️ Confirmar Exclusão</h3>
                 <p>Tem certeza que deseja excluir "{userToDelete.name}" ({userToDelete.type})?<br></br>Esta ação não pode ser desfeita.</p>
                 <div className="modal-buttons">
-                    <button className="confirm-btn" onClick={confirmDelete}>🗑️ Excluir</button>
+                    <button className="confirm-btn" onClick={handleDeleteUser}>🗑️ Excluir</button>
                     <button className="cancel-btn" onClick={closeModal}>↩️ Cancelar</button>
                 </div>
                 </div>
