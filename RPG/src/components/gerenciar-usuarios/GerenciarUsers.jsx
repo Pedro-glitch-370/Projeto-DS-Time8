@@ -26,15 +26,6 @@ const GerenciarUsers = () => {
 
   const navigate = useNavigate();
 
-    // Simulação de carregamento inicial ADAPTAR ISSO AQUI
-    useEffect(() => {
-        // Aqui você chamaria sua API para buscar usuários  ADAPTAR ISSO AQUI
-        setCurrentUser("Administrador Pedro");
-        setTotalAdmins(3);
-        setTotalClientes(12);
-        setTotalUsers(15);
-    }, []);
-
     // Para segurança
     useEffect(() => {
         const userData = localStorage.getItem("user");
@@ -67,7 +58,7 @@ const GerenciarUsers = () => {
         console.log("📊 Status da resposta admins:", adminsResponse.status);
 
         if (adminsResponse.ok) {
-            const adminsData = await adminsResponse.json();
+            adminsData = await adminsResponse.json();
             console.log("👨‍💼 Admins carregados:", adminsData);
             setAdmins(adminsData);
             setTotalAdmins(adminsData.length);
@@ -83,7 +74,7 @@ const GerenciarUsers = () => {
         console.log("📊 Status da resposta clientes:", clientesResponse.status);
 
         if (clientesResponse.ok) {
-            const clientesData = await clientesResponse.json();
+            clientesData = await clientesResponse.json();
             console.log("👥 Clientes carregados:", clientesData);
             setClientes(clientesData);
             setTotalClientes(clientesData.length);
@@ -95,11 +86,7 @@ const GerenciarUsers = () => {
         }
 
         // Atualizar o total
-        setTotalUsers(adminsResponse.ok && clientesResponse.ok
-            ? adminsResponse.status === 200 && clientesResponse.status === 200
-            ? adminsData.length + clientesData.length
-            : 0
-            : 0);
+        setTotalUsers(adminsData.length + clientesData.length);
 
         console.log("✅ Usuários carregados com sucesso!");
         } catch (error) {
@@ -167,6 +154,8 @@ const GerenciarUsers = () => {
             setUserToDelete(null); // fecha o modal
         }
     };
+    console.log("ADMINS AQUI ÓOOOOOOOOO", admins);
+    console.log("LOADING ADMINSSSSSSS:", loadingAdmins);
 
     return (
         <div className="admin-container">
