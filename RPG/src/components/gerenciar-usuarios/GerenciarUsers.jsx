@@ -154,8 +154,6 @@ const GerenciarUsers = () => {
             setUserToDelete(null); // fecha o modal
         }
     };
-    console.log("ADMINS AQUI ÓOOOOOOOOO", admins);
-    console.log("LOADING ADMINSSSSSSS:", loadingAdmins);
 
     return (
         <div className="admin-container">
@@ -163,7 +161,7 @@ const GerenciarUsers = () => {
         <div className="header-gerenciar">
             <h1>Gerenciar Usuários</h1>
             <div className="user-info-gerenciar">
-            <p className="user-welcome-gerenciar">Administrador atual: {currentUser?.name}</p>
+            <p className="user-welcome-gerenciar">Administrador atual: {currentUser?.nome}</p>
             </div>
         </div>
 
