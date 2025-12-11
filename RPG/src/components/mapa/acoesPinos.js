@@ -74,9 +74,8 @@ export async function handleSavePino({
   try {
     // Formata dados e envia para a API
     const pinoData = formatarDadosPino(dados);
-    const pinoSalvo = await pinoService.adicionarPino(pinoData);
-    
-    console.log("✅ Pino salvo com sucesso");
+    const resposta = await pinoService.adicionarPino(pinoData);
+    const pinoSalvo = resposta.pino;
     
     // Atualiza estado local apenas se o pino tiver coordenadas válidas
     if (pinoSalvo.localizacao?.coordinates) {

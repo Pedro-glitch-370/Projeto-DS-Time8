@@ -91,12 +91,14 @@ const usePinosManagement = () => {
       logOperacao('atualizar pino', { pinoId, dadosAtualizados });
       
       // Chama o serviço para atualizar no servidor
-      const pinoAtualizado = await pinoService.atualizarPino(pinoId, dadosAtualizados);
+      const resposta = await pinoService.atualizarPino(pinoId, dadosAtualizados);
+      const pinoAtualizado = resposta.pino || resposta;
       
       // Atualiza o estado local com o pino modificado
       setPinos(prev => prev.map(pino => 
         pino._id === pinoId ? pinoAtualizado : pino
       ));
+      console.log("OOOO ATUALIZACAO CONCLUIDA OOOO")
       
       // Log de sucesso
       logSucesso('atualizar pino', pinoAtualizado.nome);

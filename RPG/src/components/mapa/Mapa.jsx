@@ -507,10 +507,6 @@ export default function Mapa() {
                     </div>
                   )}
 
-                  {/* Aviso para admin */}
-                  {isAdmin && (
-                    <div className="admin-hint">💡 Admin: Clique fora do popup para editar este pino</div>
-                  )}
                 </div>
               </Popup>
             </Marker>

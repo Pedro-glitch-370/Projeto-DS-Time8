@@ -4,4 +4,3 @@ export { InputField } from "./inputField/InputField";
 export { CapibasInput } from "./capibasInput/CapibasInput";
 export { ActionButtons } from "./actionButtons/ActionsButtons";
 export { PinoInfo } from "./pinoInfo/PinoInfo";
-export { DebugInfo } from "./debugInfo/DebugInfo";

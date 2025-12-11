@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./barra-lateral.css";
 import { validateForm, extractCoordinates, logDebugInfo } from "./funcoes-auxiliares";
 import { SidebarHeader, CoordinatesInfo, InputField,
-  CapibasInput, ActionButtons, PinoInfo, DebugInfo } from "./componentes-auxiliares/componentesAux";
+  CapibasInput, ActionButtons, PinoInfo } from "./componentes-auxiliares/componentesAux";
 
 // =================================================================
 // Componente principal
@@ -34,6 +34,12 @@ export default function Sidebar({
       setCapibas("0");
     }
   }, [selectedPino]);
+
+  // Variáveis apenas para dar permissão de atualizar pino
+  const originalNome = selectedPino?.nome || "";
+  const originalMsg = selectedPino?.msg || "";
+  const originalCapibas = selectedPino?.capibas?.toString() || "0";
+  const hasChanges = nome !== originalNome || msg !== originalMsg || capibas !== originalCapibas;
 
   // Handlers
   const handleSave = () => {
@@ -143,13 +149,7 @@ export default function Sidebar({
         onChange={handleCapibasChange}
       />
 
-      <div className="capibas-info">
-        <small>💡 Digite a quantidade de capibas que os usuários receberão ao completar esta atividade</small>
-      </div>
-
       <PinoInfo selectedPino={selectedPino} />
-
-      <DebugInfo selectedPino={selectedPino} />
     </div>
 
     <ActionButtons
@@ -158,6 +158,7 @@ export default function Sidebar({
       onUpdate={handleUpdate}
       onDelete={handleDelete}
       onCancel={handleCancel}
+      hasChanges={hasChanges}
     />
   </div>
   )

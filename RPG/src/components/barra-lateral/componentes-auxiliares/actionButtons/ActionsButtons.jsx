@@ -1,4 +1,4 @@
-export const ActionButtons = ({ mode, onSave, onUpdate, onDelete, onCancel }) => {
+export const ActionButtons = ({ mode, onSave, onUpdate, onDelete, onCancel, hasChanges }) => {
   const renderCreationMode = () => (
     <button onClick={onSave} className="saveButton">
       ✅ Salvar Novo Ponto
@@ -7,10 +7,10 @@ export const ActionButtons = ({ mode, onSave, onUpdate, onDelete, onCancel }) =>
 
   const renderEditionMode = () => (
     <>
-      <button onClick={onUpdate} className="updateButton">
+      <button onClick={onUpdate} className="updateButton" disabled={!hasChanges} type="button">
         🔄 Atualizar Ponto
       </button>
-      <button onClick={onDelete} className="deleteButton">
+      <button onClick={onDelete} className="deleteButton" type="button">
         🗑️ Excluir Ponto
       </button>
     </>

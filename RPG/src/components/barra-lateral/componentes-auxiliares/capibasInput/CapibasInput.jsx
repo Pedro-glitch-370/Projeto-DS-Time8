@@ -26,12 +26,12 @@ export const CapibasInput = ({ value, onChange }) => {
 
   return (
     <div className="input-group">
-      <label>🪙 Quantidade de Capibas (Recompensa):</label>
+      <label>Quantidade de Capibas (Recompensa):</label>
       <input
         type="text"
         inputMode="numeric"
         pattern="[0-9]*"
-        placeholder="0"
+        placeholder="Digite a quantidade de Capibas"
         value={value}
         onChange={handleChange}
         onFocus={handleFocus}
