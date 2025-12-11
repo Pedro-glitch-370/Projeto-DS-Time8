@@ -5,7 +5,7 @@ import RegisterPopup from "./popups/RegisterPopUp";
 import UserMenu from "./menu/UserMenu";
 import SettingsMenu from "./menu/SettingsMenu";
 import { NavLink, useNavigate } from "react-router-dom";
-
+import { setAtualizarUsuarioLogado } from "./utils/userState";
 import "./navbar.css";
 
 export default function Navbar() {
@@ -22,6 +22,7 @@ export default function Navbar() {
         if (savedUser) {
             setUsuarioLogado(JSON.parse(savedUser));
         }
+        setAtualizarUsuarioLogado(setUsuarioLogado);
     }, []);
 
     return (

@@ -4,6 +4,7 @@ import Loading from './components/loading/Loading.jsx'
 import Mapa from './components/mapa/Mapa.jsx'
 import TarefasCarrossel from './components/tarefas/tarefasCarrossel/TarefasCarrossel.jsx';
 import Navbar from './components/barra-superior/Navbar.jsx';
+import GerenciarUsers from './components/gerenciar-usuarios/GerenciarUsers.jsx';
 import './css/App.css'
 
 function Home() {
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/tarefas" element={<TarefasCarrossel />} />
         <Route path="/capibas" element={<div>Capibas aqui</div>} />
+        <Route path="/gerenciar" element={<GerenciarUsers />} />
       </Routes>
     </BrowserRouter>
   )

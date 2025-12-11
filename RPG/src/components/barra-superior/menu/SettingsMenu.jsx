@@ -1,8 +1,11 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { isUserAdmin } from "../para-react/userUtils";
 import "./settingsMenu.css";
 
 export default function SettingsMenu({ onClose }) {
+  const navigate = useNavigate();
+
   useEffect(() => {
     function handleEsc(e) {
       if (e.key === "Escape") onClose();
@@ -13,7 +16,7 @@ export default function SettingsMenu({ onClose }) {
 
   function handleManageUsers() {
     if (isUserAdmin()) {
-      window.location.href = "/src/public/apagar.html";
+      navigate("/gerenciar");
     } else {
       alert("❌ Apenas administradores podem acessar o gerenciamento de usuários.");
     }
