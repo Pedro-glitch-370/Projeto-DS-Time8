@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import "./barra-lateral.css";
 import { validateForm, extractCoordinates, logDebugInfo } from "./funcoes-auxiliares";
-import { SidebarHeader, CoordinatesInfo, InputField,
-  CapibasInput, ActionButtons, PinoInfo } from "./componentes-auxiliares/componentesAux";
+import { SidebarHeader, InputField, CapibasInput,
+  ActionButtons, PinoInfo } from "./componentes-auxiliares/componentesAux";
 
 // =================================================================
 // Componente principal
@@ -126,8 +126,6 @@ export default function Sidebar({
     <SidebarHeader selectedPino={selectedPino} onClose={onClose} />
     
     <div className="sidebar-content">
-      <CoordinatesInfo tempPin={tempPin} selectedPino={selectedPino} />
-
       <InputField
         label="Nome do Local"
         value={nome}

@@ -498,7 +498,7 @@ export default function Mapa() {
                     {validandoLocalizacao ? '⏳ Validando...' :
                      !permissaoLocalizacao ? '📍 Permitir Localização' :
                      isTarefaConcluida(pino._id) ? '✅ Já Concluída' :
-                     '✅ Confirmar Presença'}
+                     'Confirmar Presença'}
                   </button>
 
                   {/* Mensagens de status */}

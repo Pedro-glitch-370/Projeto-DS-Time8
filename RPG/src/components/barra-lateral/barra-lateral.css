@@ -101,26 +101,11 @@
 }
 
 /* ==================================================
-   INFORMAÇÕES DE COORDENADAS
-   ================================================== */
-.coordinates {
-  margin: 0;
-  font-size: 0.875rem;
-  color: #475569;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-radius: var(--border-radius);
-  border-left: 4px solid var(--primary-color);
-  font-family: 'Monaco', 'Consolas', monospace;
-  box-shadow: var(--shadow);
-  flex-shrink: 0;
-}
-
-/* ==================================================
    FORMULÁRIO E INPUTS
    ================================================== */
 .input-group {
   margin-bottom: 0;
+  margin-right: 8px;
 }
 
 .input-group label {
@@ -276,12 +261,16 @@
    SEÇÕES DE INFORMAÇÃO
    ================================================== */
 .infoBox {
-  padding: 20px;
+  margin: 0;
+  margin-right: 8px;
+  padding: 12px;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border-radius: var(--border-radius);
   font-size: 0.75rem;
+  color: #475569;
   border-left: 4px solid var(--info-color);
   box-shadow: var(--shadow);
+  font-family: 'Monaco', 'Consolas', monospace;
 }
 
 .infoBox p {
