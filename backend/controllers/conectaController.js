@@ -10,19 +10,28 @@ async function loginConecta(req, res) {
   const { username, password } = req.body;
 
   try {
+    // Como o Conecta não está funcionando, foi feita essa checagem forçada
+    const validUser = username === "88232462027";
+    const validPass = password === "desenv@12345";
+    console.log(validUser);
+    console.log(validPass);
+    if (!validUser || !validPass) {
+      return res.status(401).json({ error: "Username ou senha inválida para usuário de teste" });
+    }
+
     const response = await fetch(CONECTA_AUTH_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         grant_type: 'password',
         client_id: 'app-recife',
-        username: '88232462027',
-        password: 'desenv@12345'
+        username,
+        password
       })
     });
-
+    console.log("Tentando login no Conecta com:", username, password);
     const data = await response.json();
-
+    console.log("Resposta do Conecta:", data);
     if (!response.ok) {
       return res.status(response.status).json({ error: data.error_description || 'Erro no login' });
     }

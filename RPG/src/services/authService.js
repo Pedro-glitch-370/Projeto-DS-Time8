@@ -29,6 +29,12 @@ export const authService = {
       const { token } = response.data;
       if (!token) throw new Error('Token não recebido do Conecta');
 
+      // Montar o objeto parcial de usuário interno
+      let userData = { email, token };
+      // Salvar no localStorage
+      authService.setUser(userData);
+      console.log("📦 User parcial salvo no localStorage:", userData);
+
       console.log('📨 Buscando tipo para email:', email);
       // Buscar o tipo no MongoDB
       const userResponse = await api.get('/usuarios/byEmail', {
@@ -36,15 +42,10 @@ export const authService = {
       });
       const tipo = userResponse.data.tipo || 'cliente'; // fallback para cliente
 
-      // Montar o objeto de usuário interno
-      const userData = { email, tipo, token };
-      // Salvar no localStorage
+      // Atualiza o objeto com tipo
+      userData = { ...userData, tipo };
       authService.setUser(userData);
-      console.log('📦 Dados salvos no localStorage');
-
-      if (!token) {
-        throw new Error('Token não recebido do Conecta');
-      }
+      console.log("📦 User completo salvo no localStorage:", userData);
       
       console.log('✅ Login realizado com sucesso via Conecta');
       return userData;

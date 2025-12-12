@@ -178,21 +178,6 @@ router.get('/conecta/self/products', async (req, res) => {
   await proxyGET(req, res, url);
 });
 
-// ================== ROTAS DE DESAFIOS ==================
-
-// POST /api/challenges/{id}/share/{requirementId}
-router.post('/conecta/challenges/:id/share/:requirementId', async (req, res) => {
-  const { id, requirementId } = req.params;
-  const url = u(`/api/challenges/${id}/share/${requirementId}`);
-  await proxyPOST(req, res, url);
-});
-
-// GET /api/questions/challenge/{challengeId}
-router.get('/conecta/questions/challenge/:challengeId', async (req, res) => {
-  const { challengeId } = req.params;
-  const url = u(`/api/questions/challenge/${challengeId}`);
-  await proxyGET(req, res, url);
-});
 
 // ================== ROTAS DE CHECK IN ==================
 
@@ -207,14 +192,6 @@ router.post('/conecta/check-in/location/challenge/:challengeId/requirement/:requ
   const { challengeId, requirementId } = req.params;
   const url = u(`/api/check-in/location/challenge/${challengeId}/requirement/${requirementId}`);
   await proxyPOST(req, res, url, req.body);
-});
-
-// ================== ROTAS DE CATEGORIAS PÚBLICAS ==================
-
-// GET /api/categories
-router.get('/conecta/categories', async (req, res) => {
-  const url = withQuery(u('/api/categories'), req.query);
-  await proxyGET(req, res, url);
 });
 
 // ================== ROTAS DE USUÁRIO ==================
