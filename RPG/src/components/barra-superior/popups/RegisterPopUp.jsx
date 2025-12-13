@@ -37,7 +37,7 @@ export default function RegisterPopup({ onClose, abrirLogin }) {
 
     try {
       // rota depende do tipo
-      const rota = tipo === "admin" ? "/auth/admins/register" : "/auth/clientes/register";
+      const rota = tipo === "admin" ? "/auth/admins/register/" : "/auth/clientes/register/";
       console.log("ENVIANDO AO BACKEND:", { nome, email, senha });
       const response = await fetch(`${API_BASE_URL}${rota}`, {
         method: "POST",

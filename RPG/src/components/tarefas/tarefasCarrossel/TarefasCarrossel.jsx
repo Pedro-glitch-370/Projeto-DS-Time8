@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./TarefasCarrossel.css";
+import "./tarefasCarrossel.css";
 import TarefasDisponiveis from '../tarefasDisponiveis/TarefasDisponiveis'
 import TarefasConcluidas from '../tarefasConcluidas/TarefasConcluidas';
 import TarefasSolicitadas from '../tarefasSolicitadas/TarefasSolicitadas';
