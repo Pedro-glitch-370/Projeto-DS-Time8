@@ -7,22 +7,28 @@ export default function LoginPopup({ onClose, onLoginSuccess, abrirRegistro }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mensagemErro, setMensagemErro] = useState("");
+  const [exibirErro, setExibirErro] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState("");
+  const [exibirSucesso, setExibirSucesso] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
     setMensagemErro("");
+    setExibirErro(false);
     setMensagemSucesso("");
+    setExibirSucesso(false);
     setLoading(true);
 
     if (!isValidEmail(email)) {
       setMensagemErro("Por favor, insira um email válido");
+      setExibirErro(true);
       setLoading(false);
       return;
     }
     if (!senha) {
       setMensagemErro("Por favor, insira sua senha");
+      setExibirErro(true);
       setLoading(false);
       return;
     }
@@ -31,6 +37,7 @@ export default function LoginPopup({ onClose, onLoginSuccess, abrirRegistro }) {
       const userData = await authService.login(email, senha);
       if (!userData) {
         setMensagemErro("Falha no login: usuário não recebido");
+        setExibirErro(true);
         return;
       }
 
@@ -40,9 +47,13 @@ export default function LoginPopup({ onClose, onLoginSuccess, abrirRegistro }) {
       // avisa o Navbar que o login deu certo
       if (onLoginSuccess) onLoginSuccess(userData);
       setMensagemSucesso("Login realizado com sucesso!");
+      setExibirSucesso(true);
 
       // fecha popup
-      onClose();
+      setTimeout(() => {
+        onClose();
+      }, 3000);
+      
     } catch (error) {
       setMensagemErro(error.message || "Erro ao fazer login. Tente novamente.");
     } finally {
@@ -79,8 +90,8 @@ export default function LoginPopup({ onClose, onLoginSuccess, abrirRegistro }) {
           <button type="submit" disabled={loading}>Entrar</button>
         </form>
 
-        {mensagemErro && <div className="error">{mensagemErro}</div>}
-        {mensagemSucesso && <div className="success">{mensagemSucesso}</div>}
+        {exibirErro && !exibirSucesso && <div className="error">{mensagemErro}</div>}
+        {exibirSucesso && !exibirErro && <div className="success">{mensagemSucesso}</div>}
         {loading && <div className="loading">Entrando...</div>}
 
         <div className="register-link-container">

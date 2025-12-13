@@ -101,6 +101,7 @@ export default function Navbar() {
         {userMenuAberto && usuarioLogado && (
             <UserMenu
                 usuarioLogado={usuarioLogado}
+                abaLoginAberta={loginPopupAberto}
                 onClose={() => setUserMenuAberto(false)}
                 onLogout={() => {
                 localStorage.removeItem("user");

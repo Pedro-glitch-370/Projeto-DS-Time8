@@ -347,7 +347,6 @@ padding: 1rem;
 border-radius: 8px;
 margin-bottom: 1rem;
 border: 1px solid #f5c6cb;
-display: none;
 }
 
 .success {
@@ -357,7 +356,6 @@ padding: 1rem;
 border-radius: 8px;
 margin-bottom: 1rem;
 border: 1px solid #c3e6cb;
-display: none;
 }
 
 .loading {

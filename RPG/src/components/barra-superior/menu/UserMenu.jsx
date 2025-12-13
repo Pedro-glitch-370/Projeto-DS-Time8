@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import "./userMenu.css";
 
-export default function UserMenu({ usuarioLogado, onClose, onLogout }) {
+export default function UserMenu({ usuarioLogado, abaLoginAberta, onClose, onLogout }) {
   // fecha com ESC
   useEffect(() => {
     function handleEsc(e) {
@@ -11,7 +11,7 @@ export default function UserMenu({ usuarioLogado, onClose, onLogout }) {
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
-  if (!usuarioLogado) return null;
+  if (!usuarioLogado || abaLoginAberta) return null;
 
   return (
     <div className="user-menu" onClick={(e) => e.target === e.currentTarget && onClose()}>
