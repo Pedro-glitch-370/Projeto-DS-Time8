@@ -9,7 +9,7 @@ export const authService = {
    * Realiza o login do usuário via Conecta
    * @param {string} email - Email do usuário
    * @param {string} senha - Senha do usuário
-   * @returns {Promise<Object>} Dados do usuário logado + token
+   * @returns {Promise<Object>} Dados do usuário logado
    * @throws {Error} Em caso de falha no login
    */
   login: async (email, senha) => {
@@ -18,39 +18,35 @@ export const authService = {
         throw new Error('Email e senha são obrigatórios');
       }
 
-      console.log(`🔐 Tentando login no Conecta: ${email}`);
-      
-      // Faz requisição POST para endpoint de login
-      const response = await api.post('/conecta/login', {
-        username: email,
-        password: senha
-      });
+      console.log(`🔐 Tentando login local: ${email}`);
 
-      const { token } = response.data;
-      if (!token) throw new Error('Token não recebido do Conecta');
+      // Primeiro testa se é um admin
+      let response;
+      try {
+        response = await api.post('/auth/admins/login', { email, senha });
+        console.log(`RESPONSE: ${response.data}`)
+      } catch (err) {
+        // Depois testa se é um cliente/user normal
+        if (err.response?.status === 401 || err.response?.status === 404) {
+          response = await api.post('/auth/clientes/login', { email, senha });
+        } else {
+          throw err;
+        }
+      }
 
-      // Montar o objeto parcial de usuário interno
-      let userData = { email, token };
-      // Salvar no localStorage
-      authService.setUser(userData);
-      console.log("📦 User parcial salvo no localStorage:", userData);
+      const { user } = response.data;
+      console.log(`USER DE RESPONSE DATA: ${user}`)
+      if (!user) throw new Error('Usuário não encontrado ou credenciais inválidas');
 
-      console.log('📨 Buscando tipo para email:', email);
-      // Buscar o tipo no MongoDB
-      const userResponse = await api.get('/usuarios/byEmail', {
-        params: { email }
-      });
-      const tipo = userResponse.data.tipo || 'cliente'; // fallback para cliente
+      // Salva no localStorage
+      authService.setUser(user);
+      api.defaults.headers['user-data'] = JSON.stringify(user);
 
-      // Atualiza o objeto com tipo
-      userData = { ...userData, tipo };
-      authService.setUser(userData);
-      console.log("📦 User completo salvo no localStorage:", userData);
-      
-      console.log('✅ Login realizado com sucesso via Conecta');
-      return userData;
+      console.log("📦 User salvo no localStorage:", user);
+      console.log('✅ Login realizado com sucesso!');
+      return user;
     } catch (error) {
-      console.error('❌ Erro no login via Conecta:', error);
+      console.error('❌ Erro no login local:', error);
       // Propaga mensagem de erro específica da API ou mensagem genérica
       throw new Error(error.response?.data?.message || 'Erro no login');
     }
@@ -166,7 +162,7 @@ export const authService = {
    */
   setUser: (userData) => {
     try {
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem("user", JSON.stringify(userData));
       console.log('💾 Dados do usuário salvos no localStorage');
     } catch (error) {
       console.error('❌ Erro ao salvar dados do usuário:', error);

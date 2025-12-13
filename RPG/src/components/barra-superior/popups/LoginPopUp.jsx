@@ -29,8 +29,8 @@ export default function LoginPopup({ onClose, onLoginSuccess, abrirRegistro }) {
 
     try {
       const userData = await authService.login(email, senha);
-      if (!userData || !userData.token) {
-        setMensagemErro("Falha no login: token não recebido");
+      if (!userData) {
+        setMensagemErro("Falha no login: usuário não recebido");
         return;
       }
 

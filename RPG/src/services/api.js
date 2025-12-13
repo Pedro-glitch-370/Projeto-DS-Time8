@@ -5,7 +5,7 @@ import axios from "axios";
  * Esta instância será usada para todas as chamadas API da aplicação
  */
 const api = axios.create({
-  baseURL: "http://localhost:5001/api", // URL base da API
+  baseURL: "/api", // URL base da API
   timeout: 5000, // Timeout de 5 segundos para todas as requisições
   headers: {
     "Content-Type": "application/json",
@@ -19,8 +19,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Recupera dados do usuário do localStorage
+    console.log(localStorage.getItem('user'));
     const userData = localStorage.getItem('user');
-    
     // Se existir dados do usuário, adiciona no header da requisição
     if (userData) {
       try {
