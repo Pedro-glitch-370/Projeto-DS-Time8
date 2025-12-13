@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./tarefasConcluidas.css";
 import { pinoService } from "../../../services/pinoService";
 
-export default function TarefasSolicitadas() {
+export default function TarefasConcluidas() {
   const [usuarioLogado, setUsuarioLogado] = useState(null); 
   const [tarefasConcluidas, setTarefasConcluidas] = useState([]);
   const [tarefasDisponiveis, setTarefasDisponiveis] = useState(0);

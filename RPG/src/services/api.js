@@ -5,7 +5,7 @@ import axios from "axios";
  * Esta instância será usada para todas as chamadas API da aplicação
  */
 const api = axios.create({
-  baseURL: "/api", // URL base da API
+  baseURL: "http://localhost:5001/api", // URL base da API
   timeout: 5000, // Timeout de 5 segundos para todas as requisições
   headers: {
     "Content-Type": "application/json",

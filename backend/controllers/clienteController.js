@@ -122,7 +122,7 @@ class ClienteController {
     static async listarClientes(req, res) {
         try {
             console.log("📋 Buscando todos os clientes...");
-            const clientes = await Cliente.find({}, { nome: 1, email: 1, capibas: 1, tarefasCompletas: 1, tipo: 1, senha: 1 });
+            const clientes = await Cliente.find({}, { nome: 1, senha: 1, email: 1, capibas: 1, tipo: 1, tarefasCompletas: 1 });
             console.log(`✅ ${clientes.length} clientes encontrados`);
             res.json(clientes);
         } catch (error) {
