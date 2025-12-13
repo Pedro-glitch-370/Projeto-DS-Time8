@@ -5,6 +5,7 @@ const Schema = mongoose.Schema
 const adminSchema = new Schema({
     nome: { type: String, required: true, unique: true, trim: true }, // nome do admin
     email: { type: String, required: true, unique: true , trim: true }, // email do admin
+    senha: { type: String, required: true, trim: true }, // senha do admin
     tipo: { type: String, enum: ['cliente', 'admin'], required: true , default: 'admin' }, // tipo do usuário
     tarefasCompletas: { type: Number, default: 0, min: 0 }, // número de tarefas completas
     tarefasConcluidas: [{ type: String, unique: true }], // array de IDs das tarefas concluídas

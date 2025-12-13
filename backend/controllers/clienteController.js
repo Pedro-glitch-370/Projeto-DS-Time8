@@ -12,13 +12,13 @@ class ClienteController {
      */
     static async registrarCliente(req, res) {
         try {
-            const { nome, email } = req.body;
+            const { nome, email, senha } = req.body;
 
             console.log("📝 Recebendo registro de cliente:", { nome, email });
 
             // Validação dos campos obrigatórios
-            if (!nome || !email) {
-                return res.status(400).json({ message: "Nome e email são obrigatórios" });
+            if (!nome || !email || !senha) {
+                return res.status(400).json({ message: "Nome, email e senha são obrigatórios" });
             }
 
             // Verificar se o cliente já existe
@@ -31,6 +31,7 @@ class ClienteController {
             const newCliente = new Cliente({
                 nome,
                 email,
+                senha,
                 tipo: 'cliente',
                 capibas: 0,
                 tarefasCompletas: 0,
@@ -47,6 +48,7 @@ class ClienteController {
                     id: newCliente._id,
                     nome: newCliente.nome,
                     email: newCliente.email,
+                    senha: newCliente.senha,
                     tipo: newCliente.tipo,
                     capibas: newCliente.capibas,
                     tarefasCompletas: newCliente.tarefasCompletas
@@ -66,13 +68,13 @@ class ClienteController {
      */
     static async loginCliente(req, res) {
         try {
-            const { email } = req.body;
+            const { email, senha } = req.body;
 
-            console.log("🔐 Recebendo login de cliente para email:", email);
+            console.log("🔐 Recebendo login de cliente para email:", email, senha);
 
-            // Validar email
-            if (!email) {
-                return res.status(400).json({ message: "Email é obrigatório" });
+            // Validar email e senha
+            if (!email || !senha) {
+                return res.status(400).json({ message: "Email e senha são obrigatórios" });
             }
 
             // Buscar cliente pelo email
@@ -83,15 +85,20 @@ class ClienteController {
                 return res.status(400).json({ message: "Cliente não encontrado. Faça o registro primeiro." });
             }
 
+            if (cliente.senha !== senha) {
+                return res.status(401).json({ message: "Senha incorreta" });
+            }
+
             console.log("✅ Login de cliente bem-sucedido para:", cliente.email);
 
-            // Retornar dados do cliente
+            // Retornar dados do cliente TERMIANR DE ADAPTAR ISSO
             res.json({
                 message: "Login realizado com sucesso",
                 user: {
                     id: cliente._id,
                     nome: cliente.nome,
                     email: cliente.email,
+                    senha: cliente.senha,
                     tipo: 'cliente',
                     capibas: cliente.capibas,
                     tarefasCompletas: cliente.tarefasCompletas,
@@ -147,6 +154,7 @@ class ClienteController {
                     id: cliente._id,
                     nome: cliente.nome,
                     email: cliente.email,
+                    senha: cliente.email,
                     tipo: 'cliente',
                     capibas: cliente.capibas,
                     tarefasCompletas: cliente.tarefasCompletas,
@@ -183,6 +191,7 @@ class ClienteController {
                     id: cliente._id,
                     nome: cliente.nome,
                     email: cliente.email,
+                    senha: cliente.senha,
                     tipo: 'cliente',
                     capibas: cliente.capibas,
                     tarefasCompletas: cliente.tarefasCompletas,

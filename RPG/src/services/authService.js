@@ -6,7 +6,7 @@ import api from './api';
  */
 export const authService = {
   /**
-   * Realiza o login do usuário via Conecta
+   * Realiza o login do usuário
    * @param {string} email - Email do usuário
    * @param {string} senha - Senha do usuário
    * @returns {Promise<Object>} Dados do usuário logado
@@ -14,8 +14,12 @@ export const authService = {
    */
   login: async (email, senha) => {
     try {
-      if (!email || !senha) {
-        throw new Error('Email e senha são obrigatórios');
+      if (!email) {
+        throw new Error('Email é obrigatório');
+      }
+
+      if (!senha) {
+        throw new Error('Senha é obrigatória')
       }
 
       console.log(`🔐 Tentando login local: ${email}`);
@@ -24,7 +28,6 @@ export const authService = {
       let response;
       try {
         response = await api.post('/auth/admins/login', { email, senha });
-        console.log(`RESPONSE: ${response.data}`)
       } catch (err) {
         // Depois testa se é um cliente/user normal
         if (err.response?.status === 401 || err.response?.status === 404) {
@@ -35,7 +38,6 @@ export const authService = {
       }
 
       const { user } = response.data;
-      console.log(`USER DE RESPONSE DATA: ${user}`)
       if (!user) throw new Error('Usuário não encontrado ou credenciais inválidas');
 
       // Salva no localStorage

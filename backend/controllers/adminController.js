@@ -15,13 +15,14 @@ class AdminController {
      * @param {Object} req.body - Corpo da requisição
      * @param {string} req.body.nome - Nome do administrador
      * @param {string} req.body.email - Email do administrador
+     * @param {string} req.body.senha - Senha do administrador
      * @param {Object} res - Response do Express
      */
     static async registrarAdmin(req, res) {
         try {
-            const { nome, email } = req.body;
+            const { nome, email, senha } = req.body;
 
-            console.log("📝 Recebendo registro de admin:", { nome, email });
+            console.log("📝 Recebendo registro de admin:", { nome, email, senha });
 
             // Validação de campos obrigatórios
             if (!nome?.trim()) {
@@ -30,6 +31,10 @@ class AdminController {
 
             if (!email?.trim()) {
                 return res.status(400).json({ message: "Email é obrigatório" });
+            }
+
+            if (!senha?.trim()) {
+                return res.status(400).json({ message: "Senha é obrigatória" });
             }
 
             // Verifica se o admin já existe pelo email
@@ -42,6 +47,7 @@ class AdminController {
             const newAdmin = new Admin({
                 nome: nome.trim(),
                 email: email.trim(),
+                senha: senha.trim(),
                 tipo: 'admin'
                 // Os outros campos usam os defaults do model
             });
@@ -57,6 +63,7 @@ class AdminController {
                     id: newAdmin._id,
                     nome: newAdmin.nome,
                     email: newAdmin.email,
+                    senha: newAdmin.senha,
                     tipo: newAdmin.tipo,
                     permissoes: newAdmin.permissoes,
                     tarefasCompletas: newAdmin.tarefasCompletas
@@ -80,17 +87,22 @@ class AdminController {
      * Realiza login de um administrador existente
      * @param {Object} req - Request do Express
      * @param {string} req.body.email - Email do administrador
+     * @param {string} req.body.senha - Senha do administrador
      * @param {Object} res - Response do Express
      */
     static async loginAdmin(req, res) {
         try {
-            const { email } = req.body;
+            const { email, senha } = req.body;
 
-            console.log("🔐 Recebendo login de admin para email:", email);
+            console.log("🔐 Recebendo login de admin para email:", email, senha);
 
             // Validação básica
             if (!email?.trim()) {
                 return res.status(400).json({ message: "Email é obrigatório" });
+            }
+
+            if (!senha?.trim()) {
+                return res.status(400).json({ message: "Senha é obrigatória"});
             }
 
             // Busca admin pelo email
@@ -98,6 +110,10 @@ class AdminController {
             
             if (!admin) {
                 return res.status(400).json({ message: "Admin não encontrado. Faça o registro primeiro." });
+            }
+            
+            if (admin.senha !== senha) {
+                return res.status(401).json({ message: "Senha incorreta" });
             }
 
             console.log("✅ Login de admin bem-sucedido para:", admin.email);
@@ -109,6 +125,7 @@ class AdminController {
                     id: admin._id,
                     nome: admin.nome,
                     email: admin.email,
+                    senha: admin.senha,
                     tipo: 'admin',
                     permissoes: admin.permissoes,
                     tarefasCompletas: admin.tarefasCompletas,
@@ -136,7 +153,7 @@ class AdminController {
             // Busca todos os admins, selecionando apenas campos necessários
             const admins = await Admin.find({}, { 
                 nome: 1, 
-                email: 1, 
+                email: 1,
                 permissoes: 1, 
                 tipo: 1, 
                 tarefasCompletas: 1 
@@ -174,6 +191,7 @@ class AdminController {
                     id: admin._id,
                     nome: admin.nome,
                     email: admin.email,
+                    senha: admin.senha,
                     tipo: 'admin',
                     permissoes: admin.permissoes,
                     tarefasCompletas: admin.tarefasCompletas,
@@ -216,6 +234,7 @@ class AdminController {
                     id: admin._id,
                     nome: admin.nome,
                     email: admin.email,
+                    senha: admin.senha,
                     tipo: 'admin',
                     permissoes: admin.permissoes,
                     tarefasCompletas: admin.tarefasCompletas,
