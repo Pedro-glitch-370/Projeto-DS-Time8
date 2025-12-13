@@ -16,7 +16,7 @@ export default function TarefasDisponiveis() {
     const userData = localStorage.getItem("user");
     if (!userData) {
       alert("⚠️ Você precisa estar logado para acessar as tarefas!");
-      window.location.href = "/login";
+      window.location.href = "/";
       return;
     }
 
@@ -25,7 +25,7 @@ export default function TarefasDisponiveis() {
       setUsuarioLogado(user);
     } catch (error) {
       console.error("Erro ao parsear dados do usuário:", error);
-      window.location.href = "/login";
+      window.location.href = "/";
     }
   }, []);
 

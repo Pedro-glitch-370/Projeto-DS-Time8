@@ -3,8 +3,8 @@ const Schema = mongoose.Schema
 
 // esquema dos clientes
 const clienteSchema = new Schema({
-    nome: { type: String, required: true , trim: true }, // nome do cliente
-    email: { type: String, required: true , trim: true, unique: true }, // email do cliente
+    nome: { type: String, required: true, trim: true }, // nome do cliente
+    email: { type: String, required: true, trim: true, unique: true }, // email do cliente
     senha: { type: String, required: true, trim: true }, // senha do cliente
     tipo: { type: String, enum: ['cliente', 'admin'], required: true , default: 'cliente' }, // tipo do cliente
     capibas: { type:Number, required: true, default: 0 , min: 0}, // cliente sempre começa com 0 capibas
