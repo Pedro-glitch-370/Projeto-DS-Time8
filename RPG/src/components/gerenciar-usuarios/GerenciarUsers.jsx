@@ -20,6 +20,7 @@ const GerenciarUsers = () => {
   const [totalUsers, setTotalUsers] = useState(0);
   const [activeTab, setActiveTab] = useState("admins");
   const [userToDelete, setUserToDelete] = useState(null);
+  const [boolDelete, setBoolDelete] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -116,10 +117,12 @@ const GerenciarUsers = () => {
 
     const closeModal = () => {
         setUserToDelete(null);
+        setBoolDelete(false);
     };
 
     const confirmDelete = (type, id, name) => {
         setUserToDelete({ type, id, name });
+        setBoolDelete(true);
     };
 
     const handleDeleteUser = async () => {
@@ -130,7 +133,7 @@ const GerenciarUsers = () => {
             `${API_BASE_URL}/${userToDelete.type}s/${userToDelete.id}`,
             { method: "DELETE" }
             );
-
+            
             if (response.ok) {
             setSuccessMessage(`✅ ${userToDelete.name} excluído com sucesso!`);
 
@@ -151,7 +154,8 @@ const GerenciarUsers = () => {
         } catch (err) {
             setErrorMessage(`❌ Erro de rede: ${err.message}`);
         } finally {
-            setUserToDelete(null); // fecha o modal
+            setUserToDelete(null);
+            setBoolDelete(false);
         }
     };
 
@@ -166,31 +170,31 @@ const GerenciarUsers = () => {
         </div>
 
         {/* Content */}
-        <div className="content">
+        <div className="content-gerenciar">
             <div className="nav-links">
                 <a className="back-link-gerenciar" href="/">Voltar ao Mapa</a>
                 <button className="logout-btn-gerenciar" onClick={logout}>Sair</button>
             </div>
 
             {/* Stats */}
-            <div className="stats">
+            <div className="stats-gerenciar">
             <div className="stat-card">
                 <div className="stat-number">{totalAdmins}</div>
-                <div className="stat-label">Administradores</div>
+                <div className="stat-label-gerenciar">Administradores</div>
             </div>
             <div className="stat-card">
                 <div className="stat-number">{totalClientes}</div>
-                <div className="stat-label">Clientes</div>
+                <div className="stat-label-gerenciar">Clientes</div>
             </div>
             <div className="stat-card">
                 <div className="stat-number">{totalUsers}</div>
-                <div className="stat-label">Usuários ao Total</div>
+                <div className="stat-label-gerenciar">Usuários ao Total</div>
             </div>
             </div>
 
             {/* Feedback */}
-            <div className="error">{errorMessage}</div>
-            <div className="success">{successMessage}</div>
+            {errorMessage && <div className="error-gerenciar">{errorMessage}</div>}
+            {successMessage && <div className="success-gerenciar">{successMessage}</div>}
 
             {/* Tabs */}
             <div className="tabs">
@@ -212,7 +216,7 @@ const GerenciarUsers = () => {
             {activeTab === "admins" && (
                 <div id="admins" className="tab-content active">
                     {loadingAdmins ? (
-                    <div className="loading">Carregando administradores...</div>
+                    <div className="loading-gerenciar">Carregando administradores...</div>
                     ) : admins.length === 0 ? (
                     <div className="empty-state">
                         <h3>📭 Nenhum administrador encontrado</h3>
@@ -249,7 +253,7 @@ const GerenciarUsers = () => {
             {activeTab === "clientes" && (
                 <div id="clientes" className="tab-content active">
                     {loadingClientes ? (
-                    <div className="loading">Carregando clientes...</div>
+                    <div className="loading-gerenciar">Carregando clientes...</div>
                     ) : clientes.length === 0 ? (
                     <div className="empty-state">
                         <h3>📭 Nenhum cliente encontrado</h3>
@@ -291,14 +295,15 @@ const GerenciarUsers = () => {
         </div>
 
         {/* Modal */}
-        {userToDelete && (
-            <div className="modal-gerenciar" id="confirmModal">
+        {console.log(boolDelete)}
+        {boolDelete && (
+            <div className="modal-gerenciar">
                 <div className="modal-content">
                 <h3>⚠️ Confirmar Exclusão</h3>
                 <p>Tem certeza que deseja excluir "{userToDelete.name}" ({userToDelete.type})?<br></br>Esta ação não pode ser desfeita.</p>
                 <div className="modal-buttons">
-                    <button className="confirm-btn" onClick={handleDeleteUser}>🗑️ Excluir</button>
-                    <button className="cancel-btn" onClick={closeModal}>↩️ Cancelar</button>
+                    <button className="confirm-btn" onClick={handleDeleteUser}>Excluir</button>
+                    <button className="cancel-btn" onClick={closeModal}>Cancelar</button>
                 </div>
                 </div>
             </div>        

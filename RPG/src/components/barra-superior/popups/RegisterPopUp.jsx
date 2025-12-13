@@ -98,9 +98,9 @@ export default function RegisterPopup({ onClose, abrirLogin }) {
           <button type="submit" disabled={loading}>Registrar</button>
         </form>
 
-        {mensagemErro && <div className="error">{mensagemErro}</div>}
-        {mensagemSucesso && <div className="success">{mensagemSucesso}</div>}
-        {loading && <div className="loading">Registrando...</div>}
+        {mensagemErro && <div className="error-register">{mensagemErro}</div>}
+        {mensagemSucesso && <div className="success-register">{mensagemSucesso}</div>}
+        {loading && <div className="loading-register">Registrando...</div>}
 
         <div className="register-link-container">
           <a className="register-link" href="#" onClick={(e) => { e.preventDefault(); onClose(); abrirLogin(); }}>

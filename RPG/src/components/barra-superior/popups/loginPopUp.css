@@ -106,7 +106,7 @@
 }
 
 /* Mensagens de status */
-.error, .loading {
+.error-login, .loading {
   text-align: center;
   margin-top: 1rem;
   padding: 0.75rem;
@@ -114,13 +114,13 @@
   font-size: 0.9rem;
 }
 
-.error {
+.error-login {
   color: var(--error-color);
   background: #f8d7da;
   border: 1px solid #f5c6cb;
 }
 
-.loading {
+.loading-login {
   color: var(--primary-blue);
   font-weight: 500;
   background: none;
@@ -151,7 +151,7 @@
   background-color: rgba(20, 73, 192, 0.05);
 }
 
-.success {
+.success-login {
   color: #2F7854;
   font-size: 0.95rem;
   font-weight: 600; 

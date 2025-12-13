@@ -89,10 +89,10 @@ export default function LoginPopup({ onClose, onLoginSuccess, abrirRegistro }) {
           </div>
           <button type="submit" disabled={loading}>Entrar</button>
         </form>
-
-        {exibirErro && !exibirSucesso && <div className="error">{mensagemErro}</div>}
-        {exibirSucesso && !exibirErro && <div className="success">{mensagemSucesso}</div>}
-        {loading && <div className="loading">Entrando...</div>}
+    
+        {exibirErro && !exibirSucesso && <div className="error-login">{mensagemErro}</div>}
+        {exibirSucesso && !exibirErro && <div className="success-login">{mensagemSucesso}</div>}
+        {loading && <div className="loading-login">Entrando...</div>}
 
         <div className="register-link-container">
           <a className="register-link" href="#" onClick={(e) => { e.preventDefault(); abrirRegistro(); }}>
