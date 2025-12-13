@@ -27,11 +27,11 @@ export const authService = {
       // Primeiro testa se é um admin
       let response;
       try {
-        response = await api.post('/auth/admins/login', { email, senha });
+        response = await api.post('/auth/admins/logi/n', { email, senha });
       } catch (err) {
         // Depois testa se é um cliente/user normal
         if (err.response?.status === 401 || err.response?.status === 404) {
-          response = await api.post('/auth/clientes/login', { email, senha });
+          response = await api.post('/auth/clientes/login/', { email, senha });
         } else {
           throw err;
         }
