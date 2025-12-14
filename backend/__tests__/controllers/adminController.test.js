@@ -36,7 +36,8 @@ describe('AdminController', () => {
       // 1. Dados de teste
       const mockAdminData = {
         nome: 'Admin Teste',
-        email: 'admin@teste.com'
+        email: 'admin@teste.com',
+        senha: '123'
       };
 
       // 2. Mock do Admin.findOne (admin não existe)
@@ -47,6 +48,7 @@ describe('AdminController', () => {
         _id: new mongoose.Types.ObjectId(),
         nome: mockAdminData.nome,
         email: mockAdminData.email,
+        senha: mockAdminData.senha,
         tipo: 'admin',
         permissoes: ['ler', 'criar', 'deletar'],
         tarefasCompletas: 0,
@@ -67,6 +69,7 @@ describe('AdminController', () => {
       expect(response.body.message).toBe('Admin registrado com sucesso');
       expect(response.body.user.nome).toBe(mockAdminData.nome);
       expect(response.body.user.email).toBe(mockAdminData.email);
+      expect(response.body.user.senha).toBe(mockAdminData.senha);
       expect(response.body.user.tipo).toBe('admin');
       expect(Admin.findOne).toHaveBeenCalledWith({ email: mockAdminData.email });
     });
@@ -93,7 +96,8 @@ describe('AdminController', () => {
       const mockAdmin = {
         _id: new mongoose.Types.ObjectId(),
         nome: 'Admin Existente',
-        email: 'existente@teste.com'
+        email: 'existente@teste.com',
+        senha: '123'
       };
 
       Admin.findOne.mockResolvedValue(mockAdmin);
@@ -102,7 +106,8 @@ describe('AdminController', () => {
         .post('/admins/registrar')
         .send({
           nome: 'Novo Admin',
-          email: 'existente@teste.com' // Email já existe
+          email: 'existente@teste.com', // Email já existe
+          senha: '123'
         })
         .expect(400);
 
@@ -116,7 +121,8 @@ describe('AdminController', () => {
         .post('/admins/registrar')
         .send({
           nome: 'Admin Teste',
-          email: 'teste@email.com'
+          email: 'teste@email.com',
+          senha: '123'
         })
         .expect(500);
 
@@ -131,6 +137,7 @@ describe('AdminController', () => {
         _id: new mongoose.Types.ObjectId(),
         nome: 'Admin Teste',
         email: 'admin@teste.com',
+        senha: '123',
         tipo: 'admin',
         permissoes: ['ler', 'criar', 'deletar'],
         tarefasCompletas: 5,
@@ -141,11 +148,12 @@ describe('AdminController', () => {
 
       const response = await request(app)
         .post('/admins/login')
-        .send({ email: 'admin@teste.com' })
+        .send({ email: 'admin@teste.com', senha: '123' })
         .expect(200);
 
       expect(response.body.message).toBe('Login realizado com sucesso');
       expect(response.body.user.email).toBe('admin@teste.com');
+      expect(response.body.user.senha).toBe('123');
       expect(response.body.user.tarefasCompletas).toBe(5);
       expect(Admin.findOne).toHaveBeenCalledWith({ email: 'admin@teste.com' });
     });
@@ -164,7 +172,7 @@ describe('AdminController', () => {
 
       const response = await request(app)
         .post('/admins/login')
-        .send({ email: 'naoexiste@teste.com' })
+        .send({ email: 'naoexiste@teste.com', senha: '123' })
         .expect(400);
 
       expect(response.body.message).toBe('Admin não encontrado. Faça o registro primeiro.');
@@ -179,6 +187,7 @@ describe('AdminController', () => {
           _id: new mongoose.Types.ObjectId(),
           nome: 'Admin 1',
           email: 'admin1@teste.com',
+          senha: '11',
           tipo: 'admin',
           permissoes: ['ler'],
           tarefasCompletas: 2
@@ -187,6 +196,7 @@ describe('AdminController', () => {
           _id: new mongoose.Types.ObjectId(),
           nome: 'Admin 2',
           email: 'admin2@teste.com',
+          senha: '12',
           tipo: 'admin',
           permissoes: ['ler', 'criar'],
           tarefasCompletas: 5
@@ -203,6 +213,7 @@ describe('AdminController', () => {
       expect(Admin.find).toHaveBeenCalledWith({}, {
         nome: 1,
         email: 1,
+        senha: 1,
         permissoes: 1,
         tipo: 1,
         tarefasCompletas: 1
@@ -227,6 +238,7 @@ describe('AdminController', () => {
         _id: new mongoose.Types.ObjectId(),
         nome: 'Admin Teste',
         email: 'teste@email.com',
+        senha: '321',
         tipo: 'admin',
         permissoes: ['ler', 'criar'],
         tarefasCompletas: 3,
@@ -264,6 +276,7 @@ describe('AdminController', () => {
         _id: validId,
         nome: 'Admin por ID',
         email: 'id@teste.com',
+        senha: '321',
         tipo: 'admin',
         permissoes: ['ler'],
         tarefasCompletas: 1,
@@ -308,6 +321,7 @@ describe('AdminController', () => {
         _id: adminId,
         nome: 'Admin Testador',
         email: 'testador@email.com',
+        senha: 'teste',
         tarefasConcluidas: [],
         tarefasCompletas: 0,
         ultimoAcesso: null,

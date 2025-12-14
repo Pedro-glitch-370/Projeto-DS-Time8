@@ -37,7 +37,8 @@ describe('ClienteController', () => {
       // Arrange (Preparar)
       const req = criarReq({ 
         nome: 'João Silva', 
-        email: 'joao@email.com' 
+        email: 'joao@email.com',
+        senha: '123456' 
       });
       const res = criarRes();
 
@@ -49,6 +50,7 @@ describe('ClienteController', () => {
         _id: 'cliente123',
         nome: 'João Silva',
         email: 'joao@email.com',
+        senha: '123456',
         tipo: 'cliente',
         capibas: 0,
         tarefasCompletas: 0,
@@ -70,6 +72,7 @@ describe('ClienteController', () => {
           id: 'cliente123',
           nome: 'João Silva',
           email: 'joao@email.com',
+          senha: '123456',
           tipo: 'cliente',
           capibas: 0,
           tarefasCompletas: 0
@@ -84,7 +87,7 @@ describe('ClienteController', () => {
       await ClienteController.registrarCliente(req1, res1);
       expect(res1.status).toHaveBeenCalledWith(400);
       expect(res1.json).toHaveBeenCalledWith({ 
-        message: "Nome e email são obrigatórios" 
+        message: "Nome, email e senha são obrigatórios" 
       });
 
       // Teste sem email
@@ -97,7 +100,8 @@ describe('ClienteController', () => {
     test('deve retornar erro 400 se cliente já existir', async () => {
       const req = criarReq({ 
         nome: 'Maria', 
-        email: 'existente@email.com' 
+        email: 'existente@email.com',
+        senha: 'maria123' 
       });
       const res = criarRes();
 
@@ -127,6 +131,7 @@ describe('ClienteController', () => {
         _id: 'cliente123',
         nome: 'Cliente Teste',
         email: 'cliente@email.com',
+        senha: 'teste',
         tipo: 'cliente',
         capibas: 100,
         tarefasCompletas: 5,
@@ -141,6 +146,7 @@ describe('ClienteController', () => {
           id: 'cliente123',
           nome: 'Cliente Teste',
           email: 'cliente@email.com',
+          senha: 'teste',
           tipo: 'cliente',
           capibas: 100,
           tarefasCompletas: 5,
@@ -189,6 +195,7 @@ describe('ClienteController', () => {
           _id: '1',
           nome: 'Cliente 1',
           email: 'c1@email.com',
+          senha: '11',
           capibas: 50,
           tarefasCompletas: 2,
           tipo: 'cliente'
@@ -197,6 +204,7 @@ describe('ClienteController', () => {
           _id: '2',
           nome: 'Cliente 2',
           email: 'c2@email.com',
+          senha: '12',
           capibas: 100,
           tarefasCompletas: 5,
           tipo: 'cliente'
@@ -209,6 +217,7 @@ describe('ClienteController', () => {
       expect(Cliente.find).toHaveBeenCalledWith({}, {
         nome: 1,
         email: 1,
+        senha: 1,
         capibas: 1,
         tarefasCompletas: 1,
         tipo: 1
