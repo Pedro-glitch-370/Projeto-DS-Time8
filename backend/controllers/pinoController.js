@@ -1,3 +1,4 @@
+const Temporada = require("../models/temporadaModel");
 const Pino = require("../models/pinoModel");
 const mongoose = require("mongoose");
 
@@ -470,6 +471,48 @@ class PinoController {
       });
     }
   }
+
+  /**
+   * Retorna apenas os pinos da temporada ativa
+   */
+  static async getPinosDisponiveis(req, res) {
+    try {
+      // Buscar temporada ativa
+      const agora = new Date();
+      console.log("➡️ getPinosDisponiveis chamado em", agora);
+      const temporada =
+        (await Temporada.findOne({ status: "ativo" }).sort({ dataInicio: -1 })) ||
+        (await Temporada.findOne({
+          dataInicio: { $lte: agora },
+          dataFim: { $gte: agora }
+        }).sort({ dataInicio: -1 }));
+        
+      console.log("Temporada encontrada:", temporada);  
+      if (!temporada) {
+        return res.json({ message: "Nenhuma temporada ativa", pinos: [] });
+      }
+
+      console.log("IDs de pinos da temporada:", temporada.pinIds);
+      // Buscar pinos pelos IDs da temporada
+      const pinos = await Pino.find({ _id: { $in: temporada.pinIds } });
+
+      console.log(`✅ ${pinos.length} pinos disponíveis na temporada ${temporada.titulo}`);
+
+      res.json({
+        temporada: {
+          id: temporada._id,
+          titulo: temporada.titulo,
+          dataInicio: temporada.dataInicio,
+          dataFim: temporada.dataFim,
+          status: temporada.status
+        },
+        pinos
+      });
+    } catch (err) {
+      console.error("❌ Erro ao buscar pinos disponíveis:", err);
+      res.status(500).json({ message: "Erro interno ao buscar pinos disponíveis" });
+    }
+  }  
 }
 
 // ==================================================

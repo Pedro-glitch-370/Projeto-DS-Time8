@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import "./tarefasDisponiveis.css";
-import { pinoService } from "../../../services/pinoService";
 import { clienteService } from "../../../services/clienteService";
 import { adminService } from "../../../services/adminService";
 
@@ -41,11 +40,27 @@ export default function TarefasDisponiveis() {
   useEffect(() => {
     async function carregarTarefas() {
       try {
-        const pinos = await pinoService.getPinos();
+        const res = await fetch("/api/temporadas/atual", {
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": usuarioLogado?.id,
+            "x-user-tipo": usuarioLogado?.tipo
+          }
+        });
+
+        const data = await res.json();
         const concluidas = usuarioLogado?.tarefasConcluidas || [];
 
+        // Se não tiver nenhuma temporada ativa
+        if (!data.temporada) {
+          setTarefas([]);
+          setTarefasDisponiveis([]);
+          setLoading(false);
+          return;
+        }
+
         // Mapeia todas as tarefas
-        const todas = pinos.map((pino) => ({
+        const todas = data.pinos.map((pino) => ({
           id: pino._id,
           nome: pino.nome,
           descricao: pino.msg,

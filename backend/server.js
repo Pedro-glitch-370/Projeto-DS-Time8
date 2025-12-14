@@ -9,8 +9,9 @@ const pinoRoutes = require("./routes/pinosRoutes")
 const clienteRoutes = require("./routes/clienteRoutes.js")
 const adminRoutes = require("./routes/adminRoutes.js")
 const validarLocalizacaoRouter = require("./routes/validarLocalizacaoRouter.js")
-const usuariosRoutes = require("./routes/usuariosRoutes.js")
 const solicitacaoRoutes = require("./routes/solicitacaoRoutes.js")
+const temporadaRoutes = require("./routes/temporadaRoutes.js")
+const usuariosRoutes = require("./routes/usuariosRoutes.js");
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -42,6 +43,7 @@ app.use("/api/solicitacoes", solicitacaoRoutes)
 app.use("/api/validar-localizacao", validarLocalizacaoRouter)
 app.use("/api/auth/clientes", clienteRoutes)
 app.use("/api/auth/admins", adminRoutes)
+app.use("/api/temporadas", temporadaRoutes);
 app.use("/api/usuarios", usuariosRoutes);
 /*quando criar novas rotas, adicionar aqui*/
 

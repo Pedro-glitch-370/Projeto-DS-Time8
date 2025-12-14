@@ -61,19 +61,35 @@ export default function TarefasSolicitadas() {
     return solicitacao.status === filtroStatus;
   });
 
-  // Função para obter nome do solicitante
-  const getNomeSolicitante = (solicitacao) => {
+  // Função para obter nome do solicitante formatado
+  const getNomeSolicitanteFormatado = (solicitacao) => {
+    let nomeBase = "Usuário";
+    
     // Se tiver enviadoPor como objeto
     if (solicitacao.enviadoPor && typeof solicitacao.enviadoPor === 'object') {
-      return solicitacao.enviadoPor.nome || "Usuário";
+      nomeBase = solicitacao.enviadoPor.nome || nomeBase;
+    } else if (solicitacao.nomeUsuario) {
+      nomeBase = solicitacao.nomeUsuario;
     }
     
-    // Se tiver nomeUsuario
-    if (solicitacao.nomeUsuario) {
-      return solicitacao.nomeUsuario;
+    // Verificar se é do usuário atual
+    const isOwner = isSolicitacaoDoUsuario(solicitacao);
+    
+    // Se for o usuário atual, mostrar apenas "Você"
+    if (isOwner) {
+      return {
+        displayName: "Você",
+        isCurrentUser: true,
+        originalName: nomeBase
+      };
     }
     
-    return "Usuário";
+    // Se for outro usuário, mostrar o nome dele
+    return {
+      displayName: nomeBase,
+      isCurrentUser: false,
+      originalName: nomeBase
+    };
   };
 
   // Função para verificar se a solicitação é do usuário atual
@@ -403,32 +419,22 @@ export default function TarefasSolicitadas() {
           solicitacoesFiltradas.map((solicitacao) => {
             const statusBadge = getStatusBadge(solicitacao.status);
             const permissoes = verificarPermissao(solicitacao);
-            const nomeSolicitante = getNomeSolicitante(solicitacao);
+            const solicitanteInfo = getNomeSolicitanteFormatado(solicitacao);
             
             return (
               <div key={solicitacao._id} className="solicitacao-card">
                 {/* Header com nome da tarefa e status */}
                 <div className="solicitacao-header">
-                  <h3>{solicitacao.nome}</h3>
+                  <div>
+                    <h3>{solicitacao.nome}</h3>
+                    {/* Descrição da tarefica EM CIMA */}
+                    <div className="solicitacao-body">
+                      <p className="solicitacao-descricao">{solicitacao.msg}</p>
+                    </div>
+                  </div>
                   <span className={`status-badge ${statusBadge.classe}`}>
                     {statusBadge.texto}
                   </span>
-                </div>
-                
-                {/* Área do solicitante (separada) */}
-                <div className="solicitacao-solicitante">
-                  <div className="solicitante-info">
-                    <span className="solicitante-icon">👤</span>
-                    <div className="solicitante-detalhes">
-                      <span className="solicitante-label">Solicitante:</span>
-                      <span className="solicitante-nome">{nomeSolicitante}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Descrição da tarefa */}
-                <div className="solicitacao-body">
-                  <p className="solicitacao-descricao">{solicitacao.msg}</p>
                 </div>
                 
                 {/* Informações adicionais */}
@@ -458,6 +464,19 @@ export default function TarefasSolicitadas() {
                       <span className="metadata-value">{solicitacao.motivoRejeicao}</span>
                     </div>
                   )}
+                </div>
+                
+                {/* Área do solicitante EM BAIXO (agora formatado corretamente) */}
+                <div className="solicitacao-solicitante">
+                  <div className="solicitante-info">
+                    <span className="solicitante-icon">👤</span>
+                    <div className="solicitante-detalhes">
+                      <span className="solicitante-label">Solicitante:</span>
+                      <span className={`solicitante-nome ${solicitanteInfo.isCurrentUser ? 'solicitante-atual' : ''}`}>
+                        {solicitanteInfo.displayName}
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 
                 {/* Ações */}
@@ -509,7 +528,7 @@ export default function TarefasSolicitadas() {
       {/* Seção "Como usar" */}
       <div className="solicitacoes-info">
         <div className="info-card">
-          <h4>📋 Como usar esta página?</h4>
+          <h4> Como usar esta página?</h4>
           <div className="info-content">
             <div className="info-item">
               <div className="info-icon">➕</div>
@@ -523,7 +542,7 @@ export default function TarefasSolicitadas() {
               <div className="info-icon">👤</div>
               <div className="info-text">
                 <h5>Ver solicitante</h5>
-                <p>Cada tarefa mostra quem a sugeriu na seção "Solicitante".</p>
+                <p>Cada tarefa mostra quem a sugeriu na seção "Solicitante". Se for você, aparecerá apenas "Você".</p>
               </div>
             </div>
             
