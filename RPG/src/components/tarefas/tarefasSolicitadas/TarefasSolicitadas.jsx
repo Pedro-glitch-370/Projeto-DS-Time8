@@ -12,7 +12,7 @@ export default function TarefasSolicitadas() {
   const [novaSolicitacao, setNovaSolicitacao] = useState({
     nome: "",
     descricao: "",
-    capibas: 0
+    capibas: ""
   });
   
   const [filtroStatus, setFiltroStatus] = useState("todas");
@@ -131,7 +131,7 @@ export default function TarefasSolicitadas() {
     setNovaSolicitacao({
       nome: solicitacao.nome,
       descricao: solicitacao.msg,
-      capibas: solicitacao.capibas
+      capibas: solicitacao.capibas || "" // Converte 0 para string vazia se for 0
     });
     setMostrarFormulario(true);
   };
@@ -139,11 +139,11 @@ export default function TarefasSolicitadas() {
   // Função para cancelar edição
   const handleCancelarEdicao = () => {
     setSolicitacaoEditando(null);
-    setNovaSolicitacao({ nome: "", descricao: "", capibas: 0 });
+    setNovaSolicitacao({ nome: "", descricao: "", capibas: "" });
     setMostrarFormulario(false);
   };
 
-  // Função para enviar nova solicitação ou atualizar
+  // Função para validar e enviar nova solicitação ou atualizar
   const handleEnviarSolicitacao = async (e) => {
     e.preventDefault();
     
@@ -152,26 +152,43 @@ export default function TarefasSolicitadas() {
       return;
     }
 
+    // Validação do campo capibas
+    let capibasNumero;
+    if (novaSolicitacao.capibas.trim() === "") {
+      // Se estiver vazio, define como 0
+      capibasNumero = 0;
+    } else {
+      const valor = parseInt(novaSolicitacao.capibas);
+      
+      // Verifica se é um número válido e não negativo
+      if (isNaN(valor) || valor < 0) {
+        alert("Por favor, insira um número válido de capibas (não negativo).");
+        return;
+      }
+      
+      capibasNumero = valor;
+    }
+
     try {
       if (solicitacaoEditando) {
         await solicitacaoService.atualizarSolicitacao(
           solicitacaoEditando._id,
           novaSolicitacao.nome,
           novaSolicitacao.descricao,
-          novaSolicitacao.capibas
+          capibasNumero
         );
         alert("✅ Solicitação atualizada com sucesso!");
       } else {
         await solicitacaoService.criarSolicitacao(
           novaSolicitacao.nome,
           novaSolicitacao.descricao,
-          novaSolicitacao.capibas
+          capibasNumero
         );
         alert("✅ Solicitação enviada com sucesso!");
       }
       
       setSolicitacaoEditando(null);
-      setNovaSolicitacao({ nome: "", descricao: "", capibas: 0 });
+      setNovaSolicitacao({ nome: "", descricao: "", capibas: "" });
       setMostrarFormulario(false);
       
       const data = await solicitacaoService.getSolicitacoes();
@@ -181,6 +198,19 @@ export default function TarefasSolicitadas() {
       console.error("❌ Erro ao enviar/atualizar solicitação:", error);
       const errorMsg = error.response?.data?.message || error.message;
       alert(`Erro: ${errorMsg}`);
+    }
+  };
+
+  // Função para lidar com mudança no campo capibas
+  const handleCapibasChange = (e) => {
+    const valor = e.target.value;
+    
+    // Permite apenas números ou string vazia
+    if (valor === "" || /^\d*$/.test(valor)) {
+      setNovaSolicitacao({
+        ...novaSolicitacao,
+        capibas: valor
+      });
     }
   };
 
@@ -321,7 +351,7 @@ export default function TarefasSolicitadas() {
             className="btn-nova-solicitacao"
             onClick={() => {
               setSolicitacaoEditando(null);
-              setNovaSolicitacao({ nome: "", descricao: "", capibas: 0 });
+              setNovaSolicitacao({ nome: "", descricao: "", capibas: "" }); // String vazia
               setMostrarFormulario(!mostrarFormulario);
             }}
           >
@@ -360,12 +390,16 @@ export default function TarefasSolicitadas() {
             <div className="form-group">
               <label>Capibas Sugeridos (opcional)</label>
               <input
-                type="number"
-                min="0"
+                type="text"
+                inputMode="numeric"
                 value={novaSolicitacao.capibas}
-                onChange={(e) => setNovaSolicitacao({...novaSolicitacao, capibas: parseInt(e.target.value) || 0})}
+                onChange={handleCapibasChange}
                 placeholder="Quantidade de capibas"
+                min="0"
               />
+              <small className="form-hint">
+                Digite um número não negativo. Deixe em branco para 0.
+              </small>
             </div>
             
             <div className="form-actions">
@@ -441,7 +475,7 @@ export default function TarefasSolicitadas() {
                 <div className="solicitacao-metadata">
                   <div className="metadata-item">
                     <span className="metadata-label">💰 Capibas Sugeridos:</span>
-                    <span className="metadata-value">{solicitacao.capibas}</span>
+                    <span className="metadata-value">{solicitacao.capibas || 0}</span>
                   </div>
                   
                   <div className="metadata-item">

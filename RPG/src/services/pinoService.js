@@ -83,15 +83,55 @@ export const pinoService = {
    */
   getPinos: async () => {
     try {
-      console.log('🗺️ Buscando todos os pinos...');
+      console.log("📍📍📍 PINO SERVICE: Iniciando getPinos()");
+      console.log("📍📍📍 PINO SERVICE: Fazendo requisição GET para /pinos");
+      
       const response = await api.get('/pinos');
-      console.log(`✅ Encontrados ${response.data.length} pinos`);
+      
+      console.log("📍📍📍 PINO SERVICE: Resposta recebida");
+      console.log("📍📍📍 PINO SERVICE: Status:", response.status);
+      console.log("📍📍📍 PINO SERVICE: Status Text:", response.statusText);
+      console.log("📍📍📍 PINO SERVICE: Headers:", response.headers);
+      console.log("📍📍📍 PINO SERVICE: Data:", response.data);
+      console.log("📍📍📍 PINO SERVICE: Tipo de data:", typeof response.data);
+      console.log("📍📍📍 PINO SERVICE: É array?", Array.isArray(response.data));
+      
+      if (response.data && typeof response.data === 'object') {
+        console.log("📍📍📍 PINO SERVICE: Chaves do objeto:", Object.keys(response.data));
+        
+        // Verificar se há uma propriedade específica que contenha os pinos
+        const possibleArrayKeys = Object.keys(response.data).filter(key => 
+          Array.isArray(response.data[key])
+        );
+        console.log("📍📍📍 PINO SERVICE: Chaves que são arrays:", possibleArrayKeys);
+      }
+      
+      // Retornar os dados diretamente - o componente vai processar
+      console.log("📍📍📍 PINO SERVICE: Retornando dados para componente");
       return response.data;
+      
     } catch (error) {
-      logErro('BUSCAR PINOS', error);
+      console.error("📍📍📍 PINO SERVICE: ERRO NA REQUISIÇÃO:");
+      console.error("📍📍📍 PINO SERVICE: Mensagem:", error.message);
+      
+      if (error.response) {
+        console.error("📍📍📍 PINO SERVICE: Resposta do erro:", {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+          headers: error.response.headers
+        });
+      }
+      
+      if (error.request) {
+        console.error("📍📍📍 PINO SERVICE: Request feita:", error.request);
+        console.error("📍📍📍 PINO SERVICE: URL da request:", error.config?.url);
+      }
+      
       throw error;
     }
   },
+
 
   /**
    * Adiciona um novo pino no mapa

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import "./tarefasDisponiveis.css";
+import { pinoService } from "../../../services/pinoService";
 import { clienteService } from "../../../services/clienteService";
 import { adminService } from "../../../services/adminService";
 
 export default function TarefasDisponiveis() {
   const [usuarioLogado, setUsuarioLogado] = useState(null); 
   const [tarefas, setTarefas] = useState([]);
-  const [tarefasDisponiveis, setTarefasDisponiveis] = useState([]); // Nova state
+  const [tarefasDisponiveis, setTarefasDisponiveis] = useState([]);
   const [loading, setLoading] = useState(true);
   const [popupAberto, setPopupAberto] = useState(false);
   const [tarefaAtual, setTarefaAtual] = useState(null);
@@ -40,27 +41,11 @@ export default function TarefasDisponiveis() {
   useEffect(() => {
     async function carregarTarefas() {
       try {
-        const res = await fetch("/api/temporadas/atual", {
-          headers: {
-            "Content-Type": "application/json",
-            "x-user-id": usuarioLogado?.id,
-            "x-user-tipo": usuarioLogado?.tipo
-          }
-        });
-
-        const data = await res.json();
+        const pinos = await pinoService.getPinos();
         const concluidas = usuarioLogado?.tarefasConcluidas || [];
 
-        // Se não tiver nenhuma temporada ativa
-        if (!data.temporada) {
-          setTarefas([]);
-          setTarefasDisponiveis([]);
-          setLoading(false);
-          return;
-        }
-
         // Mapeia todas as tarefas
-        const todas = data.pinos.map((pino) => ({
+        const todas = pinos.map((pino) => ({
           id: pino._id,
           nome: pino.nome,
           descricao: pino.msg,
@@ -283,14 +268,9 @@ export default function TarefasDisponiveis() {
           <h3>{tarefa.nome}</h3>
           <p>{tarefa.descricao}</p>
           <p className="recompensa">
-            🎁 Recompensa: {tarefa.recompensa} capibas
+            🎁 Recompensa: <strong>{tarefa.recompensa} capibas</strong>
           </p>
-          <button
-            className="btn-confirmar"
-            onClick={() => abrirPopupTarefa(tarefa)}
-          >
-            Confirmar Conclusão
-          </button>
+          {/* BOTÃO REMOVIDO - APENAS VISUALIZAÇÃO */}
         </div>
       ))}
 
@@ -309,10 +289,8 @@ export default function TarefasDisponiveis() {
               </>
             )}
             <div className="popup-actions">
-              <button className="btn-concluir" onClick={concluirTarefa}>
-                {usuarioLogado?.tipo === "admin" ? "Testar Tarefa" : "Confirmar Conclusão"}
-              </button>
-              <button className="btn-cancelar" onClick={fecharPopupTarefa}>Cancelar</button>
+              {/* BOTÕES REMOVIDOS - SEM AÇÕES */}
+              <button className="btn-fechar" onClick={fecharPopupTarefa}>Fechar</button>
             </div>
           </div>
         </div>
