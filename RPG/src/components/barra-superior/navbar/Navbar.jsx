@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { getUserInitials, isUserAdmin } from "./para-react/userUtils";
-import LoginPopup from "./popups/LoginPopUp";
-import RegisterPopup from "./popups/RegisterPopUp";
-import UserMenu from "./menu/UserMenu";
-import SettingsMenu from "./menu/SettingsMenu";
+import { getUserInitials, isUserAdmin } from "../para-react/userUtils";
+import LoginPopup from "../popups/LoginPopUp";
+import RegisterPopup from "../popups/RegisterPopUp";
+import UserMenu from "../menu/UserMenu";
+import SettingsMenu from "../menu/SettingsMenu";
 import { NavLink, useNavigate } from "react-router-dom";
-import { setAtualizarUsuarioLogado } from "./utils/userState";
-import "./navbar.css";
+import { setAtualizarUsuarioLogado } from "../utils/userState";
+import "../../../css/navbar.css";
 
 export default function Navbar() {
     const [loginPopupAberto, setLoginPopupAberto] = useState(false);

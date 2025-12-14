@@ -49,13 +49,13 @@ export default function RegisterPopup({ onClose, abrirLogin }) {
       console.log("DATA:", data);
 
       if (response.ok) {
-        setMensagemSucesso("✅ Registro realizado com sucesso! Redirecionando para login...");
+        setMensagemSucesso("Registro realizado com sucesso! Redirecionando para login...");
         setTimeout(() => {
           onClose();
           abrirLogin();
         }, 2000);
       } else {
-        setMensagemErro(data.message || "❌ Erro no registro. Tente novamente.");
+        setMensagemErro(data.message || "Erro no registro. Tente novamente.");
       }
     } catch (error) {
       setMensagemErro(`❌ Erro ${error} durante o registro. Tente novamente.`);
@@ -84,10 +84,10 @@ export default function RegisterPopup({ onClose, abrirLogin }) {
           </div>
           <div className="form-group">
             <label>Tipo de usuário *</label>
-            <div className="user-type">
+            <div className="user-type-register">
               <label>
                 <input type="radio" value="cliente" checked={tipo === "cliente"} onChange={() => setTipo("cliente")} />
-                <span>{tipo === "cliente" ? "✓ Cliente" : "Cliente"}</span>
+                <span >{tipo === "cliente" ? "✓ Cliente" : "Cliente"}</span>
               </label>
               <label>
                 <input type="radio" value="admin" checked={tipo === "admin"} onChange={() => setTipo("admin")} />

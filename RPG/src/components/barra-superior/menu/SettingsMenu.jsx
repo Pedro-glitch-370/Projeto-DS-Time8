@@ -22,9 +22,9 @@ export default function SettingsMenu({ onClose }) {
     }
   }
 
-  function handleSystemSettings() {
+  function handleSeasonConfiguration() {
     if (isUserAdmin()) {
-      alert("🔧 Configurações do sistema - Em desenvolvimento");
+      navigate("/temporadas")
     } else {
       alert("❌ Apenas administradores podem acessar as configurações do sistema.");
     }
@@ -47,7 +47,7 @@ export default function SettingsMenu({ onClose }) {
         </div>
         <div className="settings-menu-content">
           <button className="settings-option" onClick={handleManageUsers}>👥 Gerenciar Usuários</button>
-          <button className="settings-option" onClick={handleSystemSettings}>🔧 Configurações do Sistema</button>
+          <button className="settings-option" onClick={handleSeasonConfiguration}>🔧 Configurar Temporadas</button>
           <button className="settings-option" onClick={handleBackup}>💾 Backup de Dados</button>
         </div>
       </div>
