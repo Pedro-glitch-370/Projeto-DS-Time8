@@ -268,7 +268,7 @@ export default function TarefasDisponiveis() {
           <h3>{tarefa.nome}</h3>
           <p>{tarefa.descricao}</p>
           <p className="recompensa">
-            🎁 Recompensa: <strong>{tarefa.recompensa} capibas</strong>
+            🎁 Recompensa: {tarefa.recompensa} capibas
           </p>
           <button
             className="btn-confirmar"

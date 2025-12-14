@@ -61,7 +61,7 @@ export default function TarefasConcluidas() {
   if (loading) {
     return (
       <div className="sem-tarefas">
-        <div className="loading-spinner"></div>
+        <div className="loading-spinner-tarefas"></div>
         <h3>Carregando suas tarefas...</h3>
         <p>Aguarde enquanto buscamos seu progresso</p>
       </div>

@@ -456,11 +456,6 @@ export default function Mapa() {
                 <div className="modal"> 
                   <h3 className="mensagem">{pino.nome}</h3>
 
-                  {/* Badge de tarefa concluída */}
-                  {isTarefaConcluida(pino._id) && (
-                    <div className="tarefa-concluida-badge">✅ Concluída</div>
-                  )}
-
                   {/* Upload de foto */}
                   <label htmlFor={`foto-${pino._id || pino.id}`}>
                     <img
@@ -497,7 +492,7 @@ export default function Mapa() {
                   >
                     {validandoLocalizacao ? '⏳ Validando...' :
                      !permissaoLocalizacao ? '📍 Permitir Localização' :
-                     isTarefaConcluida(pino._id) ? '✅ Já Concluída' :
+                     isTarefaConcluida(pino._id) ? 'Já Concluída' :
                      'Confirmar Presença'}
                   </button>
 
