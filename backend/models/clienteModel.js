@@ -7,6 +7,12 @@ const clienteSchema = new Schema({
     email: { type: String, required: true, trim: true, unique: true }, // email do cliente
     senha: { type: String, required: true, trim: true }, // senha do cliente
     tipo: { type: String, enum: ['cliente', 'admin'], required: true , default: 'cliente' }, // tipo do cliente
+    
+    solicitacoesEnviadas: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Solicitacao' 
+    }],
+
     capibas: { type:Number, required: true, default: 0 , min: 0}, // cliente sempre começa com 0 capibas
     tarefasCompletas: { type: Number, default: 0 , min: 0}, // número de tarefas completas
     tarefasConcluidas: [{ type: String }], // array de IDs das tarefas concluídas

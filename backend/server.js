@@ -9,7 +9,8 @@ const pinoRoutes = require("./routes/pinosRoutes")
 const clienteRoutes = require("./routes/clienteRoutes.js")
 const adminRoutes = require("./routes/adminRoutes.js")
 const validarLocalizacaoRouter = require("./routes/validarLocalizacaoRouter.js")
-const usuariosRoutes = require("./routes/usuariosRoutes.js");
+const usuariosRoutes = require("./routes/usuariosRoutes.js")
+const solicitacaoRoutes = require("./routes/solicitacaoRoutes.js")
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -37,6 +38,7 @@ app.use(express.json()) // Middleware para interpretar dados JSON no corpo das r
 // ==================================================
 // Rotas da API
 app.use("/api/pinos", pinoRoutes)
+app.use("/api/solicitacoes", solicitacaoRoutes)
 app.use("/api/validar-localizacao", validarLocalizacaoRouter)
 app.use("/api/auth/clientes", clienteRoutes)
 app.use("/api/auth/admins", adminRoutes)
@@ -55,6 +57,7 @@ const startServer = async () => {
       console.log("SERVIDOR BACKEND INICIADO!")
       console.log(`Porta: ${PORT}`) // numero da porta que o server tá rodando
       console.log(`URL: http://localhost:${PORT}/api/pinos`) // rota que pega todos os pinos do mongoDB
+      console.log(`URL: http://localhost:${PORT}/api/solicitacoes`) // rota que pega todos os solicitacoes do mongoDB
       console.log(`URL: http://localhost:${PORT}/api/auth/clientes/`) // listar clientes
       console.log(`URL: http://localhost:${PORT}/api/auth/admins/`) // listar admins
       console.log(`Banco de dados: ${getDBStatus().connected ? "Conectado" : "Desconectado"}`); // Indica se o banco de dados foi conectado
