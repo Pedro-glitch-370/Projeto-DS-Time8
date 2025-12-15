@@ -11,7 +11,7 @@ import { MAP_CONFIG, ICONS } from "./constantes/constantesMapa.js";
 import { createUserLocationIcon, createUserLocationUpdatingIcon, createUserLocationFallbackIcon } from "./constantes/iconsLeaflet.js";
 import usePinosManagement from "./usePinosManagement.js";
 import MapClickHandler from "./MapClickHandler.jsx";
-import Sidebar from "../barra-lateral/barra-lateral.jsx";
+import Sidebar from "../barra-lateral/barraLateral.jsx";
 import { authService } from "../../services/authService.js";
 
 import StatusLocalizacao from "./StatusLocalizacao.jsx";
