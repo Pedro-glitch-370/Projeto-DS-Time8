@@ -19,8 +19,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Recupera dados do usuário do localStorage
-    console.log(localStorage.getItem('user'));
     const userData = localStorage.getItem('user');
+    console.log(localStorage.getItem('user'));
     // Se existir dados do usuário, adiciona no header da requisição
     if (userData) {
       try {

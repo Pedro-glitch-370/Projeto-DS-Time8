@@ -30,9 +30,9 @@ export default function StatusLocalizacao({
   // Calcula qualidade do GPS baseada na precisão
   const getQualidadeGPS = (precisao) => {
     if (!precisao) return { texto: '', cor: '#6c757d' };
-    if (precisao < 20) return { texto: 'Excelente', cor: '#28a745' };
-    if (precisao < 50) return { texto: 'Boa', cor: '#ffc107' };
-    if (precisao < 100) return { texto: 'Regular', cor: '#fd7e14' };
+    if (precisao < 0.01) return { texto: 'Excelente', cor: '#28a745' };
+    if (precisao < 0.05) return { texto: 'Boa', cor: '#ffc107' };
+    if (precisao < 0.10) return { texto: 'Regular', cor: '#fd7e14' };
     return { texto: 'Ruim', cor: '#dc3545' };
   };
 
