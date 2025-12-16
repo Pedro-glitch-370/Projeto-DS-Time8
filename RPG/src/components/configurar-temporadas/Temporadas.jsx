@@ -3,6 +3,7 @@ import { temporadaService } from "../../services/temporadaService";
 import { pinoService } from "../../services/pinoService";
 import { authService } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
+import "./Temporadas.css";
 
 export default function Temporadas() {
   const [titulo, setTitulo] = useState("");
@@ -12,7 +13,7 @@ export default function Temporadas() {
   const [pinIds, setPinIds] = useState([]);
   const [pinos, setPinos] = useState([]);
   const [temporadas, setTemporadas] = useState([]);
-  const [temporadaAtual, setTemporadaAtual] = useState(null);
+  //const [temporadaAtual, setTemporadaAtual] = useState(null);
   const [mensagem, setMensagem] = useState("");
 
   const navigate = useNavigate();
@@ -38,12 +39,12 @@ export default function Temporadas() {
         const pinosData = await pinoService.getPinos();
         setPinos(pinosData);
 
-        const temporadasData = await temporadaService.getTemporadas();
-        setTemporadas(temporadasData);
+        //const temporadasData = await temporadaService.getTemporadas();
+        //setTemporadas(temporadasData);
 
         // Buscar temporada atual
-        const atual = temporadasData.find(t => t.status === "ativo");
-        setTemporadaAtual(atual || null);
+        //const atual = temporadasData.find(t => t.status === "ativo");
+        //setTemporadaAtual(atual || null);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       }
@@ -113,7 +114,7 @@ export default function Temporadas() {
   };
 
   return (
-    <div>
+    <div className="temporadas-container">
       <h2>Criar Temporada</h2>
       <form onSubmit={handleCriarTemporada}>
         <input
@@ -152,10 +153,13 @@ export default function Temporadas() {
         <button type="submit">Criar Temporada</button>
       </form>
 
-      {mensagem && <p>{mensagem}</p>}
+      {mensagem &&
+        <p className={`mensagem ${mensagem.startsWith("✅") ? "sucesso" : "erro"}`}>
+          {mensagem}
+        </p>}
 
       <h3>Temporada Atual</h3>
-      {temporadaAtual ? (
+      {/*temporadaAtual ? (
         <div>
           <p>{temporadaAtual.titulo}</p>
           <p>
@@ -166,11 +170,11 @@ export default function Temporadas() {
         </div>
       ) : (
         <p>Nenhuma temporada ativa</p>
-      )}
+      )*/}
 
       <h3>Temporadas Existentes</h3>
       {temporadas.map((t) => (
-        <div key={t._id}>
+        <div key={t._id} className="temporada-item">
           <p>{t.titulo}</p>
           <p>
             {new Date(t.dataInicio).toLocaleDateString("pt-BR")} -{" "}
