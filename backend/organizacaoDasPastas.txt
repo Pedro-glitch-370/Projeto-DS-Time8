@@ -1,0 +1,156 @@
+/config:
+
+Conteúdo Principal:
+
+Configuração do Banco de Dados (DB), Funções de Conexão.
+
+Função no Backend:
+
+Contém a lógica centralizada para iniciar, gerenciar e encerrar a conexão com o 
+MongoDB (ou outro serviço externo). Isola as credenciais e o status do DB do 
+restante da aplicação.
+
+================================================================================
+
+/models:
+
+Conteúdo Principal:
+
+Schemas e Modelos do Mongoose.
+
+Função no Backend:
+
+Define a estrutura dos dados da aplicação. Cada arquivo representa uma coleção
+no banco de dados e determina as regras de validação (Schema) e os métodos de
+interação com o DB (Model).
+
+================================================================================
+
+/controller:
+
+Conteúdo Principal:
+
+Lógica de Negócio (Intermediária).
+
+Função no Backend:
+
+Recebe as requisições das rotas, interage com os Models para manipular os dados 
+(CRUD - Criar, Ler, Atualizar, Deletar), e formata a resposta antes de enviá-la
+de volta. É o mediador entre as Rotas e os Models.
+
+================================================================================
+
+/routes:
+
+Conteúdo Principal:
+
+Rotas da API (GET, POST, PUT, DELETE).
+
+Função no Backend:
+
+Contém o código que define os endpoints da API e as funções de callback que lidam
+com as requisições HTTP, encaminhando-as para a lógica de negócio ou modelos.
+
+================================================================================
+
+/test:
+
+Conteúdo Principal:
+
+Arquivos para Testes.
+
+Função no Backend:
+
+Armazena os scripts para testar as funcionalidades da API (rotas, modelos, etc.).
+Essencial para garantir que o código funciona conforme o esperado e prevenir
+regressões.
+
+================================================================================
+
+server:
+
+Conteúdo Principal:
+
+Configuração do Express e Inicialização.
+
+Função no Backend:
+
+É o ponto de entrada da aplicação. 
+Ele configura o servidor web (Express), 
+carrega middlewares, 
+estabelece a conexão inicial com o Banco de Dados (usando /config), 
+e inicia o servidor HTTP para escutar as requisições.
+
+================================================================================
+
+ORDEM DE ACONTECIMENTO
+
+primeiro o banco de dados é inicializado, depois as rotas são criadas
+
+quando o usuario entrar no view e mandar alguma informação de ela, ela deve ser trasferida até o bankend, conferida por um controler, e depois de verifica deve mandar uma resposta atraves do proprio controler dependendo do que for ou de um model, ai depois essa api vai mandar essa informação de volta atraves de uma resposta (se necessario)
+
+===============================================================================
+
+// Fluxo quando o usuario interage
+
+USUÁRIO NO FRONTEND (View)
+         ↓
+FAZ UMA REQUISIÇÃO HTTP (GET, POST, DELETE, etc.)
+         ↓
+ROTA ESPECÍFICA (Routes) - Define o endpoint
+         ↓
+CONTROLLER - Recebe a requisição
+         ↓
+    ↓           ↓
+VALIDAÇÃO    BUSINESS LOGIC
+(dados, regras) (processamentos)
+         ↓
+MODEL - Interage com o Banco de Dados
+         ↓
+CONTROLLER - Recebe o resultado do Model
+         ↓
+ENVIA RESPOSTA HTTP (JSON, HTML, redirect)
+         ↓
+VIEW - Atualiza a interface do usuário
+
+===============================================================================
+
+// FLUXO COMPLETO:
+
+// 1. Usuário clica no botão "Deletar" no HTML
+<button onclick="deletarPino('507f1f77bcf86cd799439011')">Deletar</button>
+
+// 2. Frontend faz requisição (Routes)
+fetch('/api/pinos/deletar/507f1f77bcf86cd799439011', {
+    method: 'DELETE'
+});
+
+// 3. Rota captura a requisição
+router.delete('/deletar/:id', pinoController.deletarPino);
+
+// 4. Controller processa
+const deletarPino = async (req, res) => {
+    // 4.1 Validação
+    const pinoId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(pinoId)) {
+        return res.status(400).json({ error: 'ID inválido' });
+    }
+    
+    // 4.2 Business Logic (se houver)
+    // Ex: Verificar permissões, auditoria, etc.
+    
+    // 4.3 Chama o Model para interagir com DB
+    const resultado = await Pino.findByIdAndDelete(pinoId);
+    
+    // 4.4 Processa resposta do Model
+    if (!resultado) {
+        return res.status(404).json({ error: 'Pino não encontrado' });
+    }
+    
+    // 4.5 Envia resposta para o Frontend
+    res.json({ message: 'Pino deletado com sucesso' });
+}
+
+// 5. Model (operações no MongoDB)
+const Pino = mongoose.model('Pino', PinoSchema);
+// O Mongoose traduz para: db.pinos.findOneAndDelete({_id: ObjectId('...')})

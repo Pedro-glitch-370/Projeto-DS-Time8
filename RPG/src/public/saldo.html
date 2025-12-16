@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saldo - Recife Point Game</title>
+    <link rel="stylesheet" href="../css/saldo.css" />
+  </head>
+  <body>
+    <!-- 
+      CONTAINER PRINCIPAL DA PÁGINA DE SALDO
+      Exibe ranking de jogadores e saldo pessoal do usuário
+    -->
+    <div id="saldo">
+      <div class="saldo-container">
+        <!-- Título principal da página -->
+        <h1>🏆 Ranking de Capibas</h1>
+        
+        <!-- 
+          SEÇÃO DO CARROSSEL DE RANKING
+          Exibe os primeiros colocados em um layout deslizante
+        -->
+        <div class="carrossel-container">
+          <!-- Container dos cards dos jogadores -->
+          <div class="carrossel">
+            <!-- 
+              CARD DO 1º LUGAR
+              Posição de destaque no ranking
+            -->
+            <div class="pessoa">
+              <p class="nome">Maria Silva</p>
+              <p class="saldo">🎯 1º Lugar</p>
+              <p class="pontos">250 capibas</p>
+            </div>
+            
+            <!-- Card do 2º lugar -->
+            <div class="pessoa">
+              <p class="nome">João Santos</p>
+              <p class="saldo">🥈 2º Lugar</p>
+              <p class="pontos">180 capibas</p>
+            </div>
+            
+            <!-- Card do 3º lugar -->
+            <div class="pessoa">
+              <p class="nome">Ana Oliveira</p>
+              <p class="saldo">🥉 3º Lugar</p>
+              <p class="pontos">150 capibas</p>
+            </div>
+            
+            <!-- Card do 4º lugar -->
+            <div class="pessoa">
+              <p class="nome">Pedro Costa</p>
+              <p class="saldo">4º Lugar</p>
+              <p class="pontos">120 capibas</p>
+            </div>
+          </div>
+          
+          <!-- 
+            CONTROLES DO CARROSSEL
+            Botões para navegar entre os cards do ranking
+          -->
+          <button class="prev" onclick="mudarSlide(-1)">&#10094;</button>
+          <button class="next" onclick="mudarSlide(1)">&#10095;</button>
+        </div>
+
+        <!-- 
+          SEÇÃO DO SALDO PESSOAL
+          Mostra a posição e pontuação do usuário atual
+        -->
+        <div class="meu-saldo">
+          <h2>Meu Saldo</h2>
+          <div class="saldo-pessoal">
+            <!-- Quantidade de capibas do usuário -->
+            <span class="valor">75 capibas</span>
+            <!-- Posição do usuário no ranking geral -->
+            <span class="posicao">🎮 5º Lugar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 
+      SCRIPTS DA APLICAÇÃO
+      
+      barra-superior-loader.js: Componente que carrega a navbar dinamicamente
+      saldo.js: Lógica do carrossel e possivelmente integração com API para dados em tempo real
+    -->
+    <script type="module" src="../components/barra-superior/barra-superior-loader.js"></script>
+    <script src="../js/saldo.js"></script>
+
+  </body>
+</html>
