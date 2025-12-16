@@ -12,8 +12,6 @@ const validarLocalizacaoRouter = require("./routes/validarLocalizacaoRouter.js")
 const usuariosRoutes = require("./routes/usuariosRoutes.js");
 const grupoRoutes = require('./routes/grupoRoutes');
 
-// [IMPORTANTE] Ativa o serviço de agendamento (Cron Job) para pagamentos mensais
-// Certifique-se de ter criado o arquivo em services/cronService.js
 try {
     require('./services/cronService');
 } catch (e) {
