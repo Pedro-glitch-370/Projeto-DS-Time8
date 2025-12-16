@@ -31,51 +31,63 @@ export default function Temporadas() {
   const [scrollAtivo, setScrollAtivo] = useState(0);
   const [totalCards, setTotalCards] = useState(0);
   const [cardsVisiveis, setCardsVisiveis] = useState(3);
-  
-  console.log("🚀 Componente Temporadas MONTADO");
-  console.log("📊 Estado inicial - pinos:", pinos);
-  console.log("📊 Estado inicial - carregandoPinos:", carregandoPinos);
-  
-  // Verificar autenticação
+
+  // 1. PRIMEIRO useEffect: Verifica autenticação e define usuarioLogado
   useEffect(() => {
-    console.log("🔐 useEffect - Verificando autenticação");
-    const verificarAutenticacao = () => {
+    console.log("🔐 PRIMEIRO useEffect - Verificando autenticação");
+    
+    const verificarEConfigurarUsuario = () => {
       const userData = localStorage.getItem('user');
       
       if (!userData) {
         console.warn("⚠️ Nenhum usuário encontrado no localStorage");
         alert('⚠️ Você precisa estar logado para acessar esta página!');
         navigate('/');
-        return false;
+        return null;
       }
       
       try {
         const user = JSON.parse(userData);
-        console.log("👤 Usuário logado:", user);
-        setUsuarioLogado(user);
+        console.log("👤 Usuário logado encontrado:", user);
         
         if (user.tipo !== 'admin') {
           console.warn("❌ Usuário não é admin. Tipo:", user.tipo);
           alert('❌ Apenas administradores podem acessar as configurações de temporadas!');
           navigate('/');
-          return false;
+          return null;
         }
         
-        console.log("✅ Usuário é admin, pode continuar");
-        return true;
+        console.log("✅ Usuário é admin, retornando usuário");
+        return user;
+        
       } catch (error) {
         console.error('❌ Erro ao verificar autenticação:', error);
         localStorage.removeItem('user');
         navigate('/');
-        return false;
+        return null;
       }
     };
     
-    if (verificarAutenticacao()) {
-      console.log("✅ Autenticação OK, carregando dados...");
-      carregarDados();
+    const usuario = verificarEConfigurarUsuario();
+    if (usuario) {
+      console.log("✅ Configurando usuarioLogado no estado");
+      setUsuarioLogado(usuario);
     }
+    
   }, [navigate]);
+
+  // 2. SEGUNDO useEffect: Carrega dados quando usuarioLogado é definido
+  useEffect(() => {
+    console.log("🔄 SEGUNDO useEffect - Verificando se pode carregar dados");
+    console.log("📊 usuarioLogado atual:", usuarioLogado);
+    
+    if (usuarioLogado) {
+      console.log("✅ usuarioLogado definido, iniciando carregamento...");
+      carregarDados();
+    } else {
+      console.log("⏳ Aguardando usuarioLogado ser definido...");
+    }
+  }, [usuarioLogado]); // Executa quando usuarioLogado muda
 
   // Mostrar navegação quando scroll > 300px
   useEffect(() => {
@@ -128,11 +140,11 @@ export default function Temporadas() {
   }, [temporadas.length, cardsVisiveis]);
 
   const carregarDados = async () => {
-    console.log("🔄 INICIANDO carregarDados()");
-    console.log("📊 Estado usuarioLogado:", usuarioLogado);
+    console.log("🔄 INICIANDO carregarDados() - COM USUÁRIO DEFINIDO");
+    console.log("📊 usuarioLogado no carregarDados:", usuarioLogado);
     
     if (!usuarioLogado) {
-      console.warn("⚠️ usuarioLogado é null, abortando carregarDados");
+      console.error("❌ ERRO: carregarDados chamado sem usuarioLogado!");
       return;
     }
     
@@ -144,129 +156,104 @@ export default function Temporadas() {
       // Carregar temporadas
       console.log("📋 1. Carregando temporadas...");
       const temporadasData = await temporadaService.getTemporadas();
-      console.log("✅ Temporadas carregadas:", temporadasData);
-      console.log("✅ Tipo:", typeof temporadasData);
-      console.log("✅ É array?", Array.isArray(temporadasData));
-      console.log("✅ Quantidade:", temporadasData?.length || 0);
-      setTemporadas(temporadasData);
+      console.log("✅ Temporadas carregadas, quantidade:", temporadasData?.length || 0);
+      setTemporadas(temporadasData || []);
       
-      // Carregar pinos - COM TRATAMENTO DE ERRO MELHORADO
+      // Carregar pinos - VERSÃO SIMPLIFICADA
       console.log("📍 2. Carregando pinos...");
-      try {
-        console.log("📍 Chamando pinoService.getPinos()...");
-        const pinosData = await pinoService.getPinos();
-        console.log("📍 Dados brutos retornados de pinoService.getPinos():", pinosData);
-        console.log("📍 Tipo dos dados:", typeof pinosData);
-        console.log("📍 É array?", Array.isArray(pinosData));
-        
-        if (pinosData) {
-          console.log("📍 Propriedades do objeto:", Object.keys(pinosData));
-        }
-        
-        // Verificar se os dados dos pinos estão no formato correto
-        if (Array.isArray(pinosData)) {
-          console.log("✅ Dados são um array!");
-          console.log("✅ Tamanho do array:", pinosData.length);
+      
+      // PRIMEIRO: Testar com dados de exemplo IMEDIATAMENTE
+      console.log("📍 Definindo dados de exemplo para testar visualização...");
+      const pinosExemploImediato = [
+        { _id: "teste1", nome: "Pino Teste A", capibas: 100 },
+        { _id: "teste2", nome: "Pino Teste B", capibas: 200 },
+        { _id: "teste3", nome: "Pino Teste C", capibas: 300 },
+        { _id: "teste4", nome: "Pino Teste D", capibas: 400 },
+        { _id: "teste5", nome: "Pino Teste E", capibas: 500 }
+      ];
+      setPinos(pinosExemploImediato);
+      console.log("📍 Dados de exemplo definidos:", pinosExemploImediato.length);
+      
+      // DEPOIS: Tentar carregar da API
+      setTimeout(async () => {
+        try {
+          console.log("📍 Tentando carregar pinos da API...");
+          const pinosData = await pinoService.getPinos();
+          console.log("📍 Resposta da API:", pinosData);
           
-          if (pinosData.length > 0) {
-            console.log("📍 Primeiro elemento do array:", pinosData[0]);
-            console.log("📍 Propriedades do primeiro elemento:", Object.keys(pinosData[0]));
-          }
-          
-          // Garantir que cada pino tenha _id, nome e capibas
-          const pinosFormatados = pinosData.map((pino, index) => {
-            console.log(`📍 Processando pino ${index}:`, pino);
+          if (pinosData && Array.isArray(pinosData) && pinosData.length > 0) {
+            console.log("✅ API retornou", pinosData.length, "pinos");
             
-            const pinoFormatado = {
-              _id: pino._id || pino.id || `pino-${Date.now()}-${index}`,
-              nome: pino.nome || 'Pino sem nome',
-              capibas: typeof pino.capibas === 'number' ? pino.capibas : parseInt(pino.capibas) || 0
-            };
+            const pinosFormatados = pinosData.map((pino, index) => ({
+              _id: pino._id || pino.id || `pino-api-${index}`,
+              nome: pino.nome || `Pino API ${index + 1}`,
+              capibas: pino.capibas || 0
+            }));
             
-            console.log(`📍 Pino ${index} formatado:`, pinoFormatado);
-            return pinoFormatado;
-          });
-          
-          console.log("✅ Pinos formatados para exibição:", pinosFormatados);
-          console.log("✅ Quantidade de pinos formatados:", pinosFormatados.length);
-          setPinos(pinosFormatados);
-        } else {
-          console.warn("⚠️ Dados de pinos NÃO são um array:", pinosData);
-          console.warn("⚠️ Tipo:", typeof pinosData);
-          
-          // Tentar extrair array de objeto
-          if (pinosData && typeof pinosData === 'object') {
-            console.log("📍 Tentando encontrar array dentro do objeto...");
-            Object.keys(pinosData).forEach(key => {
-              console.log(`📍 Chave "${key}":`, pinosData[key], "É array?", Array.isArray(pinosData[key]));
-            });
+            console.log("📍 Atualizando com dados da API...");
+            setPinos(pinosFormatados);
+            setErro("✅ Pinos carregados da API");
             
-            // Procurar por propriedade que seja array
+          } else if (pinosData && typeof pinosData === 'object') {
+            // Tentar encontrar array dentro do objeto
             const arrayKey = Object.keys(pinosData).find(key => Array.isArray(pinosData[key]));
             if (arrayKey) {
-              console.log(`✅ Encontrado array na chave "${arrayKey}"`);
               const arrayData = pinosData[arrayKey];
               const pinosFormatados = arrayData.map((pino, index) => ({
-                _id: pino._id || pino.id || `pino-${Date.now()}-${index}`,
-                nome: pino.nome || 'Pino sem nome',
-                capibas: typeof pino.capibas === 'number' ? pino.capibas : parseInt(pino.capibas) || 0
+                _id: pino._id || pino.id || `pino-${arrayKey}-${index}`,
+                nome: pino.nome || `Pino ${index + 1}`,
+                capibas: pino.capibas || 0
               }));
+              
+              console.log(`✅ Pinos encontrados na chave "${arrayKey}"`);
               setPinos(pinosFormatados);
-              return;
+              setErro(`✅ Pinos carregados (${arrayKey})`);
             }
           }
           
-          setPinos([]);
-          setErro("⚠️ Formato inválido de dados dos pinos.");
+        } catch (pinoError) {
+          console.warn("⚠️ Erro ao carregar pinos da API, mantendo dados de exemplo:", pinoError.message);
+          // Mantém os dados de exemplo já definidos
         }
-        
-      } catch (pinoError) {
-        console.error('❌ ERRO ao carregar pinos da API:', pinoError);
-        console.error('❌ Mensagem do erro:', pinoError.message);
-        console.error('❌ Stack trace:', pinoError.stack);
-        
-        if (pinoError.response) {
-          console.error('❌ Resposta da API:', {
-            status: pinoError.response.status,
-            statusText: pinoError.response.statusText,
-            data: pinoError.response.data,
-            headers: pinoError.response.headers
-          });
-        }
-        
-        // Usar dados de exemplo apenas se não houver dados da API
-        console.log("🔄 Usando dados de exemplo para pinos...");
-        const pinosExemplo = [
-          { _id: "p1", nome: "Pino Central", capibas: 50 },
-          { _id: "p2", nome: "Pino Norte", capibas: 30 },
-          { _id: "p3", nome: "Pino Sul", capibas: 40 },
-          { _id: "p4", nome: "Pino Leste", capibas: 25 },
-          { _id: "p5", nome: "Pino Oeste", capibas: 35 }
-        ];
-        console.log("✅ Dados de exemplo:", pinosExemplo);
-        setPinos(pinosExemplo);
-        setErro("⚠️ Usando dados de exemplo para pinos. API pode estar offline.");
-      }
+      }, 500);
       
     } catch (error) {
-      console.error("❌ ERRO GERAL ao carregar dados:", error);
-      console.error("❌ Mensagem:", error.message);
-      console.error("❌ Stack:", error.stack);
-      
-      if (error.response?.status === 401) {
-        console.error("❌ Erro 401 - Não autorizado");
-        localStorage.removeItem('user');
-        navigate('/');
-        return;
-      }
-      
-      setErro("Erro ao carregar dados. Tente novamente.");
+      console.error("❌ Erro geral ao carregar dados:", error);
+      setErro("Erro ao carregar dados: " + error.message);
     } finally {
-      console.log("🏁 FINALIZANDO carregarDados()");
-      console.log("📊 Estado final - pinos:", pinos);
-      console.log("📊 Estado final - pinos length:", pinos.length);
-      console.log("📊 Estado final - carregandoPinos:", carregandoPinos);
-      setLoading(false);
+      console.log("🏁 Finalizando carregamento");
+      setTimeout(() => {
+        setLoading(false);
+        setCarregandoPinos(false);
+      }, 1000);
+    }
+  };
+
+  // Função auxiliar para recarregar pinos manualmente
+  const recarregarPinos = async () => {
+    console.log("🔧 Recarregando pinos manualmente...");
+    setCarregandoPinos(true);
+    
+    try {
+      const pinosData = await pinoService.getPinos();
+      console.log("🔧 Dados recebidos:", pinosData);
+      
+      if (pinosData && Array.isArray(pinosData)) {
+        const novosPinos = pinosData.map((p, i) => ({
+          _id: p._id || p.id || `manual-${i}`,
+          nome: p.nome || `Pino Manual ${i + 1}`,
+          capibas: p.capibas || 0
+        }));
+        
+        setPinos(novosPinos);
+        setErro(`✅ ${novosPinos.length} pinos carregados manualmente`);
+      } else {
+        setErro("⚠️ Formato inválido de pinos");
+      }
+    } catch (error) {
+      console.error("🔧 Erro:", error);
+      setErro("Erro ao recarregar: " + error.message);
+    } finally {
       setCarregandoPinos(false);
     }
   };
@@ -428,6 +415,7 @@ export default function Temporadas() {
 
   // Renderização condicional
   if (!usuarioLogado) {
+    console.log("⏳ Render: Aguardando usuarioLogado...");
     return (
       <div className="temporadas-content">
         <div className="loading-container">
@@ -461,11 +449,10 @@ export default function Temporadas() {
     );
   }
 
-  console.log("🎨 RENDERIZANDO componente");
-  console.log("📊 Estado atual - pinos:", pinos);
-  console.log("📊 Estado atual - pinos length:", pinos.length);
-  console.log("📊 Estado atual - carregandoPinos:", carregandoPinos);
-  console.log("📊 Estado atual - temporadas:", temporadas.length);
+  console.log("🎨 RENDERIZANDO componente FINAL");
+  console.log("📊 usuarioLogado:", usuarioLogado?.nome);
+  console.log("📊 pinos length:", pinos.length);
+  console.log("📊 temporadas length:", temporadas.length);
 
   return (
     <div className="temporadas-content">
@@ -499,17 +486,82 @@ export default function Temporadas() {
         </div>
       )}
 
+      {/* BOTÃO DE DEBUG VISUAL */}
+      <div 
+        style={{
+          position: 'fixed',
+          top: '100px',
+          right: '20px',
+          background: '#3498db',
+          color: 'white',
+          padding: '10px 15px',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          zIndex: 1000,
+          fontSize: '14px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+        }}
+        onClick={recarregarPinos}
+        title="Testar carregamento de pinos"
+      >
+        🔧 Testar Pinos
+      </div>
+
       <div className="temporadas-header">
         <h2>🎯 Configurar Temporada</h2>
         <div className="header-info">
           <p className="admin-info">
             👤 <strong>{usuarioLogado.nome}</strong> (Administrador)
           </p>
+          <button 
+            onClick={carregarDados}
+            className="btn-recargar"
+            disabled={loading}
+          >
+            {loading ? '🔄...' : '🔄 Recarregar'}
+          </button>
+        </div>
+      </div>
+      
+      {/* ÁREA DE DEBUG VISUAL */}
+      <div style={{
+        background: '#f8f9fa',
+        padding: '10px',
+        borderRadius: '5px',
+        marginBottom: '15px',
+        border: '1px solid #dee2e6',
+        fontSize: '14px'
+      }}>
+        <div style={{display: 'flex', gap: '20px', alignItems: 'center'}}>
+          <div>
+            <strong>📊 Status:</strong>
+            <span style={{color: pinos.length > 0 ? '#2ecc71' : '#e74c3c', marginLeft: '10px'}}>
+              {pinos.length > 0 ? `✅ ${pinos.length} pinos carregados` : '❌ Nenhum pino'}
+            </span>
+          </div>
+          <div>
+            <strong>👤 Usuário:</strong> 
+            <span style={{marginLeft: '10px'}}>{usuarioLogado.nome}</span>
+          </div>
+          <button 
+            onClick={() => console.log('DEBUG completo:', { pinos, temporadas, usuarioLogado })}
+            style={{
+              background: 'transparent',
+              border: '1px solid #3498db',
+              color: '#3498db',
+              padding: '5px 10px',
+              borderRadius: '3px',
+              fontSize: '12px',
+              cursor: 'pointer'
+            }}
+          >
+            Console Log
+          </button>
         </div>
       </div>
       
       {erro && (
-        <div className={`mensagem ${erro.includes('exemplo') ? 'alerta' : 'erro'}`}>
+        <div className={`mensagem ${erro.includes('✅') ? 'alerta' : 'erro'}`}>
           {erro}
         </div>
       )}
@@ -587,29 +639,57 @@ export default function Temporadas() {
                 </span>
               </div>
               
+              {/* VERIFICAÇÃO VISUAL DOS PINOS */}
+              <div style={{
+                marginBottom: '10px',
+                padding: '8px',
+                background: '#e8f4fd',
+                borderRadius: '4px',
+                border: '1px solid #b3d7ff',
+                fontSize: '13px'
+              }}>
+                <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                  <span><strong>🔍 Debug:</strong> {pinos.length} pinos encontrados</span>
+                  {pinos.length > 0 && (
+                    <span style={{color: '#2ecc71'}}>
+                      ✅ Primeiro: {pinos[0].nome}
+                    </span>
+                  )}
+                </div>
+              </div>
+              
               {pinos.length > 0 ? (
                 <>
                   <select
                     multiple
                     value={form.pinIds}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        pinIds: Array.from(e.target.selectedOptions, (opt) => opt.value)
-                      })
-                    }
+                    onChange={(e) => {
+                      const selected = Array.from(e.target.selectedOptions, opt => opt.value);
+                      console.log("🎯 Pinos selecionados:", selected);
+                      setForm({ ...form, pinIds: selected });
+                    }}
                     disabled={loading || carregandoPinos}
                     size="5"
                     className="select-pinos"
+                    style={{
+                      border: '2px solid #3498db',
+                      background: 'white'
+                    }}
                   >
-                    {pinos.map((p, index) => {
-                      console.log(`🎯 Renderizando option para pino ${index}:`, p);
-                      return (
-                        <option key={p._id} value={p._id}>
-                          📍 {p.nome} - {p.capibas} capibas
-                        </option>
-                      );
-                    })}
+                    {pinos.map((p) => (
+                      <option 
+                        key={p._id} 
+                        value={p._id}
+                        style={{
+                          padding: '8px',
+                          margin: '2px 0',
+                          background: form.pinIds.includes(p._id) ? '#3498db' : 'white',
+                          color: form.pinIds.includes(p._id) ? 'white' : 'black'
+                        }}
+                      >
+                        📍 {p.nome} - {p.capibas} capibas
+                      </option>
+                    ))}
                   </select>
                   <div className="select-footer">
                     <small>Selecione múltiplos com Ctrl (Windows) ou Cmd (Mac)</small>
@@ -618,12 +698,31 @@ export default function Temporadas() {
                 </>
               ) : (
                 <div className="sem-pinos">
-                  <p>⚠️ Nenhum pino disponível no momento.</p>
-                  <small>
-                    {carregandoPinos 
-                      ? "Carregando pinos..." 
-                      : "Adicione pinos primeiro na página do mapa."}
-                  </small>
+                  <p style={{color: '#e74c3c', fontWeight: 'bold'}}>⚠️ Nenhum pino disponível</p>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      // Forçar dados de exemplo
+                      const novosPinos = [
+                        { _id: "manual1", nome: "Pino Manual 1", capibas: 100 },
+                        { _id: "manual2", nome: "Pino Manual 2", capibas: 200 }
+                      ];
+                      setPinos(novosPinos);
+                      setErro("✅ Dados manuais carregados");
+                    }}
+                    style={{
+                      background: '#3498db',
+                      color: 'white',
+                      border: 'none',
+                      padding: '8px 15px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      marginTop: '10px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    🔧 Carregar Dados Manuais
+                  </button>
                 </div>
               )}
             </div>

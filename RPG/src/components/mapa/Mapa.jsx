@@ -1,3 +1,5 @@
+// Mapa.jsx - Código otimizado
+
 import "../../css/mapa.css";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -49,19 +51,30 @@ export default function Mapa() {
   const [atualizandoLocalizacao, setAtualizandoLocalizacao] = useState(false);
   
   // Estado de tarefas concluídas
-  const [tarefasConcluidas, setTarefasConcluidas] = useState(new Set());
+  const [tarefasConcluidas, setTarefasConcluidas] = useState(new Map());
 
   const watchIdRef = useRef(null);
   const { pinos, loading, error, fetchPinos, addPino, removePino, updatePino } = usePinosManagement();
 
   // Verifica autenticação ao carregar
   useEffect(() => {
+    console.log("🔍 Verificando autenticação...");
     const userData = authService.getUser();
+    
     if (userData) {
       setUser(userData);
-      setIsAdmin(authService.isAdmin());
+      const adminStatus = authService.isAdmin();
+      console.log("👑 É admin?", adminStatus);
+      setIsAdmin(adminStatus);
+      
+      // Carrega tarefas concluídas do usuário
       if (userData.tarefasConcluidas) {
-        setTarefasConcluidas(new Set(userData.tarefasConcluidas));
+        const tarefasMap = new Map();
+        userData.tarefasConcluidas.forEach(id => {
+          tarefasMap.set(id, true);
+        });
+        console.log("✅ Tarefas concluídas carregadas:", tarefasMap.size);
+        setTarefasConcluidas(tarefasMap);
       }
     }
     setIsCheckingAuth(false);
@@ -72,12 +85,21 @@ export default function Mapa() {
     try {
       const userData = authService.getUser();
       if (userData?.id) {
+        console.log("🔄 Atualizando dados do usuário:", userData.id);
         const usuarioAtualizado = await clienteService.getCliente(userData.id);
         if (usuarioAtualizado.user) {
           setUser(usuarioAtualizado.user);
+          
+          // Atualiza tarefas concluídas
           if (usuarioAtualizado.user.tarefasConcluidas) {
-            setTarefasConcluidas(new Set(usuarioAtualizado.user.tarefasConcluidas));
+            const novasTarefas = new Map();
+            usuarioAtualizado.user.tarefasConcluidas.forEach(id => {
+              novasTarefas.set(id, true);
+            });
+            console.log("🆕 Atualizando tarefas concluídas:", novasTarefas.size);
+            setTarefasConcluidas(novasTarefas);
           }
+          
           authService.updateUserData(usuarioAtualizado.user);
         }
       }
@@ -86,10 +108,15 @@ export default function Mapa() {
     }
   }, []);
 
-  // Verifica se tarefa já foi concluída
-  const isTarefaConcluida = useCallback((pinoId) => {
-    return tarefasConcluidas.has(pinoId);
-  }, [tarefasConcluidas]);
+  // Função para marcar tarefa como concluída
+  const marcarTarefaComoConcluida = useCallback((pinoId) => {
+    console.log(`📝 Marcando tarefa ${pinoId} como concluída`);
+    setTarefasConcluidas(prev => {
+      const novoMap = new Map(prev);
+      novoMap.set(pinoId, true);
+      return novoMap;
+    });
+  }, []);
 
   // Solicita permissão de localização
   useEffect(() => {
@@ -107,8 +134,7 @@ export default function Mapa() {
           setMensagemLocalizacao("📍 Usando localização padrão. Ative o GPS para melhor precisão.");
           setTimeout(() => setMensagemLocalizacao(""), 5000);
         }
-      // eslint-disable-next-line no-unused-vars
-      } catch (error) {
+      } catch (error) { // eslint-disable-line no-unused-vars
         setPermissaoLocalizacao(false);
         setMensagemLocalizacao("📍 Permissão necessária. Clique em 'Atualizar' quando permitir.");
         
@@ -186,7 +212,10 @@ export default function Mapa() {
 
   // Busca pinos após verificação de autenticação
   useEffect(() => {
-    if (!isCheckingAuth) fetchPinos();
+    if (!isCheckingAuth) {
+      console.log("🗺️ Buscando pinos do mapa...");
+      fetchPinos();
+    }
   }, [isCheckingAuth, fetchPinos]);
 
   // Handlers para operações com pinos
@@ -226,18 +255,21 @@ export default function Mapa() {
     [isAdmin]
   );
 
-  // Confirma atividade no pino (valida localização e marca tarefa)
+  // Função otimizada para confirmar atividade
   const confirmarAtividade = async (pino) => {
-    const userData = authService.getUser();
-    if (!userData?.id) {
-      setMensagemLocalizacao("❌ Você precisa estar logado para confirmar atividades.");
+    const pinoId = pino._id;
+    
+    // VERIFICAÇÃO RÁPIDA - Se já está concluída, não faz nada
+    if (tarefasConcluidas.has(pinoId)) {
+      const mensagem = isAdmin ? "✅ Tarefa já testada!" : "✅ Tarefa já concluída!";
+      setMensagemLocalizacao(mensagem);
+      setTimeout(() => setMensagemLocalizacao(""), 3000);
       return;
     }
 
-    // Verifica se tarefa já foi concluída
-    if (isTarefaConcluida(pino._id)) {
-      setMensagemLocalizacao("✅ Você já completou esta tarefa!");
-      setTimeout(() => setMensagemLocalizacao(""), 3000);
+    const userData = authService.getUser();
+    if (!userData?.id) {
+      setMensagemLocalizacao("❌ Você precisa estar logado para confirmar atividades.");
       return;
     }
 
@@ -248,11 +280,12 @@ export default function Mapa() {
     }
 
     // Obtém localização atual se não disponível
-    if (!localizacaoUsuario) {
+    let coordsParaValidar = localizacaoUsuario;
+    if (!coordsParaValidar) {
       setMensagemLocalizacao("Obtendo localização atual...");
       try {
-        const coords = await localizacaoService.solicitarLocalizacao();
-        setLocalizacaoUsuario(coords);
+        coordsParaValidar = await localizacaoService.solicitarLocalizacao();
+        setLocalizacaoUsuario(coordsParaValidar);
       } catch (error) {
         setMensagemLocalizacao(error.message);
         return;
@@ -268,41 +301,73 @@ export default function Mapa() {
     try {
       // Valida proximidade do usuário com o pino
       const validacao = await localizacaoService.validarProximidadePino(
-        localizacaoUsuario.latitude,
-        localizacaoUsuario.longitude,
-        pino._id,
+        coordsParaValidar.latitude,
+        coordsParaValidar.longitude,
+        pinoId,
         50 // raio em metros
       );
 
       if (!validacao.valid) {
         setMensagemLocalizacao(`❌ Você está a ${validacao.distancia.metros}m do local. Aproxime-se!`);
         setValidandoLocalizacao(false);
+
+        // 👉 MENSAGEM SOME APÓS 2 SEGUNDOS
+        setTimeout(() => {
+          setMensagemLocalizacao("");
+        }, 2000);
+
         return;
       }
 
       setMensagemLocalizacao("✅ Localização validada! Concluindo tarefa...");
 
-      // Marca tarefa como concluída
       const capibasRecompensa = Number(pino.capibas) || 0;
       
       if (isAdmin) {
-        await adminService.concluirTarefa(userData.id, pino._id);
-        setMensagemLocalizacao("✅ Tarefa testada com sucesso! (Modo Admin)");
+        try {
+          await adminService.concluirTarefa(userData.id, pinoId, capibasRecompensa);
+          setMensagemLocalizacao("✅ Tarefa testada com sucesso!");
+          // MARCA IMEDIATAMENTE COMO TESTADA
+          marcarTarefaComoConcluida(pinoId);
+        } catch (adminError) {
+          if (adminError.message.includes("Tarefa já testada")) {
+            setMensagemLocalizacao("✅ Tarefa já foi testada anteriormente");
+            // MARCA COMO TESTADA MESMO SE JÁ FOI
+            marcarTarefaComoConcluida(pinoId);
+          } else {
+            setMensagemLocalizacao(`❌ ${adminError.message || "Erro ao testar tarefa"}`);
+          }
+        }
       } else {
-        await clienteService.concluirTarefa(userData.id, pino._id, capibasRecompensa);
-        await atualizarDadosUsuario();
-        setMensagemLocalizacao(`🎉 Parabéns! Você ganhou ${capibasRecompensa} capibas!`);
-        setTarefasConcluidas(prev => new Set([...prev, pino._id]));
+        try {
+          await clienteService.concluirTarefa(userData.id, pinoId, capibasRecompensa);
+          await atualizarDadosUsuario();
+          setMensagemLocalizacao(`🎉 Parabéns! Você ganhou ${capibasRecompensa} capibas!`);
+          // MARCA IMEDIATAMENTE COMO CONCLUÍDA
+          marcarTarefaComoConcluida(pinoId);
+        } catch (clienteError) {
+          if (clienteError.message.includes("Tarefa já concluída")) {
+            setMensagemLocalizacao("✅ Você já completou esta tarefa anteriormente!");
+            // MARCA COMO CONCLUÍDA MESMO SE JÁ FOI
+            marcarTarefaComoConcluida(pinoId);
+            // Sincroniza com servidor após 1 segundo
+            setTimeout(() => {
+              atualizarDadosUsuario();
+            }, 1000);
+          } else {
+            setMensagemLocalizacao(`❌ ${clienteError.message || "Erro ao concluir tarefa"}`);
+          }
+        }
       }
 
-      setTimeout(() => setMensagemLocalizacao(""), 5000);
+      setTimeout(() => setMensagemLocalizacao(""), 2000);
 
     } catch (error) {
       console.error('Erro ao confirmar atividade:', error);
       
       if (error.message.includes("Tarefa já concluída")) {
         setMensagemLocalizacao("✅ Você já completou esta tarefa anteriormente!");
-        setTarefasConcluidas(prev => new Set([...prev, pino._id]));
+        marcarTarefaComoConcluida(pinoId);
       } else {
         setMensagemLocalizacao(`❌ ${error.message || "Erro ao confirmar atividade. Tente novamente."}`);
       }
@@ -444,20 +509,22 @@ export default function Mapa() {
           )}
 
           {/* Pinos existentes no mapa */}
-          {pinosValidos.map((pino) => (
+          {pinosValidos.map((pino) => {
+          const pinoId = pino._id;
+          const tarefaConcluida = tarefasConcluidas.has(pinoId);
+          
+          return (
             <Marker
-              key={pino._id || pino.id}
-              // Leaflet usa [lat, lng] mas GeoJSON é [lng, lat] - invertemos a ordem
+              key={pinoId || pino.id}
               position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}
               eventHandlers={{ click: () => onPinoClick(pino) }}
-              //icon={defaultIcon}
             >
               <Popup>
                 <div className="modal"> 
                   <h3 className="mensagem">{pino.nome}</h3>
 
                   {/* Upload de foto */}
-                  <label htmlFor={`foto-${pino._id || pino.id}`}>
+                  <label htmlFor={`foto-${pinoId}`}>
                     <img
                       className="imagem"
                       src="/src/assets/AdicionarFoto.png"
@@ -474,7 +541,7 @@ export default function Mapa() {
                   </label>
                   <input
                     type="file"
-                    id={`foto-${pino._id || pino.id}`}
+                    id={`foto-${pinoId}`}
                     accept="image/*"
                     title="Enviar Foto"
                     className="inputFoto"
@@ -484,20 +551,43 @@ export default function Mapa() {
                   <p className="mensagem">{pino.msg}</p>
                   <p className="mensagem"><strong>Recompensa: {pino.capibas || 0} capibas</strong></p>
 
+                  {/* Feedback visual para tarefa concluída */}
+                  {tarefaConcluida && (
+                    <div className="tarefa-concluida-badge">
+                      <div className="badge-icon">
+                        {isAdmin ? '🧪' : '🏆'}
+                      </div>
+                      <div className="badge-text">
+                        {isAdmin ? 'Tarefa já testada' : 'Tarefa já concluída'}
+                      </div>
+                      {!isAdmin && pino.capibas > 0 && (
+                        <div className="badge-subtext">
+                          +{pino.capibas} capibas recebidos
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Botão de confirmação */}
                   <button 
-                    className={`botaoConfirmar ${validandoLocalizacao ? 'loading' : ''} ${isTarefaConcluida(pino._id) ? 'concluida' : ''}`}
-                    onClick={() => confirmarAtividade(pino)}
-                    disabled={validandoLocalizacao || !permissaoLocalizacao || isTarefaConcluida(pino._id)}
+                    className={`botaoConfirmar ${validandoLocalizacao ? 'loading' : ''} ${tarefaConcluida ? 'concluida' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!tarefaConcluida) {
+                        confirmarAtividade(pino);
+                      }
+                    }}
+                    disabled={validandoLocalizacao || !permissaoLocalizacao || tarefaConcluida}
                   >
-                    {validandoLocalizacao ? '⏳ Validando...' :
-                     !permissaoLocalizacao ? '📍 Permitir Localização' :
-                     isTarefaConcluida(pino._id) ? 'Já Concluída' :
-                     'Confirmar Presença'}
+                    {validandoLocalizacao ? '⏳ Processando...' :
+                    !permissaoLocalizacao ? '📍 Permitir Localização' :
+                    tarefaConcluida ? 
+                      (isAdmin ? '✅ Tarefa Testada' : '✅ Tarefa Completada') :
+                      (isAdmin ? '🧪 Testar Tarefa' : '🎯 Confirmar Presença')}
                   </button>
 
-                  {/* Mensagens de status */}
-                  {mensagemLocalizacao && (
+                  {/* Mensagens de status temporárias */}
+                  {mensagemLocalizacao && !tarefaConcluida && (
                     <div className={`mensagem-status ${mensagemLocalizacao.includes('❌') ? 'erro' : mensagemLocalizacao.includes('✅') ? 'sucesso' : 'info'}`}>
                       {mensagemLocalizacao}
                     </div>
@@ -506,7 +596,8 @@ export default function Mapa() {
                 </div>
               </Popup>
             </Marker>
-          ))}
+          );
+        })}
         </MapContainer>
       </div>
 
