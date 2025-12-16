@@ -5,7 +5,8 @@ import Mapa from './components/mapa/Mapa.jsx'
 import TarefasCarrossel from './components/tarefas/tarefasCarrossel/TarefasCarrossel.jsx';
 import Navbar from './components/barra-superior/navbar/Navbar.jsx';
 import GerenciarUsers from './components/gerenciar-usuarios/GerenciarUsers.jsx';
-import Temporadas from './components/barra-superior/configurar-temporadas/Temporadas.jsx';
+import Temporadas from './components/configurar-temporadas/Temporadas.jsx';
+import Tutorial from './components/tutorial/Tutorial.jsx';
 import './css/App.css'
 
 function Home() {
@@ -13,7 +14,7 @@ function Home() {
 
   useEffect(() => {
     // Simula carregamento de dados
-    setTimeout(() => setCarregando(false), 2000);
+    setTimeout(() => setCarregando(false), 1700);
   }, []);
 
   return (
@@ -32,7 +33,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/tarefas" element={<TarefasCarrossel />} />
-        <Route path="/capibas" element={<div>Capibas aqui</div>} />
+        <Route path="/tutorial" element={<Tutorial />} />
         <Route path="/gerenciar" element={<GerenciarUsers />} />
         <Route path='/temporadas' element={<Temporadas />} />
       </Routes>

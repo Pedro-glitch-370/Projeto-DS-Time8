@@ -6,6 +6,7 @@ import UserMenu from "../menu/UserMenu";
 import SettingsMenu from "../menu/SettingsMenu";
 import { NavLink, useNavigate } from "react-router-dom";
 import { setAtualizarUsuarioLogado } from "../utils/userState";
+import { authService } from "../../../services/authService";
 import "../../../css/navbar.css";
 
 export default function Navbar() {
@@ -40,7 +41,7 @@ export default function Navbar() {
         <div className="meio">
             <NavLink to="/" className={({ isActive }) => isActive ? "ativo" : ""}>Mapa</NavLink>
             <NavLink to="/tarefas" className={({ isActive }) => isActive ? "ativo" : ""}>Minhas Tarefas</NavLink>
-            <NavLink to="/capibas" className={({ isActive }) => isActive ? "ativo" : ""}>Capibas</NavLink>
+            <NavLink to="/tutorial" className={({ isActive }) => isActive ? "ativo" : ""}>Tutorial</NavLink>
         </div>
 
         <div className="direita">
@@ -104,7 +105,7 @@ export default function Navbar() {
                 abaLoginAberta={loginPopupAberto}
                 onClose={() => setUserMenuAberto(false)}
                 onLogout={() => {
-                localStorage.removeItem("user");
+                authService.logout();
                 setUsuarioLogado(null);
                 }}
             />

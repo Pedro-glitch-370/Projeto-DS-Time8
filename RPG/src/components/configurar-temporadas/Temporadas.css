@@ -124,7 +124,7 @@ html {
 }
 
 /* ===== MENSAGENS ===== */
-.mensagem {
+.mensagem-temporadas {
   padding: 14px 18px;
   border-radius: var(--border-radius-sm);
   margin-bottom: 25px;

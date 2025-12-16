@@ -179,15 +179,15 @@ const GerenciarUsers = () => {
             {/* Stats */}
             <div className="stats-gerenciar">
             <div className="stat-card">
-                <div className="stat-number">{totalAdmins}</div>
+                <div className="stat-number-gerenciar">{totalAdmins}</div>
                 <div className="stat-label-gerenciar">Administradores</div>
             </div>
             <div className="stat-card">
-                <div className="stat-number">{totalClientes}</div>
+                <div className="stat-number-gerenciar">{totalClientes}</div>
                 <div className="stat-label-gerenciar">Clientes</div>
             </div>
             <div className="stat-card">
-                <div className="stat-number">{totalUsers}</div>
+                <div className="stat-number-gerenciar">{totalUsers}</div>
                 <div className="stat-label-gerenciar">Usuários ao Total</div>
             </div>
             </div>

@@ -79,7 +79,8 @@ export const temporadaService = {
       dataInicio: temporadaData.dataInicio,
       dataFim: temporadaData.dataFim,
       status: temporadaData.status,
-      pinIds: Array.isArray(temporadaData.pinIds) ? temporadaData.pinIds : []
+      pinIds: Array.isArray(temporadaData.pinIds) ? temporadaData.pinIds : [],
+      criadoPor: temporadaData.criadoPor
     };
   },
   

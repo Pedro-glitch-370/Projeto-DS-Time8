@@ -19,7 +19,7 @@ class TemporadaController {
     try {
       TemporadaController._logOperacao("criar temporada", req.body);
 
-      const { titulo, dataInicio, dataFim, pinIds = [] } = req.body;
+      const { titulo, dataInicio, dataFim, pinIds = [], criadoPor } = req.body;
 
       if (!titulo || !dataInicio || !dataFim) {
         return res.status(400).json({ message: "Título, dataInicio e dataFim são obrigatórios" });
@@ -31,7 +31,7 @@ class TemporadaController {
         dataFim,
         status: "agendado",
         pinIds,
-        criadoPor: req.user.id // tá certo?
+        criadoPor: criadoPor
       });
 
       const salva = await temporada.save();
@@ -51,6 +51,10 @@ class TemporadaController {
   // Listar as temporadas
   static async listarTemporadas(req, res) {
     try {
+      console.log("=====================")
+      console.log("Headers recebidos:", req.headers);
+      console.log("Body recebido:", req.body);
+      console.log("=====================")
       const temporadas = await Temporada.find().sort({ dataInicio: -1 });
       TemporadaController._logSucesso("listar temporadas", `${temporadas.length} encontradas`);
       res.json(temporadas);

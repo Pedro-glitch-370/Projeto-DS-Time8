@@ -58,26 +58,43 @@ export default function Mapa() {
 
   // Verifica autenticação ao carregar
   useEffect(() => {
-    console.log("🔍 Verificando autenticação...");
-    const userData = authService.getUser();
-    
-    if (userData) {
-      setUser(userData);
-      const adminStatus = authService.isAdmin();
-      console.log("👑 É admin?", adminStatus);
-      setIsAdmin(adminStatus);
+    const checkAuth = () => {
+      console.log("🔍 Verificando autenticação...");
+      const userData = authService.getUser();
       
-      // Carrega tarefas concluídas do usuário
-      if (userData.tarefasConcluidas) {
-        const tarefasMap = new Map();
-        userData.tarefasConcluidas.forEach(id => {
-          tarefasMap.set(id, true);
-        });
-        console.log("✅ Tarefas concluídas carregadas:", tarefasMap.size);
-        setTarefasConcluidas(tarefasMap);
+      if (userData) {
+        setUser(userData);
+        const adminStatus = authService.isAdmin();
+        console.log("👑 É admin?", adminStatus);
+        setIsAdmin(adminStatus);
+        
+        // Carrega tarefas concluídas do usuário
+        if (userData.tarefasConcluidas) {
+          const tarefasMap = new Map();
+          userData.tarefasConcluidas.forEach(id => {
+            tarefasMap.set(id, true);
+          });
+          console.log("✅ Tarefas concluídas carregadas:", tarefasMap.size);
+          setTarefasConcluidas(tarefasMap);
+        }
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+        setTarefasConcluidas(new Map());
       }
-    }
-    setIsCheckingAuth(false);
+      setIsCheckingAuth(false);
+    };
+
+    // Primeira execução
+    checkAuth();
+
+    // Escuta mudanças no usuário
+    console.log(`ANTES DA SEGUNDA`);
+    console.log(authService.isAdmin());
+    window.addEventListener("userChanged", checkAuth);
+
+    // Limpa o listener ao desmontar
+    return () => window.removeEventListener("userChanged", checkAuth);
   }, []);
 
   // Atualiza dados do usuário (capibas e tarefas)
@@ -87,6 +104,7 @@ export default function Mapa() {
       if (userData?.id) {
         console.log("🔄 Atualizando dados do usuário:", userData.id);
         const usuarioAtualizado = await clienteService.getCliente(userData.id);
+
         if (usuarioAtualizado.user) {
           setUser(usuarioAtualizado.user);
           
@@ -100,7 +118,7 @@ export default function Mapa() {
             setTarefasConcluidas(novasTarefas);
           }
           
-          authService.updateUserData(usuarioAtualizado.user);
+          authService.setUser(usuarioAtualizado.user);
         }
       }
     } catch (error) {
@@ -479,7 +497,9 @@ export default function Mapa() {
                     Lng: {localizacaoUsuario.longitude.toFixed(6)}
                   </small>
                   {localizacaoUsuario.precisao && (
+                   <div>
                     <small>Precisão: ~{Math.round(localizacaoUsuario.precisao)} metros</small>
+                   </div>
                   )}
                 </div>
               </Popup>
@@ -537,7 +557,6 @@ export default function Mapa() {
                         e.target.parentNode.appendChild(fallback);
                       }}
                     />
-                    <span style={{ fontSize: '0.8rem', color: '#666' }}>Clique para adicionar foto</span>
                   </label>
                   <input
                     type="file"

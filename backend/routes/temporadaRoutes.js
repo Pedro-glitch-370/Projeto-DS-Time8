@@ -1,18 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const TemporadaController = require("../controllers/temporadaController");
-const { isAuthenticated, isAdmin } = require("../auth");
 
 // ================== ROTAS DE ADMIN ==================
 
 // POST - Criar nova temporada
-router.post("/", isAuthenticated, isAdmin, TemporadaController.criarTemporada);
+router.post("/", TemporadaController.criarTemporada);
 
 // GET - Listar todas as temporadas
-router.get("/", isAuthenticated, isAdmin, TemporadaController.listarTemporadas);
+router.get("/", TemporadaController.listarTemporadas);
 
 // DELETE - Excluir uma temporada
-router.delete("/:id", isAuthenticated, isAdmin, TemporadaController.deletarTemporada);
+router.delete("/:id", TemporadaController.deletarTemporada);
 
 // ================== ROTAS PÚBLICAS/JOGADORES ==================
 

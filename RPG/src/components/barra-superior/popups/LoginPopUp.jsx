@@ -52,7 +52,7 @@ export default function LoginPopup({ onClose, onLoginSuccess, abrirRegistro }) {
       // fecha popup
       setTimeout(() => {
         onClose();
-      }, 3000);
+      }, 1500);
       
     } catch (error) {
       setMensagemErro(error.message || "Erro ao fazer login. Tente novamente.");

@@ -13,10 +13,11 @@ const connectDB = async () => {
   try {
     // Pega a URI de conexão, utilizando uma variável de ambiente ou um valor padrão
     const MONGODB_URI =
-      process.env.MONGODB_URI || "mongodb://localhost:27017/RPG"
+      process.env.MONGODB_URI || "mongodb+srv://pedroh7brito_db_user:Ew1L1igsu2ixWkVs@naxron.hba9ufc.mongodb.net/"
     //"mongodb+srv://pedroh7brito_db_user:Ew1L1igsu2ixWkVs@naxron.hba9ufc.mongodb.net/"
     //"mongodb+srv://acsj2_db_user:aaaa@cluster0.02dncab.mongodb.net/"
     //"mongodb://localhost:27017/RPG"
+    //"mongodb://127.0.0.1:27017/RPG"
 
     // Conecta ao MongoDB usando Mongoose
     const connection = await mongoose.connect(MONGODB_URI)
