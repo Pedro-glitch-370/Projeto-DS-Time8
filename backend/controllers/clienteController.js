@@ -1,5 +1,6 @@
 const Cliente = require("../models/clienteModel");
 const Grupo = require("../models/grupoModel");
+const Pino = require("../models/pinoModel");
 
 // ================== CONTROLADOR CLIENTE ==================
 
@@ -229,10 +230,13 @@ class ClienteController {
      */
     static async concluirTarefa(req, res) {
         try {
+            console.log("REQ BODY:", req.body);
+            console.log("REQ PARAMS:", req.params);
             const { id } = req.params;
-            const { tarefaId, capibas } = req.body;
+            const { tarefaId, capibas, fotoLink, descricaoConclusao } = req.body;
 
             console.log(`🎯 Cliente ${id} concluindo tarefa ${tarefaId} por ${capibas} capibas`);
+            console.log(`📸 Dados extras: fotoLink=${fotoLink}, descricao=${descricaoConclusao?.substring(0, 50)}...`);
 
             // Validar dados obrigatórios
             if (!tarefaId || capibas === undefined) {
@@ -243,6 +247,12 @@ class ClienteController {
             const cliente = await Cliente.findById(id);
             if (!cliente) {
                 return res.status(404).json({ message: "Cliente não encontrado" });
+            }
+
+            // Buscar o pino (tarefa) pelo ID
+            const pino = await Pino.findById(tarefaId);
+            if (!pino) {
+                return res.status(404).json({ message: "Tarefa (pino) não encontrada" });
             }
 
             // Inicializar array de tarefas concluídas se não existir
@@ -260,7 +270,24 @@ class ClienteController {
                 });
             }
 
-            // Adicionar tarefa à lista de concluídas
+            // Inicializar array de conclusões se não existir
+            if (!pino.conclusoes) {
+                pino.conclusoes = [];
+            }
+
+            // Adicionar nova conclusão ao pino
+            pino.conclusoes.push({
+                cliente: id,
+                dataConclusao: new Date(),
+                fotoLink: fotoLink || "",
+                descricaoConclusao: descricaoConclusao || ""
+            });
+
+            // Salvar o pino atualizado
+            await pino.save();
+            console.log(`✅ Dados extras salvos no pino ${tarefaId}`);
+
+            // Adicionar tarefa à lista de concluídas do cliente
             cliente.tarefasConcluidas.push(tarefaId);
             
             // Incrementar contador de tarefas completas
@@ -289,7 +316,12 @@ class ClienteController {
                 message: "Tarefa concluída com sucesso", 
                 capibas: cliente.capibas,
                 tarefasCompletas: cliente.tarefasCompletas,
-                tarefasConcluidas: cliente.tarefasConcluidas 
+                tarefasConcluidas: cliente.tarefasConcluidas,
+                dadosSalvos: {
+                    fotoLink: fotoLink || "",
+                    descricaoConclusao: descricaoConclusao || "",
+                    dataConclusao: new Date()
+                }
             });
 
         } catch (error) {

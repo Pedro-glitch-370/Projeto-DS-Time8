@@ -23,4 +23,7 @@ router.get("/available", async (req, res) => {
   await PinoController.getPinosDisponiveis(req, res);
 });
 
+// GET - Buscar conclusões de um pino
+router.get("/:id/conclusoes", PinoController.buscarConclusoesPino);
+
 module.exports = router

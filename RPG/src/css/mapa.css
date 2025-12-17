@@ -48,7 +48,7 @@ html, body, #root {
    ESTILOS DO POPUP (CENTRALIZADO)
    ================================================== */
 
-.mensagem {
+.mensagem-modal {
   color: #1449c0;
   margin: 4px 0;
   line-height: 1.2;
@@ -62,14 +62,14 @@ html, body, #root {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 200px;
+  width: 180px;
   padding: 8px;
   text-align: center;
   gap: 4px;
   margin: 0 auto;
 }
 
-.modal h3.mensagem {
+.modal h3.mensagem-modal {
   font-size: 0.95rem;
   font-weight: bold;
   margin-bottom: 6px;
@@ -79,28 +79,61 @@ html, body, #root {
 }
 
 /* Upload da foto centralizado */
-.modal label {
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 2px dashed #1449c0;
+.novos-campos {
+  margin: 12px auto;
+  padding: 8px;
+  background: #f8f9fa;
   border-radius: 6px;
-  width: 80px;
-  height: 80px;
+  border-left: 3px solid #4CAF50;
+  width: 100%;
   text-align: center;
 }
 
-.imagem {
-  width: 55px;
-  height: 55px;
-  object-fit: contain;
-  opacity: 0.7;
+.campo-form {
+  margin-bottom: 10px;
+  width: 100%;
+  text-align: center;
 }
 
-.inputFoto {
-  display: none;
+.campo-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.8rem;
+  text-align: center;
+  width: 100%;
+}
+
+.campo-input,
+.campo-textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  transition: border-color 0.3s;
+  text-align: center;
+}
+
+.campo-input:focus,
+.campo-textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+}
+
+.campo-textarea {
+  resize: vertical;
+  min-height: 50px;
+}
+
+/* Placeholders centralizados */
+.campo-input::placeholder,
+.campo-textarea::placeholder {
+  text-align: center;
+  color: #888;
+  font-size: 0.75rem;
 }
 
 /* ==================================================
@@ -401,17 +434,18 @@ html, body, #root {
 }
 
 /* ==================================================
-   CORREÇÃO DO ALINHAMENTO DO LEAFLET POPUP
+   ALINHAMENTO DO LEAFLET POPUP
    ================================================== */
 .leaflet-popup-content {
   margin: 8px !important;
   text-align: center !important;
-  width: auto !important;
+  width: 200px !important;
 }
 
 .leaflet-popup-content-wrapper {
   text-align: center !important;
   border-radius: 8px !important;
+  padding: 6px !important;
 }
 
 /* ==================================================
@@ -439,11 +473,11 @@ html, body, #root {
   }
   
   .modal {
-    width: 180px;
+    width: 160px;
     padding: 6px;
   }
   
-  .mensagem {
+  .mensagem-modal {
     font-size: 0.8rem;
   }
   
@@ -451,6 +485,20 @@ html, body, #root {
     padding: 7px 10px;
     font-size: 0.7rem;
     min-height: 34px;
+  }
+
+  .novos-campos {
+    padding: 6px;
+  }
+
+  .campo-form label {
+    font-size: 0.75rem;
+  }
+
+  .campo-input,
+  .campo-textarea {
+    font-size: 0.75rem;
+    padding: 5px 6px;
   }
   
   .status-localizacao {
@@ -466,13 +514,17 @@ html, body, #root {
     height: calc(100vh - 70px);
     margin-top: 70px;
   }
+
+  .leaflet-popup-content {
+    width: 180px !important;
+  }
   
   .modal {
     width: 160px;
     padding: 4px;
   }
   
-  .mensagem {
+  .mensagem-modal {
     font-size: 0.75rem;
   }
   
@@ -496,6 +548,30 @@ html, body, #root {
   .status-message {
     font-size: 0.7rem;
   }
+
+  .novos-campos {
+    padding: 5px;
+    margin: 8px auto;
+  }
+
+  .campo-form {
+    margin-bottom: 8px;
+  }
+
+  .campo-form label {
+    font-size: 0.7rem;
+  }
+
+  .campo-input,
+  .campo-textarea {
+    font-size: 0.7rem;
+    padding: 4px 5px;
+  }
+
+  .campo-textarea {
+    min-height: 40px;
+  }
+
 }
 
 /* ==================================================
@@ -641,4 +717,67 @@ html, body, #root {
 
 .status-inactive {
   color: #dc3545;
+}
+
+/* ==================================================
+   BADGE DE TAREFA CONCLUÍDA
+   ================================================== */
+.tarefa-concluida-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: #d4edda;
+  border-radius: 6px;
+  margin: 8px 0;
+  text-align: center;
+  width: 100%;
+}
+
+.badge-icon {
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.badge-text {
+  font-weight: bold;
+  color: #155724;
+  font-size: 0.8rem;
+  margin-bottom: 2px;
+}
+
+.badge-subtext {
+  font-size: 0.7rem;
+  color: #28a745;
+}
+
+/* ==================================================
+   INFORMAÇÕES DO USUÁRIO (CAPIBAS E TAREFAS)
+   ================================================== */
+.user-capibas-info {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.capibas-counter, .tarefas-counter {
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #1449c0;
+}
+
+.capibas-icon, .tarefas-icon {
+  font-size: 1rem;
 }

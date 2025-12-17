@@ -209,11 +209,19 @@ class PinoController {
    */
   static async getTodosPinos(req, res) {
     try {
-      const pinos = await Pino.find().sort({ createdAt: -1 }).populate('usuario', 'nome');
+      const pinos = await Pino.find()
+      .sort({ createdAt: -1 })
+      .populate('usuario', 'nome')
+      .populate('conclusoes.cliente', 'nome email');
       
       PinoController._logSucesso('buscar pinos', `${pinos.length} pinos encontrados`);
       
-      res.json(pinos);
+      res.json(
+      pinos.map(p => ({
+        ...p.toObject(),
+        conclusoes: p.conclusoes || []
+      }))
+    );
     } catch (err) {
       PinoController._logErro('buscar pinos no Controller', err);
       
@@ -514,11 +522,48 @@ class PinoController {
       console.error("❌ Erro ao buscar pinos disponíveis:", err);
       res.status(500).json({ message: "Erro interno ao buscar pinos disponíveis" });
     }
-  }  
-}
+  } 
+  
+  /**
+   * Buscar conclusões de um pino específico
+   * @param {Object} req - Objeto da requisição
+   * @param {Object} res - Objeto da resposta
+   */
+  static async buscarConclusoesPino(req, res) {
+    try {
+      const { id } = req.params;
 
-// ==================================================
-// Exporta a classe PinoController
-// ==================================================
+      // Validar ID
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ 
+          message: "ID do pino inválido" 
+        });
+      }
+
+      const pino = await Pino.findById(id)
+        .populate('conclusoes.cliente', 'nome email')
+        .select('conclusoes nome');
+
+      if (!pino) {
+        return res.status(404).json({ 
+          message: "Pino não encontrado" 
+        });
+      }
+
+      res.json({
+        pinoId: pino._id,
+        nome: pino.nome,
+        totalConclusoes: pino.conclusoes?.length || 0,
+        conclusoes: pino.conclusoes || []
+      });
+
+    } catch (error) {
+      console.error("❌ Erro ao buscar conclusões do pino:", error);
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao buscar conclusões" 
+      });
+    }
+  }
+}
 
 module.exports = PinoController;

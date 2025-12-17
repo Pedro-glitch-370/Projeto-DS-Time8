@@ -23,7 +23,13 @@ const PinoSchema = new Schema({
   capibas: { type: Number, required: true, default: 0, min: 0}, // capibas iniciais do pino
   usuario: { type: Schema.Types.ObjectId, ref: "Admins" },
   grupo: { type: Schema.Types.ObjectId, ref: "Grupo" }, // O pino pertence a um grupo? (Opcional)
-  createdAt: {type: Date, default: Date.now} // Data de criação do pino, sempre salva o a data atual
+  createdAt: {type: Date, default: Date.now}, // Data de criação do pino, sempre salva o a data atual
+  conclusoes: [{
+    cliente: { type: Schema.Types.ObjectId, ref: "Cliente" }, // Quem concluiu
+    dataConclusao: { type: Date, default: Date.now }, // Quando concluiu
+    fotoLink: { type: String, default: "" }, // Link da foto
+    descricaoConclusao: { type: String, default: "" } // Descrição do que foi feito
+  }]
 })
 
 // Índice para buscas geográficas
