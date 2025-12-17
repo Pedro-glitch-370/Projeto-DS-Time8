@@ -15,6 +15,7 @@ export const temporadaService = {
   // Criar nova temporada
   async criarTemporada(temporadaData) {
     try {
+      console.log(temporadaData);
       const response = await api.post('/temporadas', temporadaData);
       return response.data;
     } catch (error) {
@@ -26,6 +27,7 @@ export const temporadaService = {
   // Atualizar temporada
   async atualizarTemporada(id, dadosAtualizados) {
     try {
+      console.log(dadosAtualizados);
       const response = await api.patch(`/temporadas/${id}`, dadosAtualizados);
       return response.data;
     } catch (error) {
@@ -46,7 +48,7 @@ export const temporadaService = {
   },
   
   // Validações e formatações (mantenha as funções originais)
-  validarTemporada(temporadaData) {
+  async validarTemporada(temporadaData) {
     const erros = [];
     
     if (!temporadaData.titulo?.trim()) {
@@ -67,6 +69,17 @@ export const temporadaService = {
       
       if (inicio >= fim) {
         erros.push('A data de início deve ser anterior à data de fim');
+      }
+    }
+
+    if (temporadaData.status == "ativo") {
+      const temporadasExistentes = await this.getTemporadas();
+      console.log(`AQUIIIIIIIIIIIIIIII`)
+      console.log(temporadasExistentes)
+      const jaAtiva = temporadasExistentes.find(t => t.status === "ativo");
+      console.log(jaAtiva)
+      if (jaAtiva) {
+        erros.push("Já existe uma temporada ativa. Encerre-a antes de criar outra.");
       }
     }
     

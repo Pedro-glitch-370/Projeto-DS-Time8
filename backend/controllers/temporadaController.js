@@ -19,7 +19,7 @@ class TemporadaController {
     try {
       TemporadaController._logOperacao("criar temporada", req.body);
 
-      const { titulo, dataInicio, dataFim, pinIds = [], criadoPor } = req.body;
+      const { titulo, dataInicio, status, dataFim, pinIds = [], criadoPor } = req.body;
 
       if (!titulo || !dataInicio || !dataFim) {
         return res.status(400).json({ message: "Título, dataInicio e dataFim são obrigatórios" });
@@ -29,14 +29,14 @@ class TemporadaController {
         titulo,
         dataInicio,
         dataFim,
-        status: "agendado",
+        status,
         pinIds,
         criadoPor: criadoPor
       });
 
       const salva = await temporada.save();
 
-      TemporadaController._logSucesso("criar temporada", { id: salva._id, titulo: salva.titulo });
+      TemporadaController._logSucesso("criar temporada", { id: salva._id, titulo: salva.titulo, status: salva.status });
 
       res.status(201).json({
         message: "Temporada criada com sucesso",
@@ -51,11 +51,10 @@ class TemporadaController {
   // Listar as temporadas
   static async listarTemporadas(req, res) {
     try {
-      console.log("=====================")
-      console.log("Headers recebidos:", req.headers);
-      console.log("Body recebido:", req.body);
-      console.log("=====================")
-      const temporadas = await Temporada.find().sort({ dataInicio: -1 });
+      const temporadas = await Temporada.find()
+      .sort({ dataInicio: -1 })
+      .populate("pinIds");
+      
       TemporadaController._logSucesso("listar temporadas", `${temporadas.length} encontradas`);
       res.json(temporadas);
     } catch (err) {
@@ -107,6 +106,30 @@ class TemporadaController {
     } catch (err) {
       console.error("❌ Erro ao deletar temporada:", err);
       res.status(500).json({ message: "Erro interno ao deletar temporada" });
+    }
+  }
+
+  // Atualizar temporada
+  static async atualizarTemporada(req, res) {
+    try {
+      const { id } = req.params;
+      const dadosAtualizados = req.body;
+
+      // Atualiza apenas os campos enviados
+      const temporada = await Temporada.findByIdAndUpdate(
+        id,
+        { $set: dadosAtualizados },
+        { new: true, runValidators: true }
+      );
+
+      if (!temporada) {
+        return res.status(404).json({ error: "Temporada não encontrada" });
+      }
+
+      res.json(temporada);
+    } catch (error) {
+      console.error("❌ Erro ao atualizar temporada:", error);
+      res.status(500).json({ error: "Erro interno ao atualizar temporada" });
     }
   }
 

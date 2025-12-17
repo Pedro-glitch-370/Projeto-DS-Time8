@@ -13,7 +13,7 @@ export default function Temporadas() {
   const [pinIds, setPinIds] = useState([]);
   const [pinos, setPinos] = useState([]);
   const [temporadas, setTemporadas] = useState([]);
-  //const [temporadaAtual, setTemporadaAtual] = useState(null);
+  const [temporadaAtual, setTemporadaAtual] = useState(null);
   const [mensagem, setMensagem] = useState("");
 
   const navigate = useNavigate();
@@ -39,18 +39,29 @@ export default function Temporadas() {
         const pinosData = await pinoService.getPinos();
         setPinos(pinosData);
 
-        //const temporadasData = await temporadaService.getTemporadas();
-        //setTemporadas(temporadasData);
+        const temporadasData = await temporadaService.getTemporadas();
+        setTemporadas(temporadasData);
 
         // Buscar temporada atual
-        //const atual = temporadasData.find(t => t.status === "ativo");
-        //setTemporadaAtual(atual || null);
+        const atual = temporadasData.find(t => t.status === "ativo");
+        setTemporadaAtual(atual || null);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       }
     };
     carregarDados();
   }, [navigate]);
+
+  useEffect(() => {
+  if (mensagem) {
+    const timer = setTimeout(() => {
+      setMensagem("");
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }
+}, [mensagem]);
+
 
   // Criar temporada
   const handleCriarTemporada = async (e) => {
@@ -68,7 +79,7 @@ export default function Temporadas() {
       criadoPor: adminId
     };
 
-    const erros = temporadaService.validarTemporada(novaTemporada);
+    const erros = await temporadaService.validarTemporada(novaTemporada);
     if (erros.length > 0) {
       setMensagem(erros.join(" | "));
       return;
@@ -83,6 +94,10 @@ export default function Temporadas() {
       const temporadasData = await temporadaService.getTemporadas();
       setTemporadas(temporadasData);
 
+      // Atualiza a temporada atual
+      const atual = temporadasData.find(t => t.status === "ativo");
+      setTemporadaAtual(atual || null);
+
       // Limpa formulário
       setTitulo("");
       setDataInicio("");
@@ -93,6 +108,30 @@ export default function Temporadas() {
       setMensagem("❌ Erro ao criar temporada: ", error);
     }
   };
+
+  const handleAtivar = async (id) => {
+    try {
+      // Desativa a temporada atual
+      if (temporadaAtual) {
+        await temporadaService.atualizarTemporada(temporadaAtual._id, { status: "agendado" });
+      }
+
+      // Ativa a temporada escolhida
+      await temporadaService.atualizarTemporada(id, { status: "ativo" });
+
+      // Atualiza lista e estado
+      const temporadasData = await temporadaService.getTemporadas();
+      setTemporadas(temporadasData);
+
+      const atual = temporadasData.find(t => t.status === "ativo");
+      setTemporadaAtual(atual || null);
+
+      setMensagem("✅ Temporada ativada com sucesso!");
+    } catch (error) {
+      setMensagem("❌ Erro ao ativar temporada: " + (error.message || ""));
+    }
+  };
+
 
   // Deletar temporada
   const handleDeletar = async (id) => {
@@ -115,7 +154,10 @@ export default function Temporadas() {
 
   return (
     <div className="temporadas-container">
-      <h2>Criar Temporada</h2>
+      <div className="header-temporadas">
+        <h2>Configurar Temporadas</h2>
+      </div>
+      
       <form onSubmit={handleCriarTemporada}>
         <input
           type="text"
@@ -123,6 +165,10 @@ export default function Temporadas() {
           value={titulo}
           onChange={(e) => setTitulo(e.target.value)}
         />
+        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+          <option value="agendado">Agendado</option>
+          <option value="ativo">Ativo</option>
+        </select>
         <input
           type="date"
           value={dataInicio}
@@ -133,10 +179,6 @@ export default function Temporadas() {
           value={dataFim}
           onChange={(e) => setDataFim(e.target.value)}
         />
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="agendado">Agendado</option>
-          <option value="ativo">Ativo</option>
-        </select>
 
         <h4>Selecionar Pinos</h4>
         {pinos.map((pino) => (
@@ -158,32 +200,53 @@ export default function Temporadas() {
           {mensagem}
         </p>}
 
-      <h3>Temporada Atual</h3>
-      {/*temporadaAtual ? (
-        <div>
-          <p>{temporadaAtual.titulo}</p>
-          <p>
-            {new Date(temporadaAtual.dataInicio).toLocaleDateString("pt-BR")} -{" "}
-            {new Date(temporadaAtual.dataFim).toLocaleDateString("pt-BR")}
-          </p>
-          <p>Status: {temporadaAtual.status}</p>
-        </div>
-      ) : (
-        <p>Nenhuma temporada ativa</p>
-      )*/}
+      <div className="temporadas-existentes">
+        <h3>Temporada Atual</h3>
+        {temporadaAtual ? (
+          <div className="temporada-item">
+            <h1><strong>{temporadaAtual.titulo}</strong></h1>
+            <p>
+              {new Date(temporadaAtual.dataInicio).toLocaleDateString("pt-BR")} -{" "}
+              {new Date(temporadaAtual.dataFim).toLocaleDateString("pt-BR")}
+            </p>
+            <p>Status: {temporadaAtual.status}</p>
+          </div>
+        ) : (
+          <p>Nenhuma temporada ativa</p>
+        )}
 
-      <h3>Temporadas Existentes</h3>
-      {temporadas.map((t) => (
-        <div key={t._id} className="temporada-item">
-          <p>{t.titulo}</p>
-          <p>
-            {new Date(t.dataInicio).toLocaleDateString("pt-BR")} -{" "}
-            {new Date(t.dataFim).toLocaleDateString("pt-BR")}
-          </p>
-          <p>Status: {t.status}</p>
-          <button onClick={() => handleDeletar(t._id)}>Deletar</button>
-        </div>
-      ))}
+        <h3>Temporadas Existentes</h3>
+        {temporadas.map((t) => (
+          <div key={t._id} className="temporada-item">
+            <h1><strong>{t.titulo}</strong></h1>
+            <p>
+              {new Date(t.dataInicio).toLocaleDateString("pt-BR")} -{" "}
+              {new Date(t.dataFim).toLocaleDateString("pt-BR")}
+            </p>
+            <p>Status: {t.status}</p>
+            {t.pinIds && t.pinIds.length > 0 && (
+              <div className="pinos-lista">
+                <p>Pinos:</p>
+                <ul>
+                  {t.pinIds.map((pino) => (
+                    <li key={pino._id}>{pino.nome || pino._id} {console.log(pino)}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {t.status !== "ativo" ? (
+                <>
+                  <button className="btn-ativar-temp" onClick={() => handleAtivar(t._id)}>Ativar</button>
+                  <button className="btn-deletar-temp" onClick={() => handleDeletar(t._id)}>Deletar</button>
+                </>
+              ) : (
+                <button className="btn-deletar-temp" onClick={() => handleDeletar(t._id)}>Deletar</button>
+              )}
+          </div>
+        ))}
+      </div>
+      
     </div>
   );
 }

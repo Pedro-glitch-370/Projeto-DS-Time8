@@ -1,69 +1,171 @@
-/* Temporadas.css */
-
 .temporadas-container {
-  margin-top: 70px;
-  max-width: 600px;
-  max-height: 400px;
-  padding: 1.5rem;
-  background: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  font-family: Arial, sans-serif;
+  max-width: 100%;
+  margin: 15px;
+  margin-top: 80px;
   overflow-y: auto;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', sans-serif;
+  scroll-behavior: smooth;
+  color: #333;
 }
 
-.temporadas-container h2,
-.temporadas-container h3,
-.temporadas-container h4 {
-  margin-bottom: 0.75rem;
+.temporadas-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.temporadas-container::-webkit-scrollbar-thumb {
+  background: var(--primary-blue);
+  border-radius: 4px;
+}
+
+.temporadas-container h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #333;
+}
+
+.temporadas-container h3 {
+  font-size: 1.4rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
   color: #333;
 }
 
 .temporadas-container form {
+  padding-top: 2.5rem;
+  padding-bottom: 1.5rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem 2rem;
 }
 
 .temporadas-container input[type="text"],
 .temporadas-container input[type="date"],
 .temporadas-container select {
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #fdfdfd;
+  width: 100%;
+}
+
+.temporadas-container h4 {
+  grid-column: 1 / -1;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  color: #444;
 }
 
 .temporadas-container label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
 }
 
-.temporadas-container button {
-  padding: 0.6rem 1rem;
-  background-color: #007bff;
+.temporadas-container button[type="submit"] {
+  grid-column: 1 / -1;
+  justify-self: center;
+  padding: 0.9rem;
+  background-color: #28a745;
+  min-width: 50%;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   color: white;
+  font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
-.temporadas-container button:hover {
-  background-color: #0056b3;
+.temporadas-container button[type="submit"]:hover {
+  background-color: #218838;
 }
 
-.temporadas-container p {
+.temporadas-container .temporada-item {
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+}
+
+.temporadas-container .temporada-item p {
   margin: 0.25rem 0;
+  font-size: 0.95rem;
+}
+
+.temporadas-container .temporada-item h1 {
+  margin: 0.25rem 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.btn-deletar-temp {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-deletar-temp:hover {
+  background-color: #c82333;
+}
+
+.btn-ativar-temp {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #2e9e68;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.btn-ativar-temp:hover {
+  background-color: #2F7854;
+}
+
+.header-temporadas {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 4px solid #667eea;
+}
+
+.header-temporadas h2 {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
 }
 
 .mensagem {
-  margin: 1rem 0;
+  grid-column: 1 / -1;
   padding: 0.75rem;
-  border-radius: 4px;
+  border-radius: 8px;
   font-weight: bold;
+  text-align: center;
+  font-size: 1rem;
+  margin-left: 25%;
+  margin-right: 25%;
 }
 
 .mensagem.sucesso {
@@ -76,10 +178,36 @@
   color: #721c24;
 }
 
-.temporada-item {
-  padding: 0.75rem;
-  margin-bottom: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: #fff;
+.temporadas-existentes {
+  padding-bottom: 1.5rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.pinos-lista {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.pinos-lista p {
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+}
+
+.pinos-lista ul {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pinos-lista li {
+  background-color: rgb(100, 255, 180, 0.25);
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #2F7854;
 }

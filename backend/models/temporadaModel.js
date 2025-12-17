@@ -12,8 +12,8 @@ const temporadaSchema = new Schema(
       enum: ["agendado", "ativo", "encerrado"],
       default: "agendado"
     },
-    pinIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Pin", default: [] }],
-    criadoPor: { type: String, required: true } // Melhorar isso depois
+    pinIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "pinos", default: [] }],
+    criadoPor: { type: String, required: true }
   },
   { timestamps: true }
 );

@@ -4,14 +4,17 @@ const TemporadaController = require("../controllers/temporadaController");
 
 // ================== ROTAS DE ADMIN ==================
 
-// POST - Criar nova temporada
-router.post("/", TemporadaController.criarTemporada);
-
 // GET - Listar todas as temporadas
 router.get("/", TemporadaController.listarTemporadas);
 
+// POST - Criar nova temporada
+router.post("/", TemporadaController.criarTemporada);
+
 // DELETE - Excluir uma temporada
 router.delete("/:id", TemporadaController.deletarTemporada);
+
+// PATCH - Atualizar parcialmente
+router.patch("/:id", TemporadaController.atualizarTemporada);
 
 // ================== ROTAS PÚBLICAS/JOGADORES ==================
 
