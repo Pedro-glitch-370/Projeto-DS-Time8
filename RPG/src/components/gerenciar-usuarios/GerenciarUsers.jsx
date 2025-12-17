@@ -229,7 +229,7 @@ const GerenciarUsers = () => {
                             <div className="user-info-card">
                             <div className="user-name">{admin.nome}</div>
                             <div className="user-email">📧 {admin.email}</div>
-                            <div className="user-details">
+                            <div className="user-details-gerenciar">
                                 <span className="user-type admin">👑 Administrador</span>
                                 <span className="user-stats">
                                 🛠️ {admin.permissoes ? admin.permissoes.length : 0} permissões
@@ -266,7 +266,7 @@ const GerenciarUsers = () => {
                             <div className="user-info-card">
                             <div className="user-name">{cliente.nome}</div>
                             <div className="user-email">📧 {cliente.email}</div>
-                            <div className="user-details">
+                            <div className="user-details-gerenciar">
                                 <span className="user-type cliente">👤 Cliente</span>
                                 <span className="user-stats">🪙 {cliente.capibas || 0} capibas</span>
                                 {cliente.tarefasCompletas && (

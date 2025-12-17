@@ -51,7 +51,7 @@ font-weight: 600;
 margin: 0;
 }
 
-.user-info {
+.user-info-gerenciar {
 grid-column: 3;
 text-align: right;
 }
@@ -228,7 +228,7 @@ margin-bottom: 0.75rem;
 font-size: 1rem;
 }
 
-.user-details {
+.user-details-gerenciar {
 display: flex;
 flex-wrap: wrap;
 }
@@ -471,7 +471,7 @@ transform: translateY(-2px);
     text-align: center;
 }
 
-.user-info {
+.user-info-gerenciar {
     text-align: center;
 }
 

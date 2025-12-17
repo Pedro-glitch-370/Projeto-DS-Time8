@@ -1,4 +1,5 @@
 const Cliente = require("../models/clienteModel");
+const Grupo = require("../models/grupoModel");
 
 // ================== CONTROLADOR CLIENTE ==================
 
@@ -78,8 +79,11 @@ class ClienteController {
             }
 
             // Buscar cliente pelo email
-            const cliente = await Cliente.findOne({ email });
-            console.log("🔍 DEBUG: Cliente encontrado:", cliente);
+            const cliente = await Cliente.findOne({ email }).populate({
+                path: 'grupo',
+                populate: { path: 'membros', select: 'nome capibas' } 
+            });
+            console.log("🔍 DEBUG: Cliente encontrado:", cliente ? cliente.email : "Não encontrado");
             
             if (!cliente) {
                 return res.status(400).json({ message: "Cliente não encontrado. Faça o registro primeiro." });
@@ -101,6 +105,7 @@ class ClienteController {
                     senha: cliente.senha,
                     tipo: 'cliente',
                     capibas: cliente.capibas,
+                    grupo: cliente.grupo,
                     tarefasCompletas: cliente.tarefasCompletas,
                     tarefasConcluidas: cliente.tarefasConcluidas || []
                 }
@@ -122,7 +127,7 @@ class ClienteController {
     static async listarClientes(req, res) {
         try {
             console.log("📋 Buscando todos os clientes...");
-            const clientes = await Cliente.find({}, { nome: 1, senha: 1, email: 1, capibas: 1, tipo: 1, tarefasCompletas: 1 });
+            const clientes = await Cliente.find({}, { nome: 1, senha: 1, email: 1, capibas: 1, tipo: 1, tarefasCompletas: 1, grupo: 1 });
             console.log(`✅ ${clientes.length} clientes encontrados`);
             res.json(clientes);
         } catch (error) {
@@ -142,7 +147,11 @@ class ClienteController {
 
             console.log("🔍 Buscando cliente por email:", email);
 
-            const cliente = await Cliente.findOne({ email });
+            const cliente = await Cliente.findOne({ email }).populate({
+                path: 'grupo',
+                populate: { path: 'membros', select: 'nome capibas' }
+            });
+
             if (!cliente) {
                 return res.status(404).json({ message: "Cliente não encontrado" });
             }
@@ -157,6 +166,7 @@ class ClienteController {
                     senha: cliente.email,
                     tipo: 'cliente',
                     capibas: cliente.capibas,
+                    grupo: cliente.grupo,
                     tarefasCompletas: cliente.tarefasCompletas,
                     tarefasConcluidas: cliente.tarefasConcluidas || []
                 }
@@ -179,7 +189,11 @@ class ClienteController {
 
             console.log("🔍 Buscando cliente por ID:", id);
 
-            const cliente = await Cliente.findById(id);
+            const cliente = await Cliente.findById(id).populate({
+                path: 'grupo',
+                populate: { path: 'membros', select: 'nome capibas' }
+            });
+
             if (!cliente) {
                 return res.status(404).json({ message: "Cliente não encontrado" });
             }
@@ -194,6 +208,7 @@ class ClienteController {
                     senha: cliente.senha,
                     tipo: 'cliente',
                     capibas: cliente.capibas,
+                    grupo: cliente.grupo,
                     tarefasCompletas: cliente.tarefasCompletas,
                     tarefasConcluidas: cliente.tarefasConcluidas || []
                 }
@@ -253,6 +268,18 @@ class ClienteController {
             
             // Adicionar capibas ao saldo do cliente
             cliente.capibas = (cliente.capibas || 0) + capibas;
+
+            // Se o usuário tem grupo, o grupo também ganha os pontos
+            if (cliente.grupo) {
+                try {
+                    await Grupo.findByIdAndUpdate(cliente.grupo, {
+                        $inc: { pontuacaoTotal: capibas }
+                    });
+                    console.log(`🆙 Grupo do usuário atualizado com +${capibas} pontos`);
+                } catch (errGrupo) {
+                    console.error("Erro ao atualizar grupo:", errGrupo);
+                }
+            }
             
             await cliente.save();
             

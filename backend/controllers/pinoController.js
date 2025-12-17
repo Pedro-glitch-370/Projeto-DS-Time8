@@ -116,7 +116,7 @@ class PinoController {
   /**
    * Formata dados do pino para salvar no banco
    */
-  static _formatarPinoParaBanco(dados, lng, lat) {
+  static _formatarPinoParaBanco(dados, lng, lat, userId) {
     return {
       nome: dados.nome?.trim(),
       msg: dados.msg?.trim(),
@@ -124,7 +124,9 @@ class PinoController {
       localizacao: {
         type: "Point",
         coordinates: [lng, lat]
-      }
+      },
+      usuario: userId || null, // Se não tiver ID, salva como null (Anônimo/Sistema)
+      grupo: dados.grupoId || null
     };
   }
 
@@ -171,7 +173,7 @@ class PinoController {
       console.log("📍 Coordenadas processadas:", { longitude: lng, latitude: lat });
 
       // Criar e salvar pino
-      const dadosPino = PinoController._formatarPinoParaBanco(req.body, lng, lat);
+      const dadosPino = PinoController._formatarPinoParaBanco(req.body, lng, lat, null);
       const novoPino = new Pino(dadosPino);
       const pinoSalvo = await novoPino.save();
 
@@ -207,7 +209,7 @@ class PinoController {
    */
   static async getTodosPinos(req, res) {
     try {
-      const pinos = await Pino.find().sort({ createdAt: -1 });
+      const pinos = await Pino.find().sort({ createdAt: -1 }).populate('usuario', 'nome');
       
       PinoController._logSucesso('buscar pinos', `${pinos.length} pinos encontrados`);
       
@@ -383,7 +385,7 @@ class PinoController {
 
       PinoController._logOperacao('buscar pino por ID', { id });
 
-      const pino = await Pino.findById(id);
+      const pino = await Pino.findById(id).populate('usuario', 'nome');
       
       if (!pino) {
         return res.status(404).json({ 
@@ -454,7 +456,7 @@ class PinoController {
             $maxDistance: radius
           }
         }
-      });
+      }).populate('usuario', 'nome');
 
       PinoController._logSucesso('buscar pinos por proximidade', {
         encontrados: pinos.length,

@@ -1,4 +1,3 @@
-/* Popup de Registro */
 .popup-register {
   display: flex;
   position: fixed;
@@ -21,6 +20,23 @@
   max-width: 400px;
   position: relative;
   animation: slideUp 0.3s ease;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+/* Estilo da barra de rolagem */
+.popup-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.popup-content::-webkit-scrollbar-thumb {
+  background: var(--primary-blue);
+  border-radius: 4px;
+}
+
+.popup-content::-webkit-scrollbar-track {
+  background: #e9ecef;
+  border-radius: 4px;
 }
 
 /* Títulos */

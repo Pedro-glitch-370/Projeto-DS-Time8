@@ -1,5 +1,3 @@
-// Mapa.jsx - Código otimizado
-
 import "../../css/mapa.css";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";

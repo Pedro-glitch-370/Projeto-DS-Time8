@@ -12,7 +12,14 @@ const validarLocalizacaoRouter = require("./routes/validarLocalizacaoRouter.js")
 const solicitacaoRoutes = require("./routes/solicitacaoRoutes.js")
 const temporadaRoutes = require("./routes/temporadaRoutes.js")
 const usuariosRoutes = require("./routes/usuariosRoutes.js");
+const grupoRoutes = require('./routes/grupoRoutes');
 /*quando criar novas rotas, adicionar aqui*/
+
+try {
+    require('./services/cronService');
+} catch (e) {
+    console.log("Aviso: cronService não encontrado ou com erro. A distribuição mensal não rodará.");
+}
 
 // ==================================================
 // Define a porta onde o servidor vai rodar
@@ -23,9 +30,9 @@ const PORT = process.env.PORT || 5001
 const initializeDatabase = async () => {
   try {
     await connectDB()
-    console.log("🗄️ Banco de dados inicializado com sucesso!")
+    console.log("Banco de dados inicializado com sucesso!")
   } catch (error) {
-    console.error("❌ Falha ao inicializar o banco de dados:", error)
+    console.error("Falha ao inicializar o banco de dados:", error)
     process.exit(1)
   }
 };
@@ -45,6 +52,7 @@ app.use("/api/auth/clientes", clienteRoutes)
 app.use("/api/auth/admins", adminRoutes)
 app.use("/api/temporadas", temporadaRoutes);
 app.use("/api/usuarios", usuariosRoutes);
+app.use('/api/grupos', grupoRoutes);
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -62,6 +70,7 @@ const startServer = async () => {
       console.log(`URL: http://localhost:${PORT}/api/solicitacoes`) // rota que pega todos os solicitacoes do mongoDB
       console.log(`URL: http://localhost:${PORT}/api/auth/clientes/`) // listar clientes
       console.log(`URL: http://localhost:${PORT}/api/auth/admins/`) // listar admins
+      console.log(`URL: http://localhost:${PORT}/api/grupos/`) // listar grupos
       console.log(`Banco de dados: ${getDBStatus().connected ? "Conectado" : "Desconectado"}`); // Indica se o banco de dados foi conectado
       console.log("=".repeat(50))
     })
