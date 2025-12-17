@@ -202,13 +202,13 @@ const GerenciarUsers = () => {
                     className={`tab ${activeTab === "admins" ? "active" : ""}`}
                     onClick={() => openTab("admins")}
                 >
-                    👨‍💼 Administradores
+                    Administradores
                 </button>
                 <button
                     className={`tab ${activeTab === "clientes" ? "active" : ""}`}
                     onClick={() => openTab("clientes")}
                 >
-                    👥 Clientes
+                    Clientes
                 </button>
             </div>
 
