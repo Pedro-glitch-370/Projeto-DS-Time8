@@ -271,8 +271,96 @@ export default function Mapa() {
     [isAdmin]
   );
 
+  // Componente interno para os campos de foto e descrição
+  const PinoPopupContent = ({ pino, pinoId, tarefaConcluida }) => {
+    // Estados locais para os campos de formulário
+    const [fotoLink, setFotoLink] = useState('');
+    const [descricaoConclusao, setDescricaoConclusao] = useState('');
+
+    return (
+      <div className="modal"> 
+        <h3 className="mensagem">{pino.nome}</h3>
+
+        {/* Descrição e recompensa */}
+        <p className="mensagem">{pino.msg}</p>
+        <p className="mensagem"><strong>Recompensa: {pino.capibas || 0} capibas</strong></p>
+
+        {/* NOVOS CAMPOS - APENAS QUANDO NÃO É ADMIN E TAREFA NÃO CONCLUÍDA */}
+        {!isAdmin && !tarefaConcluida && (
+          <div className="novos-campos">
+            <div className="campo-form">
+              <label htmlFor={`foto-link-${pinoId}`}>Link da Foto (Instagram/Facebook)</label>
+              <input
+                type="url"
+                id={`foto-link-${pinoId}`}
+                placeholder="https://instagram.com/p/..."
+                value={fotoLink}
+                onChange={(e) => setFotoLink(e.target.value)}
+                className="campo-input"
+              />
+            </div>
+            
+            <div className="campo-form">
+              <label htmlFor={`descricao-${pinoId}`}>O que você fez?</label>
+              <textarea
+                id={`descricao-${pinoId}`}
+                placeholder="Descreva como completou a missão..."
+                value={descricaoConclusao}
+                onChange={(e) => setDescricaoConclusao(e.target.value)}
+                className="campo-textarea"
+                rows="3"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Feedback visual para tarefa concluída */}
+        {tarefaConcluida && (
+          <div className="tarefa-concluida-badge">
+            <div className="badge-icon">
+              {isAdmin ? '🧪' : '🏆'}
+            </div>
+            <div className="badge-text">
+              {isAdmin ? 'Tarefa já testada' : 'Tarefa já concluída'}
+            </div>
+            {!isAdmin && pino.capibas > 0 && (
+              <div className="badge-subtext">
+                +{pino.capibas} capibas recebidos
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Botão de confirmação - ATUALIZADO PARA ENVIAR OS NOVOS DADOS */}
+        <button 
+          className={`botaoConfirmar ${validandoLocalizacao ? 'loading' : ''} ${tarefaConcluida ? 'concluida' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!tarefaConcluida) {
+              confirmarAtividade(pino, fotoLink, descricaoConclusao);
+            }
+          }}
+          disabled={validandoLocalizacao || !permissaoLocalizacao || tarefaConcluida}
+        >
+          {validandoLocalizacao ? '⏳ Processando...' :
+          !permissaoLocalizacao ? '📍 Permitir Localização' :
+          tarefaConcluida ? 
+            (isAdmin ? '✅ Tarefa Testada' : '✅ Tarefa Completada') :
+            (isAdmin ? '🧪 Testar Tarefa' : '🎯 Confirmar Presença')}
+        </button>
+
+        {/* Mensagens de status temporárias */}
+        {mensagemLocalizacao && !tarefaConcluida && (
+          <div className={`mensagem-status ${mensagemLocalizacao.includes('❌') ? 'erro' : mensagemLocalizacao.includes('✅') ? 'sucesso' : 'info'}`}>
+            {mensagemLocalizacao}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Função otimizada para confirmar atividade
-  const confirmarAtividade = async (pino) => {
+  const confirmarAtividade = async (pino, fotoLink = '', descricaoConclusao = '') => {
     const pinoId = pino._id;
     
     // VERIFICAÇÃO RÁPIDA - Se já está concluída, não faz nada
@@ -356,7 +444,14 @@ export default function Mapa() {
         }
       } else {
         try {
-          await clienteService.concluirTarefa(userData.id, pinoId, capibasRecompensa);
+          // 👉 ENVIA OS NOVOS CAMPOS PARA O BACKEND
+          await clienteService.concluirTarefa(
+            userData.id, 
+            pinoId, 
+            capibasRecompensa,
+            fotoLink,         // Novo campo
+            descricaoConclusao // Novo campo
+          );
           await atualizarDadosUsuario();
           setMensagemLocalizacao(`🎉 Parabéns! Você ganhou ${capibasRecompensa} capibas!`);
           // MARCA IMEDIATAMENTE COMO CONCLUÍDA
@@ -528,93 +623,25 @@ export default function Mapa() {
 
           {/* Pinos existentes no mapa */}
           {pinosValidos.map((pino) => {
-          const pinoId = pino._id;
-          const tarefaConcluida = tarefasConcluidas.has(pinoId);
-          
-          return (
-            <Marker
-              key={pinoId || pino.id}
-              position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}
-              eventHandlers={{ click: () => onPinoClick(pino) }}
-            >
-              <Popup>
-                <div className="modal"> 
-                  <h3 className="mensagem">{pino.nome}</h3>
-
-                  {/* Upload de foto */}
-                  <label htmlFor={`foto-${pinoId}`}>
-                    <img
-                      className="imagem"
-                      src="/src/assets/AdicionarFoto.png"
-                      alt="Adicionar Foto"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        const fallback = document.createElement('div');
-                        fallback.textContent = '📷 Adicionar Foto';
-                        fallback.style.fontSize = '2rem';
-                        e.target.parentNode.appendChild(fallback);
-                      }}
-                    />
-                  </label>
-                  <input
-                    type="file"
-                    id={`foto-${pinoId}`}
-                    accept="image/*"
-                    title="Enviar Foto"
-                    className="inputFoto"
+            const pinoId = pino._id;
+            const tarefaConcluida = tarefasConcluidas.has(pinoId);
+            
+            return (
+              <Marker
+                key={pinoId || pino.id}
+                position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}
+                eventHandlers={{ click: () => onPinoClick(pino) }}
+              >
+                <Popup>
+                  <PinoPopupContent 
+                    pino={pino} 
+                    pinoId={pinoId} 
+                    tarefaConcluida={tarefaConcluida}
                   />
-
-                  {/* Descrição e recompensa */}
-                  <p className="mensagem">{pino.msg}</p>
-                  <p className="mensagem"><strong>Recompensa: {pino.capibas || 0} capibas</strong></p>
-
-                  {/* Feedback visual para tarefa concluída */}
-                  {tarefaConcluida && (
-                    <div className="tarefa-concluida-badge">
-                      <div className="badge-icon">
-                        {isAdmin ? '🧪' : '🏆'}
-                      </div>
-                      <div className="badge-text">
-                        {isAdmin ? 'Tarefa já testada' : 'Tarefa já concluída'}
-                      </div>
-                      {!isAdmin && pino.capibas > 0 && (
-                        <div className="badge-subtext">
-                          +{pino.capibas} capibas recebidos
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Botão de confirmação */}
-                  <button 
-                    className={`botaoConfirmar ${validandoLocalizacao ? 'loading' : ''} ${tarefaConcluida ? 'concluida' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!tarefaConcluida) {
-                        confirmarAtividade(pino);
-                      }
-                    }}
-                    disabled={validandoLocalizacao || !permissaoLocalizacao || tarefaConcluida}
-                  >
-                    {validandoLocalizacao ? '⏳ Processando...' :
-                    !permissaoLocalizacao ? '📍 Permitir Localização' :
-                    tarefaConcluida ? 
-                      (isAdmin ? '✅ Tarefa Testada' : '✅ Tarefa Completada') :
-                      (isAdmin ? '🧪 Testar Tarefa' : '🎯 Confirmar Presença')}
-                  </button>
-
-                  {/* Mensagens de status temporárias */}
-                  {mensagemLocalizacao && !tarefaConcluida && (
-                    <div className={`mensagem-status ${mensagemLocalizacao.includes('❌') ? 'erro' : mensagemLocalizacao.includes('✅') ? 'sucesso' : 'info'}`}>
-                      {mensagemLocalizacao}
-                    </div>
-                  )}
-
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })}
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
 

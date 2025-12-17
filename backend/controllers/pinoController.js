@@ -309,7 +309,7 @@ class PinoController {
         };
       }
 
-      // Validar dados básicos (usando coordenadas existentes se não for fornecida atualização)
+      // Validar dados básicos (usando coordenadas existentes se não fornecida atualização)
       const coordenadasParaValidar = dadosAtualizacao.localizacao?.coordinates || pinoExistente.localizacao.coordinates;
       const errosValidacao = PinoController._validarDadosPino(
         dadosAtualizacao.nome || pinoExistente.nome,
@@ -514,7 +514,48 @@ class PinoController {
       console.error("❌ Erro ao buscar pinos disponíveis:", err);
       res.status(500).json({ message: "Erro interno ao buscar pinos disponíveis" });
     }
-  }  
+  }
+
+  /**
+   * Buscar conclusões de um pino específico
+   * @param {Object} req - Objeto da requisição
+   * @param {Object} res - Objeto da resposta
+   */
+  static async buscarConclusoesPino(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Validar ID
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ 
+          message: "ID do pino inválido" 
+        });
+      }
+
+      const pino = await Pino.findById(id)
+        .populate('conclusoes.cliente', 'nome email')
+        .select('conclusoes nome');
+
+      if (!pino) {
+        return res.status(404).json({ 
+          message: "Pino não encontrado" 
+        });
+      }
+
+      res.json({
+        pinoId: pino._id,
+        nome: pino.nome,
+        totalConclusoes: pino.conclusoes?.length || 0,
+        conclusoes: pino.conclusoes || []
+      });
+
+    } catch (error) {
+      console.error("❌ Erro ao buscar conclusões do pino:", error);
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao buscar conclusões" 
+      });
+    }
+  }
 }
 
 // ==================================================
