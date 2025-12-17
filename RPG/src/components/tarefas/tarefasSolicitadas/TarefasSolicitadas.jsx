@@ -315,32 +315,34 @@ export default function TarefasSolicitadas() {
   return (
     <div className="solicitacoes-container">
       {/* Cabeçalho */}
-      <div className="solicitacoes-header">
-        <h1>📋 {usuarioLogado?.tipo === "admin" ? "Todas as Solicitações" : "Minhas Solicitações"}</h1>
-        <p>
-          {usuarioLogado?.tipo === "admin" 
-            ? "Gerencie todas as solicitações do sistema" 
-            : "Sugira novas tarefas ou acompanhe suas sugestões"}
-        </p>
-      </div>
+      <div className="solicitacao-card">
+        <div className="solicitacoes-header">
+          <h2>📋 {usuarioLogado?.tipo === "admin" ? "Todas as Solicitações" : "Minhas Solicitações"}</h2>
+          <p>
+            {usuarioLogado?.tipo === "admin" 
+              ? "Gerencie todas as solicitações do sistema" 
+              : "Sugira novas tarefas ou acompanhe suas sugestões"}
+          </p>
+        </div>
 
-      {/* Estatísticas */}
-      <div className="solicitacoes-stats">
-        <div className="stat-card">
-          <div className="stat-number">{solicitacoes.length}</div>
-          <div className="stat-label">Total</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-number">{solicitacoes.filter(s => s.status === 'pendente').length}</div>
-          <div className="stat-label">Pendentes</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-number">{solicitacoes.filter(s => s.status === 'aprovada').length}</div>
-          <div className="stat-label">Aprovadas</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-number">{solicitacoes.filter(s => s.status === 'rejeitada').length}</div>
-          <div className="stat-label">Rejeitadas</div>
+        {/* Estatísticas */}
+        <div className="solicitacoes-stats">
+          <div className="stat-card-solicitar">
+            <div className="stat-number">{solicitacoes.length}</div>
+            <div className="stat-label">Total</div>
+          </div>
+          <div className="stat-card-solicitar">
+            <div className="stat-number">{solicitacoes.filter(s => s.status === 'pendente').length}</div>
+            <div className="stat-label">Pendentes</div>
+          </div>
+          <div className="stat-card-solicitar">
+            <div className="stat-number">{solicitacoes.filter(s => s.status === 'aprovada').length}</div>
+            <div className="stat-label">Aprovadas</div>
+          </div>
+          <div className="stat-card-solicitar">
+            <div className="stat-number">{solicitacoes.filter(s => s.status === 'rejeitada').length}</div>
+            <div className="stat-label">Rejeitadas</div>
+          </div>
         </div>
       </div>
 

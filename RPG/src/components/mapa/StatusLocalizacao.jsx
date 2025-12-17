@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react';
  */
 export default function StatusLocalizacao({ 
   permissao,        // Boolean: usuário concedeu permissão de localização
-  mensagem,         // String: mensagem de status/feedback
   isAdmin,          // Boolean: usuário é administrador
   rastreamentoAtivo, // Boolean: rastreamento GPS ativo no momento
   precisao,         // Number: precisão do GPS em metros
@@ -17,15 +16,9 @@ export default function StatusLocalizacao({
 
   // Auto-esconde mensagens de sucesso após 5 segundos
   useEffect(() => {
-    if (mensagem && mensagem.includes('✅')) {
       const timer = setTimeout(() => setMostrar(false), 5000);
       return () => clearTimeout(timer);
-    }
-  }, [mensagem]);
-
-  // Não renderiza se não há dados para mostrar
-  if (!mensagem && permissao === null) return null;
-  if (!mostrar && mensagem?.includes('✅')) return null;
+  }, []);
 
   // Calcula qualidade do GPS baseada na precisão
   const getQualidadeGPS = (precisao) => {
@@ -71,13 +64,6 @@ export default function StatusLocalizacao({
           {isAdmin && <span className="admin-badge">👑 Admin</span>}
         </div>
         
-        {/* Mensagem de feedback */}
-        {mensagem && (
-          <div className="status-message">
-            {mensagem}
-          </div>
-        )}
-        
         {/* Informações de precisão do GPS (apenas quando rastreamento ativo) */}
         {permissao && rastreamentoAtivo && precisao && (
           <div className="status-info">
@@ -105,8 +91,7 @@ export default function StatusLocalizacao({
       </div>
       
       {/* Botão para fechar manualmente */}
-      {mensagem && (
-        <button 
+      {(<button 
           className="status-close"
           onClick={() => setMostrar(false)}
           aria-label="Fechar"

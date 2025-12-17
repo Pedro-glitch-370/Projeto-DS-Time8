@@ -132,9 +132,7 @@
 
 .input:focus {
   outline: none;
-  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(20, 73, 192, 0.1);
-  transform: translateY(-1px);
 }
 
 .input:hover {
@@ -145,6 +143,19 @@
   resize: vertical;
   min-height: 100px;
   line-height: 1.5;
+}
+
+/* Remove as setas dos inputs numéricos */
+.input-group input[type="text"][inputmode="numeric"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  font-weight: 600;
+}
+
+.input-group input[type="text"][inputmode="numeric"]::-webkit-outer-spin-button,
+.input-group input[type="text"][inputmode="numeric"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* ==================================================
@@ -164,20 +175,6 @@
 .capibas-info small {
   font-size: 0.75rem;
   line-height: 1.4;
-}
-
-/* Remove as setas dos inputs numéricos */
-.input-group input[type="text"][inputmode="numeric"] {
-  -moz-appearance: textfield;
-  appearance: textfield;
-  font-weight: 600;
-  color: var(--primary-color);
-}
-
-.input-group input[type="text"][inputmode="numeric"]::-webkit-outer-spin-button,
-.input-group input[type="text"][inputmode="numeric"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
 }
 
 /* ==================================================
@@ -354,8 +351,7 @@
 
 /* Estados de foco melhorados */
 .input:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
+  border-color: var(--primary-color);
 }
 
 /* Loading states para botões */
