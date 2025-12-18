@@ -62,7 +62,7 @@ const startServer = async () => {
     await initializeDatabase() // inicializa o banco de dados, antes do server ficar online
 
     // inicia o servidor na porta previamente definida
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT,'0.0.0.0', () => {
       console.log("=".repeat(50));
       console.log("SERVIDOR BACKEND INICIADO!")
       console.log(`Porta: ${PORT}`) // numero da porta que o server tá rodando
