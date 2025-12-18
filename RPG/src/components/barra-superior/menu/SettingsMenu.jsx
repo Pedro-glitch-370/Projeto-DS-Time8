@@ -22,9 +22,9 @@ export default function SettingsMenu({ onClose }) {
     }
   }
 
-  function handleSystemSettings() {
+  function handleSeasonConfiguration() {
     if (isUserAdmin()) {
-      alert("🔧 Configurações do sistema - Em desenvolvimento");
+      navigate("/temporadas")
     } else {
       alert("❌ Apenas administradores podem acessar as configurações do sistema.");
     }
@@ -41,14 +41,19 @@ export default function SettingsMenu({ onClose }) {
   return (
     <div className="settings-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="settings-menu">
+        
         <div className="settings-header">
           <h3>⚙️ Configurações</h3>
           <span className="close-settings" onClick={onClose}>&times;</span>
         </div>
+
         <div className="settings-menu-content">
           <button className="settings-option" onClick={handleManageUsers}>👥 Gerenciar Usuários</button>
-          <button className="settings-option" onClick={handleSystemSettings}>🔧 Configurações do Sistema</button>
+          <button className="settings-option" onClick={handleSeasonConfiguration}>🔧 Configurar Temporadas</button>
           <button className="settings-option" onClick={handleBackup}>💾 Backup de Dados</button>
+        </div>
+        <div className="copyright">
+          Recife Point Game &copy; 2025
         </div>
       </div>
     </div>

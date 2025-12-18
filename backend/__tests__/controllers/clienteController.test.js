@@ -314,6 +314,7 @@ describe('🧪 ClienteController - Testes Unitários', () => {
         nome: 1,
         senha: 1,
         email: 1,
+        senha: 1,
         capibas: 1,
         tipo: 1,
         tarefasCompletas: 1

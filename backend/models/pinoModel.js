@@ -4,9 +4,9 @@ const Schema = mongoose.Schema
 // Json Schema que define a estrutura de um pino no MongoDB
 const PinoSchema = new Schema({
 
-  nome: { type: String, required: true , trim: true }, // nome do pino
+  nome: { type: String, required: true, trim: true }, // nome do pino
 
-  // localização do pino (longitude e latitude)
+  // localização do pino (longitude e latitude) - GeoJSON
   localizacao: {
     type: {
       type: String,
@@ -19,12 +19,17 @@ const PinoSchema = new Schema({
     },
   },
 
-  msg: { type: String, required: true , trim: true }, // mensagem que vai ter no pino
-  capibas: { type: Number, required: true, default: 0 , min: 0}, // capibas iniciais do pino
-
-  // Data de criação do pino, sempre salva o a data atual
-  createdAt: {type: Date, default: Date.now}
-
+  msg: { type: String, required: true, trim: true }, // mensagem que vai ter no pino
+  capibas: { type: Number, required: true, default: 0, min: 0}, // capibas iniciais do pino
+  usuario: { type: Schema.Types.ObjectId, ref: "Admins" },
+  grupo: { type: Schema.Types.ObjectId, ref: "Grupo" }, // O pino pertence a um grupo? (Opcional)
+  createdAt: {type: Date, default: Date.now}, // Data de criação do pino, sempre salva o a data atual
+  conclusoes: [{
+    cliente: { type: Schema.Types.ObjectId, ref: "Cliente" }, // Quem concluiu
+    dataConclusao: { type: Date, default: Date.now }, // Quando concluiu
+    fotoLink: { type: String, default: "" }, // Link da foto
+    descricaoConclusao: { type: String, default: "" } // Descrição do que foi feito
+  }]
 })
 
 // Índice para buscas geográficas

@@ -1,4 +1,6 @@
 const Cliente = require("../models/clienteModel");
+const Grupo = require("../models/grupoModel");
+const Pino = require("../models/pinoModel");
 
 // ================== CONTROLADOR CLIENTE ==================
 
@@ -78,8 +80,11 @@ class ClienteController {
             }
 
             // Buscar cliente pelo email
-            const cliente = await Cliente.findOne({ email });
-            console.log("🔍 DEBUG: Cliente encontrado:", cliente);
+            const cliente = await Cliente.findOne({ email }).populate({
+                path: 'grupo',
+                populate: { path: 'membros', select: 'nome capibas' } 
+            });
+            console.log("🔍 DEBUG: Cliente encontrado:", cliente ? cliente.email : "Não encontrado");
             
             if (!cliente) {
                 return res.status(400).json({ message: "Cliente não encontrado. Faça o registro primeiro." });
@@ -101,6 +106,7 @@ class ClienteController {
                     senha: cliente.senha,
                     tipo: 'cliente',
                     capibas: cliente.capibas,
+                    grupo: cliente.grupo,
                     tarefasCompletas: cliente.tarefasCompletas,
                     tarefasConcluidas: cliente.tarefasConcluidas || []
                 }
@@ -122,7 +128,7 @@ class ClienteController {
     static async listarClientes(req, res) {
         try {
             console.log("📋 Buscando todos os clientes...");
-            const clientes = await Cliente.find({}, { nome: 1, senha: 1, email: 1, capibas: 1, tipo: 1, tarefasCompletas: 1 });
+            const clientes = await Cliente.find({}, { nome: 1, senha: 1, email: 1, capibas: 1, tipo: 1, tarefasCompletas: 1, grupo: 1 });
             console.log(`✅ ${clientes.length} clientes encontrados`);
             res.json(clientes);
         } catch (error) {
@@ -142,7 +148,11 @@ class ClienteController {
 
             console.log("🔍 Buscando cliente por email:", email);
 
-            const cliente = await Cliente.findOne({ email });
+            const cliente = await Cliente.findOne({ email }).populate({
+                path: 'grupo',
+                populate: { path: 'membros', select: 'nome capibas' }
+            });
+
             if (!cliente) {
                 return res.status(404).json({ message: "Cliente não encontrado" });
             }
@@ -157,6 +167,7 @@ class ClienteController {
                     senha: cliente.email,
                     tipo: 'cliente',
                     capibas: cliente.capibas,
+                    grupo: cliente.grupo,
                     tarefasCompletas: cliente.tarefasCompletas,
                     tarefasConcluidas: cliente.tarefasConcluidas || []
                 }
@@ -179,7 +190,11 @@ class ClienteController {
 
             console.log("🔍 Buscando cliente por ID:", id);
 
-            const cliente = await Cliente.findById(id);
+            const cliente = await Cliente.findById(id).populate({
+                path: 'grupo',
+                populate: { path: 'membros', select: 'nome capibas' }
+            });
+
             if (!cliente) {
                 return res.status(404).json({ message: "Cliente não encontrado" });
             }
@@ -194,6 +209,7 @@ class ClienteController {
                     senha: cliente.senha,
                     tipo: 'cliente',
                     capibas: cliente.capibas,
+                    grupo: cliente.grupo,
                     tarefasCompletas: cliente.tarefasCompletas,
                     tarefasConcluidas: cliente.tarefasConcluidas || []
                 }
@@ -214,10 +230,13 @@ class ClienteController {
      */
     static async concluirTarefa(req, res) {
         try {
+            console.log("REQ BODY:", req.body);
+            console.log("REQ PARAMS:", req.params);
             const { id } = req.params;
-            const { tarefaId, capibas } = req.body;
+            const { tarefaId, capibas, fotoLink, descricaoConclusao } = req.body;
 
             console.log(`🎯 Cliente ${id} concluindo tarefa ${tarefaId} por ${capibas} capibas`);
+            console.log(`📸 Dados extras: fotoLink=${fotoLink}, descricao=${descricaoConclusao?.substring(0, 50)}...`);
 
             // Validar dados obrigatórios
             if (!tarefaId || capibas === undefined) {
@@ -228,6 +247,12 @@ class ClienteController {
             const cliente = await Cliente.findById(id);
             if (!cliente) {
                 return res.status(404).json({ message: "Cliente não encontrado" });
+            }
+
+            // Buscar o pino (tarefa) pelo ID
+            const pino = await Pino.findById(tarefaId);
+            if (!pino) {
+                return res.status(404).json({ message: "Tarefa (pino) não encontrada" });
             }
 
             // Inicializar array de tarefas concluídas se não existir
@@ -245,7 +270,24 @@ class ClienteController {
                 });
             }
 
-            // Adicionar tarefa à lista de concluídas
+            // Inicializar array de conclusões se não existir
+            if (!pino.conclusoes) {
+                pino.conclusoes = [];
+            }
+
+            // Adicionar nova conclusão ao pino
+            pino.conclusoes.push({
+                cliente: id,
+                dataConclusao: new Date(),
+                fotoLink: fotoLink || "",
+                descricaoConclusao: descricaoConclusao || ""
+            });
+
+            // Salvar o pino atualizado
+            await pino.save();
+            console.log(`✅ Dados extras salvos no pino ${tarefaId}`);
+
+            // Adicionar tarefa à lista de concluídas do cliente
             cliente.tarefasConcluidas.push(tarefaId);
             
             // Incrementar contador de tarefas completas
@@ -253,6 +295,18 @@ class ClienteController {
             
             // Adicionar capibas ao saldo do cliente
             cliente.capibas = (cliente.capibas || 0) + capibas;
+
+            // Se o usuário tem grupo, o grupo também ganha os pontos
+            if (cliente.grupo) {
+                try {
+                    await Grupo.findByIdAndUpdate(cliente.grupo, {
+                        $inc: { pontuacaoTotal: capibas }
+                    });
+                    console.log(`🆙 Grupo do usuário atualizado com +${capibas} pontos`);
+                } catch (errGrupo) {
+                    console.error("Erro ao atualizar grupo:", errGrupo);
+                }
+            }
             
             await cliente.save();
             
@@ -262,7 +316,12 @@ class ClienteController {
                 message: "Tarefa concluída com sucesso", 
                 capibas: cliente.capibas,
                 tarefasCompletas: cliente.tarefasCompletas,
-                tarefasConcluidas: cliente.tarefasConcluidas 
+                tarefasConcluidas: cliente.tarefasConcluidas,
+                dadosSalvos: {
+                    fotoLink: fotoLink || "",
+                    descricaoConclusao: descricaoConclusao || "",
+                    dataConclusao: new Date()
+                }
             });
 
         } catch (error) {

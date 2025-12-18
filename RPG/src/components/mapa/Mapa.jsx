@@ -3,21 +3,22 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 // Serviços e componentes
 import { handleSavePino, handleDeletePino, handleUpdatePino } from "./acoesPinos.js";
 import { MAP_CONFIG, ICONS } from "./constantes/constantesMapa.js";
 import { createUserLocationIcon, createUserLocationUpdatingIcon, createUserLocationFallbackIcon } from "./constantes/iconsLeaflet.js";
+import Loading from "../loading/Loading.jsx";
 import usePinosManagement from "./usePinosManagement.js";
 import MapClickHandler from "./MapClickHandler.jsx";
-import Sidebar from "../barra-lateral/barra-lateral.jsx";
-import { authService } from "../../services/authService.js";
-
+import Sidebar from "../barra-lateral/barraLateral.jsx";
 import StatusLocalizacao from "./StatusLocalizacao.jsx";
+import { authService } from "../../services/authService.js";
 import { localizacaoService } from "../../services/localizacaoService.js";
 import { clienteService } from "../../services/clienteService.js";
 import { adminService } from "../../services/adminService.js";
+import { temporadaService } from "../../services/temporadaService.js"
 
 // Configuração do Leaflet - remove URLs padrão
 delete L.Icon.Default.prototype._getIconUrl;
@@ -33,6 +34,7 @@ export default function Mapa() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [tempPin, setTempPin] = useState(null);
   const [selectedPino, setSelectedPino] = useState(null);
+  const [showLoading, setShowLoading] = useState(true);
   
   // Estados de autenticação
   const [user, setUser] = useState(null);
@@ -42,29 +44,85 @@ export default function Mapa() {
   // Estados de localização
   const [localizacaoUsuario, setLocalizacaoUsuario] = useState(null);
   const [permissaoLocalizacao, setPermissaoLocalizacao] = useState(null);
-  const [validandoLocalizacao, setValidandoLocalizacao] = useState(false);
-  const [mensagemLocalizacao, setMensagemLocalizacao] = useState("");
+  const [mensagemLocalizacao, setMensagemLocalizacao] = useState({});
   const [rastreamentoAtivo, setRastreamentoAtivo] = useState(false);
   const [precisaoLocalizacao, setPrecisaoLocalizacao] = useState(null);
   const [atualizandoLocalizacao, setAtualizandoLocalizacao] = useState(false);
   
   // Estado de tarefas concluídas
-  const [tarefasConcluidas, setTarefasConcluidas] = useState(new Set());
+  const [temporadaAtual, setTemporadaAtual] = useState(null);
+  const [tarefasConcluidas, setTarefasConcluidas] = useState(new Map());
+  const [presencasConfirmadas, setPresencasConfirmadas] = useState({});
+  const atualizarPresencaDoPino = (pinoId, valor) => {
+    setPresencasConfirmadas(prev => ({ ...prev, [pinoId]: valor }));
+  };
 
   const watchIdRef = useRef(null);
   const { pinos, loading, error, fetchPinos, addPino, removePino, updatePino } = usePinosManagement();
 
+  // Funções com conteúdos próprios de cada pino
+  const atualizarMensagemLocalizacao = (pinoId, msg) => {
+    setMensagemLocalizacao(prev => ({ ...prev, [pinoId]: msg }));
+  };
+
+  // Timer para garantir 1.5s de loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   // Verifica autenticação ao carregar
   useEffect(() => {
-    const userData = authService.getUser();
-    if (userData) {
-      setUser(userData);
-      setIsAdmin(authService.isAdmin());
-      if (userData.tarefasConcluidas) {
-        setTarefasConcluidas(new Set(userData.tarefasConcluidas));
+    const checkAuth = () => {
+      console.log("🔍 Verificando autenticação...");
+      const userData = authService.getUser();
+      
+      if (userData) {
+        setUser(userData);
+        const adminStatus = authService.isAdmin();
+        console.log("👑 É admin?", adminStatus);
+        setIsAdmin(adminStatus);
+        
+        // Carrega tarefas concluídas do usuário
+        if (userData.tarefasConcluidas) {
+          const tarefasMap = new Map();
+          userData.tarefasConcluidas.forEach(id => {
+            tarefasMap.set(id, true);
+          });
+          console.log("✅ Tarefas concluídas carregadas:", tarefasMap.size);
+          setTarefasConcluidas(tarefasMap);
+        }
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+        setTarefasConcluidas(new Map());
       }
-    }
-    setIsCheckingAuth(false);
+      setIsCheckingAuth(false);
+    };
+
+    // Primeira execução
+    checkAuth();
+
+    // Escuta mudanças no usuário
+    window.addEventListener("userChanged", checkAuth);
+
+    // Limpa o listener ao desmontar
+    return () => window.removeEventListener("userChanged", checkAuth);
+  }, []);
+
+  useEffect(() => {
+    const carregarTemporadaAtual = async () => {
+      try {
+        const atual = await temporadaService.getTemporadaAtual();
+        setTemporadaAtual(atual && atual.pinIds ? atual : null);
+      } catch (error) {
+        console.error("Erro ao carregar temporada atual:", error);
+      }
+    };
+    carregarTemporadaAtual();
   }, []);
 
   // Atualiza dados do usuário (capibas e tarefas)
@@ -72,13 +130,23 @@ export default function Mapa() {
     try {
       const userData = authService.getUser();
       if (userData?.id) {
+        console.log("🔄 Atualizando dados do usuário:", userData.id);
         const usuarioAtualizado = await clienteService.getCliente(userData.id);
+
         if (usuarioAtualizado.user) {
           setUser(usuarioAtualizado.user);
+          
+          // Atualiza tarefas concluídas
           if (usuarioAtualizado.user.tarefasConcluidas) {
-            setTarefasConcluidas(new Set(usuarioAtualizado.user.tarefasConcluidas));
+            const novasTarefas = new Map();
+            usuarioAtualizado.user.tarefasConcluidas.forEach(id => {
+              novasTarefas.set(id, true);
+            });
+            console.log("🆕 Atualizando tarefas concluídas:", novasTarefas.size);
+            setTarefasConcluidas(novasTarefas);
           }
-          authService.updateUserData(usuarioAtualizado.user);
+          
+          authService.setUser(usuarioAtualizado.user);
         }
       }
     } catch (error) {
@@ -86,10 +154,15 @@ export default function Mapa() {
     }
   }, []);
 
-  // Verifica se tarefa já foi concluída
-  const isTarefaConcluida = useCallback((pinoId) => {
-    return tarefasConcluidas.has(pinoId);
-  }, [tarefasConcluidas]);
+  // Função para marcar tarefa como concluída
+  const marcarTarefaComoConcluida = useCallback((pinoId) => {
+    console.log(`📝 Marcando tarefa ${pinoId} como concluída`);
+    setTarefasConcluidas(prev => {
+      const novoMap = new Map(prev);
+      novoMap.set(pinoId, true);
+      return novoMap;
+    });
+  }, []);
 
   // Solicita permissão de localização
   useEffect(() => {
@@ -107,8 +180,7 @@ export default function Mapa() {
           setMensagemLocalizacao("📍 Usando localização padrão. Ative o GPS para melhor precisão.");
           setTimeout(() => setMensagemLocalizacao(""), 5000);
         }
-      // eslint-disable-next-line no-unused-vars
-      } catch (error) {
+      } catch (error) { // eslint-disable-line no-unused-vars
         setPermissaoLocalizacao(false);
         setMensagemLocalizacao("📍 Permissão necessária. Clique em 'Atualizar' quando permitir.");
         
@@ -186,17 +258,29 @@ export default function Mapa() {
 
   // Busca pinos após verificação de autenticação
   useEffect(() => {
-    if (!isCheckingAuth) fetchPinos();
+    if (!isCheckingAuth) {
+      console.log("🗺️ Buscando pinos do mapa...");
+      fetchPinos();
+    }
   }, [isCheckingAuth, fetchPinos]);
+
+  // Função auxiliar para os handlers
+  const atualizarTemporadaAtual = async () => {
+    const temporada = await temporadaService.getTemporadaAtual();
+    setTemporadaAtual(temporada);
+  };
 
   // Handlers para operações com pinos
   const onSavePino = useCallback(
-    (dados) => handleSavePino({ dados, addPino, setIsSidebarOpen, setTempPin, setSelectedPino }),
+    async (dados) => {
+      await handleSavePino({ dados, addPino, setIsSidebarOpen, setTempPin, setSelectedPino });
+      await atualizarTemporadaAtual();
+    },
     [addPino]
   );
 
   const onUpdatePino = useCallback(
-    (dados) => {
+    async (dados) => {
       if (selectedPino?._id) {
         handleUpdatePino({
           pinoId: selectedPino._id,
@@ -205,13 +289,17 @@ export default function Mapa() {
           setIsSidebarOpen,
           setSelectedPino,
         });
+        await atualizarTemporadaAtual();
       }
     },
     [selectedPino, updatePino]
   );
 
   const onDeletePino = useCallback(
-    (pinoId) => handleDeletePino({ pinoId, removePino, setIsSidebarOpen, setSelectedPino }),
+    async (pinoId) => {
+      await handleDeletePino({ pinoId, removePino, setIsSidebarOpen, setSelectedPino });
+      await atualizarTemporadaAtual();
+    },
     [removePino]
   );
 
@@ -226,96 +314,244 @@ export default function Mapa() {
     [isAdmin]
   );
 
-  // Confirma atividade no pino (valida localização e marca tarefa)
-  const confirmarAtividade = async (pino) => {
-    const userData = authService.getUser();
-    if (!userData?.id) {
-      setMensagemLocalizacao("❌ Você precisa estar logado para confirmar atividades.");
-      return;
-    }
+  // Componente interno para os campos de foto e descrição
+  const PinoPopupContent = ({ pino, pinoId, tarefaConcluida, presencaConfirmada, setPresencaConfirmada }) => {
+    // Estados locais para os campos de formulário
+    const [fotoLink, setFotoLink] = useState('');
+    const [descricaoConclusao, setDescricaoConclusao] = useState('');
+    const [validandoLocalizacao, setValidandoLocalizacao] = useState(false);
 
-    // Verifica se tarefa já foi concluída
-    if (isTarefaConcluida(pino._id)) {
-      setMensagemLocalizacao("✅ Você já completou esta tarefa!");
-      setTimeout(() => setMensagemLocalizacao(""), 3000);
-      return;
-    }
+    // Função para validar a presença/localização
+    const validarPresenca = async (pino) => {
+      const pinoId = pino._id;
+      setValidandoLocalizacao(true);
+      atualizarMensagemLocalizacao(pinoId, "Validando sua localização...");
 
-    // Verifica permissão de localização
-    if (!permissaoLocalizacao) {
-      setMensagemLocalizacao("Permissão de localização necessária para confirmar atividades.");
-      return;
-    }
-
-    // Obtém localização atual se não disponível
-    if (!localizacaoUsuario) {
-      setMensagemLocalizacao("Obtendo localização atual...");
       try {
-        const coords = await localizacaoService.solicitarLocalizacao();
-        setLocalizacaoUsuario(coords);
+        const validacao = await localizacaoService.validarProximidadePino(
+          localizacaoUsuario.latitude,
+          localizacaoUsuario.longitude,
+          pinoId,
+          50
+        );
+
+        if (!validacao.valid) {
+          atualizarMensagemLocalizacao(pinoId, `❌ Você está a ${validacao.distancia.metros}m do local. Aproxime-se!`);
+          setValidandoLocalizacao(false);
+          return;
+        }
+
+        atualizarMensagemLocalizacao(pinoId,"✅ Localização validada! Preencha os dados para concluir.");
+        setPresencaConfirmada(true);
       } catch (error) {
-        setMensagemLocalizacao(error.message);
-        return;
-      }
-    }
-
-    // Evita múltiplos cliques
-    if (validandoLocalizacao) return;
-
-    setValidandoLocalizacao(true);
-    setMensagemLocalizacao("Validando sua localização...");
-
-    try {
-      // Valida proximidade do usuário com o pino
-      const validacao = await localizacaoService.validarProximidadePino(
-        localizacaoUsuario.latitude,
-        localizacaoUsuario.longitude,
-        pino._id,
-        50 // raio em metros
-      );
-
-      if (!validacao.valid) {
-        setMensagemLocalizacao(`❌ Você está a ${validacao.distancia.metros}m do local. Aproxime-se!`);
+        atualizarMensagemLocalizacao(pinoId,`❌ ${error.message || "Erro ao validar presença"}`);
+      } finally {
         setValidandoLocalizacao(false);
+      }
+    };
+
+    // Função para confirmar atividade
+    const confirmarAtividade = async (
+      pino,
+      fotoLink = '',
+      descricaoConclusao = ''
+    ) => {
+      const pinoId = pino._id;
+
+      // Se já está concluída, não faz nada
+      if (tarefasConcluidas.has(pinoId)) {
+        const mensagem = isAdmin ? "✅ Tarefa já testada!" : "✅ Tarefa já concluída!";
+        setMensagemLocalizacao(mensagem);
+        setTimeout(() => setMensagemLocalizacao(""), 3000);
         return;
       }
 
-      setMensagemLocalizacao("✅ Localização validada! Concluindo tarefa...");
-
-      // Marca tarefa como concluída
-      const capibasRecompensa = Number(pino.capibas) || 0;
-      
-      if (isAdmin) {
-        await adminService.concluirTarefa(userData.id, pino._id);
-        setMensagemLocalizacao("✅ Tarefa testada com sucesso! (Modo Admin)");
-      } else {
-        await clienteService.concluirTarefa(userData.id, pino._id, capibasRecompensa);
-        await atualizarDadosUsuario();
-        setMensagemLocalizacao(`🎉 Parabéns! Você ganhou ${capibasRecompensa} capibas!`);
-        setTarefasConcluidas(prev => new Set([...prev, pino._id]));
+      const userData = authService.getUser();
+      if (!userData?.id) {
+        setMensagemLocalizacao("❌ Você precisa estar logado para confirmar atividades.");
+        return;
       }
 
-      setTimeout(() => setMensagemLocalizacao(""), 5000);
-
-    } catch (error) {
-      console.error('Erro ao confirmar atividade:', error);
-      
-      if (error.message.includes("Tarefa já concluída")) {
-        setMensagemLocalizacao("✅ Você já completou esta tarefa anteriormente!");
-        setTarefasConcluidas(prev => new Set([...prev, pino._id]));
-      } else {
-        setMensagemLocalizacao(`❌ ${error.message || "Erro ao confirmar atividade. Tente novamente."}`);
+      if (!permissaoLocalizacao) {
+        setMensagemLocalizacao("📍 Permissão de localização necessária para confirmar atividades.");
+        return;
       }
-    } finally {
-      setValidandoLocalizacao(false);
-    }
+
+      let coordsParaValidar = localizacaoUsuario;
+      if (!coordsParaValidar) {
+        setMensagemLocalizacao("Obtendo localização atual...");
+        try {
+          coordsParaValidar = await localizacaoService.solicitarLocalizacao();
+          setLocalizacaoUsuario(coordsParaValidar);
+        } catch (error) {
+          setMensagemLocalizacao(error.message);
+          return;
+        }
+      }
+
+      if (validandoLocalizacao) return;
+
+      setValidandoLocalizacao(true);
+      setMensagemLocalizacao("Validando sua localização...");
+
+      try {
+        const capibasRecompensa = Number(pino.capibas) || 0;
+
+        if (isAdmin) {
+          try {
+            await adminService.concluirTarefa(userData.id, pinoId, capibasRecompensa);
+            setMensagemLocalizacao("✅ Tarefa testada com sucesso!");
+            marcarTarefaComoConcluida(pinoId);
+          } catch (adminError) {
+            if (adminError.message.includes("Tarefa já testada")) {
+              setMensagemLocalizacao("✅ Tarefa já foi testada anteriormente");
+              marcarTarefaComoConcluida(pinoId);
+            } else {
+              setMensagemLocalizacao(`❌ ${adminError.message || "Erro ao testar tarefa"}`);
+            }
+          }
+        } else {
+          // Valida campos obrigatórios
+          if (!fotoLink.trim() || !descricaoConclusao.trim()) {
+            setMensagemLocalizacao("❌ Preencha o link e o relatório antes de confirmar.");
+            setValidandoLocalizacao(false);
+            return;
+          }
+
+          try {
+            await clienteService.concluirTarefa(
+              userData.id,
+              pinoId,
+              capibasRecompensa,
+              fotoLink,
+              descricaoConclusao
+            );
+
+            await atualizarDadosUsuario();
+            setMensagemLocalizacao(`🎉 Parabéns! Você ganhou ${capibasRecompensa} capibas!`);
+            marcarTarefaComoConcluida(pinoId);
+          } catch (clienteError) {
+            if (clienteError.message.includes("Tarefa já concluída")) {
+              setMensagemLocalizacao("✅ Você já completou esta tarefa anteriormente!");
+              marcarTarefaComoConcluida(pinoId);
+              setTimeout(() => atualizarDadosUsuario(), 1000);
+            } else {
+              setMensagemLocalizacao(`❌ ${clienteError.message || "Erro ao concluir tarefa"}`);
+            }
+          }
+        }
+
+        setTimeout(() => setMensagemLocalizacao(""), 2000);
+
+      } catch (error) {
+        console.error("Erro ao confirmar atividade:", error);
+        if (error.message.includes("Tarefa já concluída")) {
+          setMensagemLocalizacao("✅ Você já completou esta tarefa anteriormente!");
+          marcarTarefaComoConcluida(pinoId);
+        } else {
+          setMensagemLocalizacao(`❌ ${error.message || "Erro ao confirmar atividade. Tente novamente."}`);
+        }
+      } finally {
+        setValidandoLocalizacao(false);
+      }
+    };
+
+    const mensagem = mensagemLocalizacao[pinoId] || '';
+
+    return (
+      <div className="modal"> 
+        <h3 className="mensagem-modal">{pino.nome}</h3>
+
+        {/* Descrição e recompensa */}
+        {!tarefaConcluida && !presencaConfirmada && (
+          <div>
+          <p className="mensagem-modal">{pino.msg}</p>
+          <p className="mensagem-modal"><strong>Recompensa: {pino.capibas || 0} capibas</strong></p>
+          </div>
+          )}
+
+        {/* Novos campos - Apenas quando não é admin e tarefa não concluída */}
+        {!isAdmin && !tarefaConcluida && presencaConfirmada && (
+          <div className="novos-campos">
+            <div className="campo-form">
+              <label htmlFor={`foto-link-${pinoId}`}>Link da Foto (Instagram/Facebook)</label>
+              <input
+                type="url"
+                id={`foto-link-${pinoId}`}
+                placeholder="https://instagram.com/p/..."
+                value={fotoLink}
+                onChange={(e) => setFotoLink(e.target.value)}
+                className="campo-input"
+              />
+            </div>
+
+            <div className="campo-form">
+              <label htmlFor={`descricao-${pinoId}`}>O que você fez?</label>
+              <textarea
+                id={`descricao-${pinoId}`}
+                placeholder="Descreva como completou a missão..."
+                value={descricaoConclusao}
+                onChange={(e) => setDescricaoConclusao(e.target.value)}
+                className="campo-textarea"
+                rows="3"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Feedback visual para tarefa concluída */}
+        {tarefaConcluida && (
+          <div className="tarefa-concluida-badge">
+            <div className="badge-icon">
+              {isAdmin ? '🧪' : '🏆'}
+            </div>
+            <div className="badge-text">
+              {isAdmin ? 'Tarefa já testada' : 'Tarefa já concluída'}
+            </div>
+            {!isAdmin && pino.capibas > 0 && (
+              <div className="badge-subtext">
+                +{pino.capibas} capibas recebidos
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Botão de confirmação */}
+        <button 
+          className={`botaoConfirmar ${validandoLocalizacao ? 'loading' : ''} ${tarefaConcluida ? 'concluida' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!tarefaConcluida) {
+              if (!presencaConfirmada) {
+                // Primeiro clique só valida presença
+                validarPresenca(pino);
+              } else {
+                // Segundo clique envia os dados e conclui
+                confirmarAtividade(pino, fotoLink, descricaoConclusao);
+              }
+            }
+          }}
+          disabled={validandoLocalizacao || !permissaoLocalizacao || tarefaConcluida}
+        >
+          {validandoLocalizacao ? '⏳ Processando...' :
+          !permissaoLocalizacao ? '📍 Permitir Localização' :
+          tarefaConcluida ? 
+            (isAdmin ? '✅ Tarefa Testada' : '✅ Tarefa Completada') :
+            (presencaConfirmada ? 
+              isAdmin ? '🧪 Testar Tarefa' : '✅ Concluir Tarefa'
+              : '🎯 Confirmar Presença'
+            )}
+        </button>
+
+        {/* Mensagens de status temporárias */}
+        {mensagem && !tarefaConcluida && (
+          <div className={`mensagem-status ${mensagem.includes('❌') ? 'erro' : mensagem.includes('✅') ? 'sucesso' : 'info'}`}>
+            {mensagem}
+          </div>
+        )}
+      </div>
+    );
   };
-
-  // Filtra pinos com coordenadas válidas
-  const pinosValidos = useMemo(
-    () => pinos.filter((pino) => pino.localizacao?.coordinates?.length === 2),
-    [pinos]
-  );
 
   // Determina ícone da localização do usuário
   const getUserLocationIcon = () => {
@@ -325,13 +561,8 @@ export default function Mapa() {
   };
 
   // Estados de loading
-  if (isCheckingAuth || loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Carregando...</p>
-      </div>
-    );
+  if (showLoading || isCheckingAuth || loading) {
+    return <Loading />;
   }
 
   if (error && pinos.length === 0) {
@@ -349,12 +580,17 @@ export default function Mapa() {
       {/* Status da localização */}
       <StatusLocalizacao 
         permissao={permissaoLocalizacao}
-        mensagem={mensagemLocalizacao}
         isAdmin={isAdmin}
         rastreamentoAtivo={rastreamentoAtivo}
         precisao={precisaoLocalizacao}
         onReiniciar={reiniciarRastreamentoLocalizacao}
       />
+
+      {(!temporadaAtual || temporadaAtual.pinIds.length === 0) && (
+        <div className="sem-temporada-overlay">
+          🚫 Nenhuma temporada ativa no momento
+        </div>
+      )}
 
       {/* Info de capibas e tarefas (apenas para clientes) */}
       {user && !isAdmin && (
@@ -414,7 +650,9 @@ export default function Mapa() {
                     Lng: {localizacaoUsuario.longitude.toFixed(6)}
                   </small>
                   {localizacaoUsuario.precisao && (
+                   <div>
                     <small>Precisão: ~{Math.round(localizacaoUsuario.precisao)} metros</small>
+                   </div>
                   )}
                 </div>
               </Popup>
@@ -444,74 +682,32 @@ export default function Mapa() {
           )}
 
           {/* Pinos existentes no mapa */}
-          {pinosValidos.map((pino) => (
-            <Marker
-              key={pino._id || pino.id}
-              // Leaflet usa [lat, lng] mas GeoJSON é [lng, lat] - invertemos a ordem
-              position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}
-              eventHandlers={{ click: () => onPinoClick(pino) }}
-              //icon={defaultIcon}
-            >
-              <Popup>
-                <div className="modal"> 
-                  <h3 className="mensagem">{pino.nome}</h3>
-
-                  {/* Badge de tarefa concluída */}
-                  {isTarefaConcluida(pino._id) && (
-                    <div className="tarefa-concluida-badge">✅ Concluída</div>
-                  )}
-
-                  {/* Upload de foto */}
-                  <label htmlFor={`foto-${pino._id || pino.id}`}>
-                    <img
-                      className="imagem"
-                      src="/src/assets/AdicionarFoto.png"
-                      alt="Adicionar Foto"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        const fallback = document.createElement('div');
-                        fallback.textContent = '📷 Adicionar Foto';
-                        fallback.style.fontSize = '2rem';
-                        e.target.parentNode.appendChild(fallback);
-                      }}
+          {temporadaAtual && temporadaAtual.pinIds
+          .filter(pino => pino.localizacao?.coordinates?.length === 2)
+          .map((pino) => {
+            const pinoId = pino._id;
+            const concluidoPorAlguem = Array.isArray(pino.conclusoes) && pino.conclusoes.length > 0;
+            const concluidoPorUsuario = tarefasConcluidas.has(pino._id);
+            const tarefaConcluida = concluidoPorUsuario || concluidoPorAlguem;
+            
+            return (
+              <Marker
+                key={pinoId || pino.id}
+                position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}
+                eventHandlers={{ click: () => onPinoClick(pino) }}
+              >
+                <Popup>
+                    <PinoPopupContent 
+                      pino={pino} 
+                      pinoId={pinoId} 
+                      tarefaConcluida={tarefaConcluida}
+                      presencaConfirmada={presencasConfirmadas[pinoId] || false}
+                      setPresencaConfirmada={(v) => atualizarPresencaDoPino(pinoId, v)}
                     />
-                    <span style={{ fontSize: '0.8rem', color: '#666' }}>Clique para adicionar foto</span>
-                  </label>
-                  <input
-                    type="file"
-                    id={`foto-${pino._id || pino.id}`}
-                    accept="image/*"
-                    title="Enviar Foto"
-                    className="inputFoto"
-                  />
-
-                  {/* Descrição e recompensa */}
-                  <p className="mensagem">{pino.msg}</p>
-                  <p className="mensagem"><strong>Recompensa: {pino.capibas || 0} capibas</strong></p>
-
-                  {/* Botão de confirmação */}
-                  <button 
-                    className={`botaoConfirmar ${validandoLocalizacao ? 'loading' : ''} ${isTarefaConcluida(pino._id) ? 'concluida' : ''}`}
-                    onClick={() => confirmarAtividade(pino)}
-                    disabled={validandoLocalizacao || !permissaoLocalizacao || isTarefaConcluida(pino._id)}
-                  >
-                    {validandoLocalizacao ? '⏳ Validando...' :
-                     !permissaoLocalizacao ? '📍 Permitir Localização' :
-                     isTarefaConcluida(pino._id) ? '✅ Já Concluída' :
-                     'Confirmar Presença'}
-                  </button>
-
-                  {/* Mensagens de status */}
-                  {mensagemLocalizacao && (
-                    <div className={`mensagem-status ${mensagemLocalizacao.includes('❌') ? 'erro' : mensagemLocalizacao.includes('✅') ? 'sucesso' : 'info'}`}>
-                      {mensagemLocalizacao}
-                    </div>
-                  )}
-
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
 

@@ -16,8 +16,8 @@ export default function UserMenu({ usuarioLogado, abaLoginAberta, onClose, onLog
   return (
     <div className="user-menu" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="user-menu-content">
-        <div className="user-info">
-          <div className="user-avatar">{usuarioLogado.iniciais}</div>
+        <div className="user-info-menu">
+          <div className="user-avatar">{usuarioLogado.nome[0].toUpperCase()}</div>
           <div className="user-details">
             <div className="user-name">{usuarioLogado.nome}</div>
             <div className="user-email">{usuarioLogado.email}</div>

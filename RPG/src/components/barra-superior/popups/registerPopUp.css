@@ -1,4 +1,3 @@
-/* Popup de Registro */
 .popup-register {
   display: flex;
   position: fixed;
@@ -21,6 +20,23 @@
   max-width: 400px;
   position: relative;
   animation: slideUp 0.3s ease;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+/* Estilo da barra de rolagem */
+.popup-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.popup-content::-webkit-scrollbar-thumb {
+  background: var(--primary-blue);
+  border-radius: 4px;
+}
+
+.popup-content::-webkit-scrollbar-track {
+  background: #e9ecef;
+  border-radius: 4px;
 }
 
 /* Títulos */
@@ -150,14 +166,14 @@
   background-color: rgba(20, 73, 192, 0.05);
 }
 
-.user-type {
+.user-type-register {
   display: flex;
   gap: 12px;
   margin-bottom: 1.5rem;
   width: 100%;
 }
 
-.user-type label {
+.user-type-register label {
   flex: 1;
   display: flex;
   align-items: center;
@@ -173,11 +189,11 @@
   min-height: 60px;
 }
 
-.user-type input[type="radio"] {
+.user-type-register input[type="radio"] {
   display: none;
 }
 
-.user-type span {
+.user-type-register span {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -192,17 +208,18 @@
   background: var(--white);
 }
 
-.user-type input[type="radio"]:checked + span {
+.user-type-register input[type="radio"]:checked + span {
   background: linear-gradient(135deg, var(--primary-blue) 0%, #1e5fd9 100%) !important;
   color: var(--white) !important;
   box-shadow: 0 4px 12px rgba(20, 73, 192, 0.3);
 }
 
-.user-type label:has(input[type="radio"]:checked) {
+
+.user-type-register label:has(input[type="radio"]:checked) {
   border-color: var(--primary-blue);
 }
 
-.user-type label:hover {
+.user-type-register label:hover {
   border-color: var(--primary-blue);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(20, 73, 192, 0.15);

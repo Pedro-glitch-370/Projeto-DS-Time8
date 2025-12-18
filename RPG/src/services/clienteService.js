@@ -62,24 +62,29 @@ export const clienteService = {
    * @param {string} clienteId - ID do cliente que está concluindo a tarefa
    * @param {string} tarefaId - ID da tarefa a ser marcada como concluída
    * @param {number} capibas - Quantidade de capibas a serem creditados ao usuário
+   * @param {string} fotoLink - Link da foto (Instagram/Facebook) - opcional
+   * @param {string} descricaoConclusao - Descrição do que foi feito - opcional
    * @returns {Promise<Object>} Resultado da operação com detalhes da conclusão
    * @throws {Error} Se a tarefa já foi concluída, cliente não existe ou ocorrer erro na API
    */
-  concluirTarefa: async (clienteId, tarefaId, capibas) => {
+  concluirTarefa: async (clienteId, tarefaId, capibas, fotoLink = '', descricaoConclusao = '') => {
     try {
       console.log('🎯 Concluindo tarefa:', { 
         clienteId, 
         tarefaId, 
-        capibas 
+        capibas,
+        fotoLink: fotoLink ? 'fornecida' : 'não fornecida',
+        descricaoConclusao: descricaoConclusao ? 'fornecida' : 'não fornecida' 
       });
       
       // Prepara payload com tipos garantidos
       const payload = {
         tarefaId: String(tarefaId), // Garante que o ID seja string
-        capibas: Number(capibas)    // Garante que capibas seja número
+        capibas: Number(capibas),    // Garante que capibas seja número
+        fotoLink: fotoLink,          // Envia link da foto
+        descricaoConclusao: descricaoConclusao // Envia descrição
       };
       
-      // 🔥 CORREÇÃO: Usando a rota correta que existe no backend
       // Faz requisição POST para endpoint de conclusão de tarefas
       const response = await api.post(`/auth/clientes/${clienteId}/tarefas/concluir`, payload);
       

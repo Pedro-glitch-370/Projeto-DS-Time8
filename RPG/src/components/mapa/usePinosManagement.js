@@ -98,7 +98,6 @@ const usePinosManagement = () => {
       setPinos(prev => prev.map(pino => 
         pino._id === pinoId ? pinoAtualizado : pino
       ));
-      console.log("OOOO ATUALIZACAO CONCLUIDA OOOO")
       
       // Log de sucesso
       logSucesso('atualizar pino', pinoAtualizado.nome);

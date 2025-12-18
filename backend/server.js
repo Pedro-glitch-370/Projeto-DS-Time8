@@ -9,8 +9,17 @@ const pinoRoutes = require("./routes/pinosRoutes")
 const clienteRoutes = require("./routes/clienteRoutes.js")
 const adminRoutes = require("./routes/adminRoutes.js")
 const validarLocalizacaoRouter = require("./routes/validarLocalizacaoRouter.js")
+const solicitacaoRoutes = require("./routes/solicitacaoRoutes.js")
+const temporadaRoutes = require("./routes/temporadaRoutes.js")
 const usuariosRoutes = require("./routes/usuariosRoutes.js");
+const grupoRoutes = require('./routes/grupoRoutes');
 /*quando criar novas rotas, adicionar aqui*/
+
+try {
+    require('./services/cronService');
+} catch (e) {
+    console.log("Aviso: cronService não encontrado ou com erro. A distribuição mensal não rodará.");
+}
 
 // ==================================================
 // Define a porta onde o servidor vai rodar
@@ -21,9 +30,9 @@ const PORT = process.env.PORT || 5001
 const initializeDatabase = async () => {
   try {
     await connectDB()
-    console.log("🗄️ Banco de dados inicializado com sucesso!")
+    console.log("Banco de dados inicializado com sucesso!")
   } catch (error) {
-    console.error("❌ Falha ao inicializar o banco de dados:", error)
+    console.error("Falha ao inicializar o banco de dados:", error)
     process.exit(1)
   }
 };
@@ -37,10 +46,13 @@ app.use(express.json()) // Middleware para interpretar dados JSON no corpo das r
 // ==================================================
 // Rotas da API
 app.use("/api/pinos", pinoRoutes)
+app.use("/api/solicitacoes", solicitacaoRoutes)
 app.use("/api/validar-localizacao", validarLocalizacaoRouter)
 app.use("/api/auth/clientes", clienteRoutes)
 app.use("/api/auth/admins", adminRoutes)
+app.use("/api/temporadas", temporadaRoutes);
 app.use("/api/usuarios", usuariosRoutes);
+app.use('/api/grupos', grupoRoutes);
 /*quando criar novas rotas, adicionar aqui*/
 
 // ==================================================
@@ -55,8 +67,10 @@ const startServer = async () => {
       console.log("SERVIDOR BACKEND INICIADO!")
       console.log(`Porta: ${PORT}`) // numero da porta que o server tá rodando
       console.log(`URL: http://localhost:${PORT}/api/pinos`) // rota que pega todos os pinos do mongoDB
+      console.log(`URL: http://localhost:${PORT}/api/solicitacoes`) // rota que pega todos os solicitacoes do mongoDB
       console.log(`URL: http://localhost:${PORT}/api/auth/clientes/`) // listar clientes
       console.log(`URL: http://localhost:${PORT}/api/auth/admins/`) // listar admins
+      console.log(`URL: http://localhost:${PORT}/api/grupos/`) // listar grupos
       console.log(`Banco de dados: ${getDBStatus().connected ? "Conectado" : "Desconectado"}`); // Indica se o banco de dados foi conectado
       console.log("=".repeat(50))
     })

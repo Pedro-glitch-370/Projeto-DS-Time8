@@ -46,7 +46,7 @@
 .stat-numero {
   font-size: 2.2rem;
   font-weight: bold;
-  color: #4CAF50;
+  color: #45a049;
   margin-bottom: 5px;
 }
 
@@ -71,7 +71,7 @@
 
 .barra-progresso-preenchida {
   height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #45a049);
+  background: linear-gradient(90deg, #45a049, #2f7854);
   border-radius: 6px;
   transition: width 0.8s ease-in-out;
 }
@@ -141,7 +141,7 @@
   background: #f8f9fa;
   border-radius: 10px;
   padding: 20px;
-  border-left: 4px solid #4CAF50;
+  border-left: 4px solid #2f7854;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -151,7 +151,7 @@
 }
 
 .tarefa-numero {
-  background: #4CAF50;
+  background: #45a049;
   color: white;
   width: 36px;
   height: 36px;
@@ -184,7 +184,7 @@
 }
 
 .badge-concluida {
-  background: #4CAF50;
+  background: #2f7854;
   color: white;
   padding: 4px 12px;
   border-radius: 12px;
@@ -225,7 +225,7 @@
 }
 
 .btn-explorar {
-  background: #4CAF50;
+  background: #2f7854;
   color: white;
   border: none;
   padding: 10px 25px;
@@ -237,7 +237,7 @@
 }
 
 .btn-explorar:hover {
-  background: #45a049;
+  background: #2f7854;
   transform: translateY(-2px);
 }
 
@@ -247,9 +247,9 @@
   padding: 60px 20px;
 }
 
-.loading-spinner {
+.loading-spinner-tarefas {
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #4CAF50;
+  border-top: 4px solid #45a049;
   border-radius: 50%;
   width: 50px;
   height: 50px;

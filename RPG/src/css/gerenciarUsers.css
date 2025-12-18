@@ -51,9 +51,9 @@ font-weight: 600;
 margin: 0;
 }
 
-.user-info {
+.user-info-gerenciar {
 grid-column: 3;
-text-align: right;
+text-align: center;
 }
 
 .user-welcome-gerenciar {
@@ -140,7 +140,7 @@ text-align: center;
 box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
 }
 
-.stat-number {
+.stat-number-gerenciar {
 font-size: 2.5rem;
 font-weight: bold;
 margin-bottom: 0.5rem;
@@ -228,7 +228,7 @@ margin-bottom: 0.75rem;
 font-size: 1rem;
 }
 
-.user-details {
+.user-details-gerenciar {
 display: flex;
 flex-wrap: wrap;
 }
@@ -471,7 +471,7 @@ transform: translateY(-2px);
     text-align: center;
 }
 
-.user-info {
+.user-info-gerenciar {
     text-align: center;
 }
 

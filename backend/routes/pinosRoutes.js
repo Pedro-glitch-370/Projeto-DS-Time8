@@ -18,4 +18,12 @@ router.put("/atualizar/:id", PinoController.atualizarPino)
 // DELETE - Deletar pino
 router.delete("/deletar/:id", PinoController.deletarPino)
 
+// GET - Pegar pinos da temporada ativa
+router.get("/available", async (req, res) => {
+  await PinoController.getPinosDisponiveis(req, res);
+});
+
+// GET - Buscar conclusões de um pino
+router.get("/:id/conclusoes", PinoController.buscarConclusoesPino);
+
 module.exports = router

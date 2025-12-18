@@ -1,3 +1,4 @@
+const Temporada = require("../models/temporadaModel");
 const Pino = require("../models/pinoModel");
 const mongoose = require("mongoose");
 
@@ -115,7 +116,7 @@ class PinoController {
   /**
    * Formata dados do pino para salvar no banco
    */
-  static _formatarPinoParaBanco(dados, lng, lat) {
+  static _formatarPinoParaBanco(dados, lng, lat, userId) {
     return {
       nome: dados.nome?.trim(),
       msg: dados.msg?.trim(),
@@ -123,7 +124,9 @@ class PinoController {
       localizacao: {
         type: "Point",
         coordinates: [lng, lat]
-      }
+      },
+      usuario: userId || null, // Se não tiver ID, salva como null (Anônimo/Sistema)
+      grupo: dados.grupoId || null
     };
   }
 
@@ -166,17 +169,27 @@ class PinoController {
 
       // Validar e parsear coordenadas
       const { lng, lat } = PinoController._validarCoordenadas(coordenadasExtraidas.coordinates);
-      
       console.log("📍 Coordenadas processadas:", { longitude: lng, latitude: lat });
 
       // Criar e salvar pino
-      const dadosPino = PinoController._formatarPinoParaBanco(req.body, lng, lat);
+      console.log(`O BODY EM CRIAR E SALVAR ESTÁ: `, req.body)
+      const dadosPino = PinoController._formatarPinoParaBanco(req.body, lng, lat, null);
       const novoPino = new Pino(dadosPino);
       const pinoSalvo = await novoPino.save();
+
+      // Vincular pino à temporada ativa
+      const temporadaAtiva = await Temporada.findOne({ status: "ativo" });
+      if (temporadaAtiva) {
+        temporadaAtiva.pinIds.push(pinoSalvo._id);
+        await temporadaAtiva.save();
+        console.log(`📌 Pino ${pinoSalvo._id} vinculado à temporada ${temporadaAtiva.titulo}`);
+      }
+      console.log(`PINO SALVO: `, pinoSalvo)
 
       PinoController._logSucesso('salvar pino no banco', {
         id: pinoSalvo._id,
         nome: pinoSalvo.nome,
+        msg: pinoSalvo.msg,
         capibas: pinoSalvo.capibas
       });
 
@@ -206,11 +219,19 @@ class PinoController {
    */
   static async getTodosPinos(req, res) {
     try {
-      const pinos = await Pino.find().sort({ createdAt: -1 });
+      const pinos = await Pino.find()
+      .sort({ createdAt: -1 })
+      .populate('usuario', 'nome')
+      .populate('conclusoes.cliente', 'nome email');
       
       PinoController._logSucesso('buscar pinos', `${pinos.length} pinos encontrados`);
       
-      res.json(pinos);
+      res.json(
+      pinos.map(p => ({
+        ...p.toObject(),
+        conclusoes: p.conclusoes || []
+      }))
+    );
     } catch (err) {
       PinoController._logErro('buscar pinos no Controller', err);
       
@@ -240,6 +261,16 @@ class PinoController {
         return res.status(404).json({ 
           message: "Pino não encontrado" 
         });
+      }
+
+      // Remover referência da temporada ativa
+      const temporadaAtiva = await Temporada.findOne({ status: "ativo" });
+      if (temporadaAtiva) {
+        temporadaAtiva.pinIds = temporadaAtiva.pinIds.filter(
+          id => id.toString() !== pinoId
+        );
+        await temporadaAtiva.save();
+        console.log(`📌 Pino ${pinoId} removido da temporada ${temporadaAtiva.titulo}`);
       }
 
       PinoController._logSucesso('deletar pino', pinoId);
@@ -382,7 +413,7 @@ class PinoController {
 
       PinoController._logOperacao('buscar pino por ID', { id });
 
-      const pino = await Pino.findById(id);
+      const pino = await Pino.findById(id).populate('usuario', 'nome');
       
       if (!pino) {
         return res.status(404).json({ 
@@ -453,7 +484,7 @@ class PinoController {
             $maxDistance: radius
           }
         }
-      });
+      }).populate('usuario', 'nome');
 
       PinoController._logSucesso('buscar pinos por proximidade', {
         encontrados: pinos.length,
@@ -470,10 +501,89 @@ class PinoController {
       });
     }
   }
-}
 
-// ==================================================
-// Exporta a classe PinoController
-// ==================================================
+  /**
+   * Retorna apenas os pinos da temporada ativa
+   */
+  static async getPinosDisponiveis(req, res) {
+    try {
+      // Buscar temporada ativa
+      const agora = new Date();
+      console.log("➡️ getPinosDisponiveis chamado em", agora);
+      const temporada =
+        (await Temporada.findOne({ status: "ativo" }).sort({ dataInicio: -1 })) ||
+        (await Temporada.findOne({
+          dataInicio: { $lte: agora },
+          dataFim: { $gte: agora }
+        }).sort({ dataInicio: -1 }));
+        
+      console.log("Temporada encontrada:", temporada);  
+      if (!temporada) {
+        return res.json({ message: "Nenhuma temporada ativa", pinos: [] });
+      }
+
+      console.log("IDs de pinos da temporada:", temporada.pinIds);
+      // Buscar pinos pelos IDs da temporada
+      const pinos = await Pino.find({ _id: { $in: temporada.pinIds } });
+
+      console.log(`✅ ${pinos.length} pinos disponíveis na temporada ${temporada.titulo}`);
+
+      res.json({
+        temporada: {
+          id: temporada._id,
+          titulo: temporada.titulo,
+          dataInicio: temporada.dataInicio,
+          dataFim: temporada.dataFim,
+          status: temporada.status
+        },
+        pinos
+      });
+    } catch (err) {
+      console.error("❌ Erro ao buscar pinos disponíveis:", err);
+      res.status(500).json({ message: "Erro interno ao buscar pinos disponíveis" });
+    }
+  } 
+  
+  /**
+   * Buscar conclusões de um pino específico
+   * @param {Object} req - Objeto da requisição
+   * @param {Object} res - Objeto da resposta
+   */
+  static async buscarConclusoesPino(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Validar ID
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ 
+          message: "ID do pino inválido" 
+        });
+      }
+
+      const pino = await Pino.findById(id)
+        .populate('conclusoes.cliente', 'nome email')
+        .select('conclusoes nome');
+
+      if (!pino) {
+        return res.status(404).json({ 
+          message: "Pino não encontrado" 
+        });
+      }
+
+      res.json({
+        pinoId: pino._id,
+        nome: pino.nome,
+        totalConclusoes: pino.conclusoes?.length || 0,
+        conclusoes: pino.conclusoes || []
+      });
+
+    } catch (error) {
+      console.error("❌ Erro ao buscar conclusões do pino:", error);
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao buscar conclusões" 
+      });
+    }
+  }
+}
 
 module.exports = PinoController;

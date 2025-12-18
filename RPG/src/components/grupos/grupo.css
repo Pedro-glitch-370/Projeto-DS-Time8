@@ -1,0 +1,269 @@
+/* Fundo escuro atrás do modal */
+.grupo-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999999; /* Z-index bem alto para ficar na frente de tudo */
+}
+
+/* O corpo da janela do modal */
+.grupo-modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  text-align: center;
+  color: #333333; /* Cinza escuro/Preto para todo o texto */
+  font-family: Arial, sans-serif;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Títulos do modal */
+.grupo-modal-content h2 {
+  color: #1449c0; /* Azul do tema */
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.grupo-modal-content h3 {
+  color: #333;
+  margin: 10px 0;
+}
+
+/* Textos gerais e parágrafos */
+.grupo-modal-content p {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Campos de digitação (Inputs) */
+.grupo-modal-content input, 
+.grupo-modal-content textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box; /* Importante para não estourar a largura */
+  
+  /* Garante que o texto digitado seja escuro */
+  color: #000000;
+  background-color: #f9f9f9;
+  font-size: 1rem;
+}
+
+/* Foco no input */
+.grupo-modal-content input:focus, 
+.grupo-modal-content textarea:focus {
+  border-color: #1449c0;
+  outline: none;
+  background-color: #fff;
+}
+
+/* Botões das Abas (Entrar/Criar) */
+.abas {
+  display: flex;
+  margin-bottom: 20px;
+  gap: 10px;
+  justify-content: center;
+}
+
+.abas button {
+  background: #eee;
+  color: #555; /* Texto cinza quando inativo */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.abas button.active {
+  background: #1449c0; /* Azul */
+  color: white; /* Texto branco apenas no botão ativo */
+  box-shadow: 0 2px 5px rgba(20, 73, 192, 0.3);
+}
+
+/* Botão Principal (Ação) */
+.submit-btn {
+  width: 100%;
+  background: #1449c0;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 15px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover {
+  background: #0d3a9c;
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Caixa do Código */
+.codigo-box {
+  background: #f0f4ff; /* Fundo azulzinho bem claro */
+  padding: 15px;
+  border: 2px dashed #1449c0;
+  margin: 15px 0;
+  border-radius: 12px;
+  transition: transform 0.2s;
+}
+
+.codigo-box:hover {
+  transform: scale(1.02);
+  background: #e6ecff;
+}
+
+.codigo-box p {
+  color: #1449c0;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Botão de Fechar (X) */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+/* Mensagem de Erro ou Sucesso */
+.msg-feedback {
+  margin-top: 15px;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* paginação e lista de membros */
+/* Estilo do Código Grande */
+.codigo-texto {
+    font-size: 1.5rem;
+    color: #1449c0;
+    display: block;
+    margin: 5px 0;
+    cursor: pointer;
+}
+
+.copiar-hint {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Botão Sair Vermelho */
+.btn-sair-grupo {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-top: 15px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.btn-sair-grupo:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+/* Área de Rolagem da Lista de Membros */
+.lista-membros-scroll {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    max-height: 200px; /* Define altura fixa */
+    overflow-y: auto;  /* Adiciona barra de rolagem se passar da altura */
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+/* Item individual da lista */
+.membro-item {
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.membro-infos {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.95rem;
+}
+
+.membro-nome {
+    font-weight: bold;
+    color: #333;
+}
+
+.membro-pts {
+    color: #28a745;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.slide-fade-in {
+    animation: fadeInSlide 0.3s ease-in-out;
+}
+
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateX(5px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* paginação */
+.pagination-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background-color: #ddd;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    background-color: #1449c0;
+    transform: scale(1.3);
+}

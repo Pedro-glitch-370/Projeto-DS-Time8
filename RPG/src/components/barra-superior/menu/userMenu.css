@@ -31,7 +31,7 @@
 }
 
 /* Info do usuário no menu */
-.user-info {
+.user-info-menu {
   display: flex;
   align-items: center;
   gap: 1rem;

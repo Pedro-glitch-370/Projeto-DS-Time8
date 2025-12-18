@@ -94,8 +94,9 @@ export const authService = {
     console.log('🚪 Realizando logout do usuário');
     // Remove dados do usuário do localStorage
     localStorage.removeItem('user');
+    window.dispatchEvent(new Event("userChanged"));
     // Redireciona para página de login
-    window.location.href = 'login.html';
+    //window.location.href = 'login.html';
   },
 
   /**
@@ -165,6 +166,7 @@ export const authService = {
   setUser: (userData) => {
     try {
       localStorage.setItem("user", JSON.stringify(userData));
+      window.dispatchEvent(new Event("userChanged"));
       console.log('💾 Dados do usuário salvos no localStorage');
     } catch (error) {
       console.error('❌ Erro ao salvar dados do usuário:', error);

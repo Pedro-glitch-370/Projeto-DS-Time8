@@ -19,8 +19,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Recupera dados do usuário do localStorage
-    console.log(localStorage.getItem('user'));
     const userData = localStorage.getItem('user');
+    console.log(localStorage.getItem('user'));
     // Se existir dados do usuário, adiciona no header da requisição
     if (userData) {
       try {
@@ -69,7 +69,7 @@ api.interceptors.response.use(
       // Remove dados do usuário do localStorage
       localStorage.removeItem('user');
       // Redireciona para página de login
-      window.location.href = 'login.html';
+      //window.location.href = 'login.html';
     } 
     // Tratamento específico para erro 403 - Acesso negado
     else if (error.response?.status === 403) {

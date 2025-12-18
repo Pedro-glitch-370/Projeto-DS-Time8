@@ -179,15 +179,15 @@ const GerenciarUsers = () => {
             {/* Stats */}
             <div className="stats-gerenciar">
             <div className="stat-card">
-                <div className="stat-number">{totalAdmins}</div>
+                <div className="stat-number-gerenciar">{totalAdmins}</div>
                 <div className="stat-label-gerenciar">Administradores</div>
             </div>
             <div className="stat-card">
-                <div className="stat-number">{totalClientes}</div>
+                <div className="stat-number-gerenciar">{totalClientes}</div>
                 <div className="stat-label-gerenciar">Clientes</div>
             </div>
             <div className="stat-card">
-                <div className="stat-number">{totalUsers}</div>
+                <div className="stat-number-gerenciar">{totalUsers}</div>
                 <div className="stat-label-gerenciar">Usuários ao Total</div>
             </div>
             </div>
@@ -202,13 +202,13 @@ const GerenciarUsers = () => {
                     className={`tab ${activeTab === "admins" ? "active" : ""}`}
                     onClick={() => openTab("admins")}
                 >
-                    👨‍💼 Administradores
+                    Administradores
                 </button>
                 <button
                     className={`tab ${activeTab === "clientes" ? "active" : ""}`}
                     onClick={() => openTab("clientes")}
                 >
-                    👥 Clientes
+                    Clientes
                 </button>
             </div>
 
@@ -229,7 +229,7 @@ const GerenciarUsers = () => {
                             <div className="user-info-card">
                             <div className="user-name">{admin.nome}</div>
                             <div className="user-email">📧 {admin.email}</div>
-                            <div className="user-details">
+                            <div className="user-details-gerenciar">
                                 <span className="user-type admin">👑 Administrador</span>
                                 <span className="user-stats">
                                 🛠️ {admin.permissoes ? admin.permissoes.length : 0} permissões
@@ -266,7 +266,7 @@ const GerenciarUsers = () => {
                             <div className="user-info-card">
                             <div className="user-name">{cliente.nome}</div>
                             <div className="user-email">📧 {cliente.email}</div>
-                            <div className="user-details">
+                            <div className="user-details-gerenciar">
                                 <span className="user-type cliente">👤 Cliente</span>
                                 <span className="user-stats">🪙 {cliente.capibas || 0} capibas</span>
                                 {cliente.tarefasCompletas && (

@@ -106,7 +106,7 @@
 }
 
 /* Mensagens de status */
-.error-login, .loading {
+.error-login, .loading-login {
   text-align: center;
   margin-top: 1rem;
   padding: 0.75rem;
