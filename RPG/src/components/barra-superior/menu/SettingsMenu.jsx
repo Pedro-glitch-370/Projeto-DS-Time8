@@ -1,0 +1,61 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { isUserAdmin } from "../para-react/userUtils";
+import "./settingsMenu.css";
+
+export default function SettingsMenu({ onClose }) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    function handleEsc(e) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+
+  function handleManageUsers() {
+    if (isUserAdmin()) {
+      navigate("/gerenciar");
+    } else {
+      alert("❌ Apenas administradores podem acessar o gerenciamento de usuários.");
+    }
+  }
+
+  function handleSeasonConfiguration() {
+    if (isUserAdmin()) {
+      navigate("/temporadas")
+    } else {
+      alert("❌ Apenas administradores podem acessar as configurações do sistema.");
+    }
+  }
+
+  function handleBackup() {
+    if (isUserAdmin()) {
+      alert("💾 Backup de dados - Em desenvolvimento");
+    } else {
+      alert("❌ Apenas administradores podem acessar o backup de dados.");
+    }
+  }
+
+  return (
+    <div className="settings-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="settings-menu">
+        
+        <div className="settings-header">
+          <h3>⚙️ Configurações</h3>
+          <span className="close-settings" onClick={onClose}>&times;</span>
+        </div>
+
+        <div className="settings-menu-content">
+          <button className="settings-option" onClick={handleManageUsers}>👥 Gerenciar Usuários</button>
+          <button className="settings-option" onClick={handleSeasonConfiguration}>🔧 Configurar Temporadas</button>
+          <button className="settings-option" onClick={handleBackup}>💾 Backup de Dados</button>
+        </div>
+        <div className="copyright">
+          Recife Point Game &copy; 2025
+        </div>
+      </div>
+    </div>
+  );
+}

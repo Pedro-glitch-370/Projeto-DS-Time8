@@ -1,14 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
+import './css/index.css'
 import App from './App.jsx'
 
-/* Importa o CSS e JS para a barra superior (top nav) */
-import './components/barra-superior/barra-superior.css'
-import './components/barra-superior/barra-superior.js'
+// Marca que é uma React App para a navbar não carregar automaticamente
+window.isReactApp = true;
 
+// Carrega a navbar e depois o React
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
   </StrictMode>,
-)
+);

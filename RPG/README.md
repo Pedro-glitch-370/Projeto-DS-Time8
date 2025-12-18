@@ -14,8 +14,14 @@ OBS: Tente fazer os passos a seguir em um terminal diferente do powershell.
 - npm run dev
 
 **Se, por algum motivo, der problema com o Leaftlet:**
-npm install react@rc react-dom@rc leaflet
-npm install react-leaflet@next
+- npm install react@rc react-dom@rc leaflet
+- npm install react-leaflet@next
+
+**Para testes de UI, faça:**
+- npx cypress open
+- Selecione um navegador
+- Escolha testes de componentes
+- Procure pelos arquivos cy.jsx listados
 
 # React + Vite
 

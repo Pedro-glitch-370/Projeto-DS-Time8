@@ -1,9 +1,273 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  font-weight: 400;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.saldo-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  text-align: center;
+  margin-top: 70px;
+}
+
+.saldo-container h1 {
+  color: white;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.carrossel-container {
+  position: relative;
+  max-width: 400px;
+  margin: 30px auto;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  background: white;
+  height: 200px;
+}
+
+.carrossel {
+  display: flex;
+  transition: transform 0.5s ease;
+  height: 100%;
+}
+
+.pessoa {
+  min-width: 100%;
+  padding: 40px 30px;
+  text-align: center;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.pessoa .nome {
+  font-size: 1.5rem;
+  color: #1449c0;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.pessoa .saldo {
+  font-size: 1.1rem;
+  color: #ff6b35;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.pessoa .pontos {
+  font-size: 2rem;
+  color: #2f7854;
+  font-weight: bold;
+}
+
+.prev, .next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1449c0;
+  color: white;
+  border: none;
+  padding: 15px;
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 20px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.prev { left: 10px; }
+.next { right: 10px; }
+
+.prev:hover, .next:hover {
+  background: #0d3a9c;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.meu-saldo {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin-top: 30px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.meu-saldo h2 {
+  color: #1449c0;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.saldo-pessoal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.valor {
+  font-size: 2rem;
+  color: #2f7854;
+  font-weight: bold;
+}
+
+.posicao {
+  font-size: 1.2rem;
+  color: #ff6b35;
+  font-weight: bold;
+}
+
+/* Logo clicável */
+.logo-img {
+  height: 40px;
+  width: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Botão Entrar */
+#login {
+  border-radius: 20px;
+  padding: 8px 20px;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  background-color: #2f7854;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#login:hover {
+  background-color: #4dc48a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#login:active {
+  transform: translateY(0);
+}
+
+/* Loading state */
+.carregando {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: white;
+  font-size: 1.2rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .saldo-container {
+    padding: 20px 15px;
+    margin-top: 70px;
+  }
+  
+  .saldo-container h1 {
+    font-size: 2rem;
+  }
+  
+  .carrossel-container {
+    max-width: 350px;
+    height: 180px;
+  }
+  
+  .pessoa {
+    padding: 30px 20px;
+  }
+  
+  .pessoa .nome {
+    font-size: 1.3rem;
+  }
+  
+  .pessoa .pontos {
+    font-size: 1.7rem;
+  }
+  
+  .prev, .next {
+    width: 40px;
+    height: 40px;
+    padding: 10px;
+  }
+}
+  
+@media (max-width: 480px) {
+  .saldo-container {
+    margin-top: 85px;
+  }
+  
+  .saldo-container h1 {
+    font-size: 1.8rem;
+  }
+  
+  .carrossel-container {
+    max-width: 300px;
+    height: 160px;
+  }
+  
+  .pessoa {
+    padding: 25px 15px;
+  }
+  
+  .pessoa .nome {
+    font-size: 1.2rem;
+  }
+  
+  .pessoa .saldo {
+    font-size: 1rem;
+  }
+  
+  .pessoa .pontos {
+    font-size: 1.5rem;
+  }
+  
+  .meu-saldo {
+    padding: 20px;
+  }
+  
+  .valor {
+    font-size: 1.7rem;
+  }
+  
+  .posicao {
+    font-size: 1.1rem;
+  }
+  
+  #login {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .logo-img {
+    height: 35px;
+  }
 }

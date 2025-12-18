@@ -1,178 +1,589 @@
-const Pino = require("../models/PinoModel"); // Importa o Model (Schema) do Pino para interagir com o MongoDB
+const Temporada = require("../models/temporadaModel");
+const Pino = require("../models/pinoModel");
+const mongoose = require("mongoose");
 
 // ==================================================
-/**
- * Lógica para criar um novo pino no banco de dados
- * Recebe nome, coordenadas e mensagem via corpo da requisição (req.body)
- * @param {Object} req - Objeto de requisição do Express, contendo os dados do formulário
- * @param {Object} res - Objeto de resposta do Express
- * @returns {void} Envia um redirecionamento ou uma resposta de erro
- */
+// Classe PinoController - Controladora de operações com pinos
+// ==================================================
 
-const criarPino = async (req, res) => {
-  try {
-    // Extrai os campos do corpo da requisição
-    const { nome, latitude, longitude, msg } = req.body;
+class PinoController {
+  // ==================================================
+  // Métodos estáticos auxiliares (privados)
+  // ==================================================
 
-    // Validação dos dados de entrada
-    const lng = parseFloat(longitude);
-    const lat = parseFloat(latitude);
+  /**
+   * Loga informações de debug para operações com pinos
+   */
+  static _logOperacao(operacao, dados) {
+    console.log(`🔍 ${operacao}:`, dados);
+  }
 
-    // Verifica se as coordenadas são números válidos após a conversão
-    if (isNaN(lng) || isNaN(lat)) {
-      // Retorna um erro 400 (Bad Request) se a validação falhar
-      return res
-        .status(400)
-        .send("Erro: Latitude e Longitude devem ser números válidos.");
+  /**
+   * Loga sucesso de operações
+   */
+  static _logSucesso(operacao, resultado) {
+    console.log(`✅ ${operacao} com sucesso:`, resultado);
+  }
+
+  /**
+   * Loga erros de forma padronizada
+   */
+  static _logErro(operacao, erro) {
+    console.error(`❌ Erro ao ${operacao}:`, erro);
+  }
+
+  /**
+   * Extrai coordenadas do request body em diferentes formatos
+   */
+  static _extrairCoordenadas(body) {
+    // Verifica formato GeoJSON padrão
+    if (body.localizacao?.coordinates && Array.isArray(body.localizacao.coordinates)) {
+      return {
+        coordinates: body.localizacao.coordinates,
+        formato: 'localizacao.coordinates'
+      };
+    }
+    
+    // Verifica formato simplificado
+    if (body.coordinates && Array.isArray(body.coordinates)) {
+      return {
+        coordinates: body.coordinates,
+        formato: 'coordinates'
+      };
+    }
+    
+    // Verifica formato latitude/longitude separados
+    if (body.latitude !== undefined && body.longitude !== undefined) {
+      return {
+        coordinates: [parseFloat(body.longitude), parseFloat(body.latitude)],
+        formato: 'latitude/longitude'
+      };
+    }
+    
+    return null;
+  }
+
+  /**
+   * Valida dados básicos do pino
+   */
+  static _validarDadosPino(nome, msg, coordinates) {
+    const erros = [];
+
+    if (!nome || typeof nome !== 'string' || nome.trim().length === 0) {
+      erros.push("Nome é obrigatório e deve ser uma string não vazia");
     }
 
-    console.log("Dados recebidos no Controller:", {
-      nome,
-      latitude,
-      longitude,
-      msg,
-    });
+    if (!msg || typeof msg !== 'string' || msg.trim().length === 0) {
+      erros.push("Mensagem é obrigatória e deve ser uma string não vazia");
+    }
 
-    // Interação com o Model (cria uma nova instância do pino)
-    const novoPino = new Pino({
-      nome: nome,
-      // O Mongoose espera as coordenadas no formato GeoJSON [longitude, latitude]
+    if (!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2) {
+      erros.push("Coordenadas devem ser um array com 2 elementos [longitude, latitude]");
+    } else {
+      const [lng, lat] = coordinates;
+      if (typeof lng !== 'number' || typeof lat !== 'number' || 
+          isNaN(lng) || isNaN(lat) ||
+          lng < -180 || lng > 180 || 
+          lat < -90 || lat > 90) {
+        erros.push("Coordenadas inválidas. Longitude deve estar entre -180 e 180, Latitude entre -90 e 90");
+      }
+    }
+
+    return erros;
+  }
+
+  /**
+   * Valida e parseia coordenadas
+   */
+  static _validarCoordenadas(coordinates) {
+    const [longitude, latitude] = coordinates.map(coord => parseFloat(coord));
+
+    if (isNaN(longitude) || isNaN(latitude)) {
+      throw new Error("Longitude e Latitude devem ser números válidos");
+    }
+
+    if (longitude < -180 || longitude > 180) {
+      throw new Error("Longitude deve estar entre -180 e 180 graus");
+    }
+
+    if (latitude < -90 || latitude > 90) {
+      throw new Error("Latitude deve estar entre -90 e 90 graus");
+    }
+
+    return { lng: longitude, lat: latitude };
+  }
+
+  /**
+   * Formata dados do pino para salvar no banco
+   */
+  static _formatarPinoParaBanco(dados, lng, lat, userId) {
+    return {
+      nome: dados.nome?.trim(),
+      msg: dados.msg?.trim(),
+      capibas: Math.max(0, Number(dados.capibas) || 0), // Garante número positivo
       localizacao: {
         type: "Point",
-        coordinates: [lng, lat],
+        coordinates: [lng, lat]
       },
-      msg: msg,
-    });
-
-    // Salva o novo pino no banco de dados, retornando o objeto salvo
-    const pinoSalvo = await novoPino.save();
-    console.log("✅ Pino salvo no banco de dados:", pinoSalvo._id);
-
-    // Resposta pro cliente
-    // Redireciona o usuário de volta com um parâmetro de sucesso
-    res.redirect("/api/pinos/adicionar?success=true");
-  } catch (err) {
-    // Manipulação de erros e resposta 500 (Internal Server Error)
-    console.error("❌ Erro ao salvar pino no Controller:", err);
-    res.status(500).send("Erro ao salvar pino: " + err.message);
+      usuario: userId || null, // Se não tiver ID, salva como null (Anônimo/Sistema)
+      grupo: dados.grupoId || null
+    };
   }
-};
 
-// ==================================================
-/**
- * Lógica para obter todos os pinos do banco de dados
- * @param {Object} req - Objeto de requisição do Express (não utilizado aqui, mas mantido para assinatura)
- * @param {Object} res - Objeto de resposta do Express
- * @returns {void} Envia um array JSON de pinos ou uma resposta de erro 500
- */
+  // ==================================================
+  // Controladores principais (métodos públicos)
+  // ==================================================
 
-const getTodosPinos = async (req, res) => {
-  try {
-    // Busca e retorna todos os documentos (pinos) da coleção
-    const pinos = await Pino.find();
-    console.log("📌 Controller solicitou todos os pinos!");
-    // Envia a lista de pinos como resposta JSON
-    res.json(pinos);
-  } catch (err) {
-    // Manipulação de erros e resposta 500
-    res
-      .status(500)
-      .json({ error: "Erro ao buscar pinos no Controller: " + err.message });
-  }
-};
+  /**
+   * Cria um novo pino no banco de dados
+   */
+  static async criarPino(req, res) {
+    try {
+      PinoController._logOperacao('BACKEND - Dados recebidos no criarPino', {
+        body: req.body
+      });
 
-// ==================================================
-/**
- * Lógica para deletar um pino específico pelo seu ID (MongoDB _id)
- * O ID é esperado como um parâmetro de rota (ex: DELETE /api/pinos/deletar/12345)
- * @param {Object} req - Objeto de requisição (espera o ID em req.params.id)
- * @param {Object} res - Objeto de resposta do Express
- * @returns {void} Envia uma mensagem de sucesso ou uma resposta de erro (404 ou 500)
- */
+      // Extrair e validar coordenadas
+      const coordenadasExtraidas = PinoController._extrairCoordenadas(req.body);
+      if (!coordenadasExtraidas) {
+        return res.status(400).json({
+          message: "Formato de localização inválido. Use: { localizacao: { coordinates: [lng, lat] } }, { coordinates: [lng, lat] } ou { latitude: X, longitude: Y }"
+        });
+      }
 
-const deletarPino = async (req, res) => {
-  try {
-    const pinoId = req.params.id; // Captura o ID do pino a ser deletado
+      console.log(`📍 Usando formato: ${coordenadasExtraidas.formato}`);
 
-    // Usa findByIdAndDelete para deletar o documento e retornar o documento deletado
-    const resultado = await Pino.findByIdAndDelete(pinoId);
+      // Validações básicas
+      const errosValidacao = PinoController._validarDadosPino(
+        req.body.nome, 
+        req.body.msg, 
+        coordenadasExtraidas.coordinates
+      );
 
-    // Verifica se o resultado é nulo, indicando que o ID não foi encontrado
-    if (!resultado) {
-      return res.status(404).json({ error: "Pino não encontrado." });
+      if (errosValidacao.length > 0) {
+        return res.status(400).json({
+          message: "Dados inválidos",
+          errors: errosValidacao
+        });
+      }
+
+      // Validar e parsear coordenadas
+      const { lng, lat } = PinoController._validarCoordenadas(coordenadasExtraidas.coordinates);
+      console.log("📍 Coordenadas processadas:", { longitude: lng, latitude: lat });
+
+      // Criar e salvar pino
+      console.log(`O BODY EM CRIAR E SALVAR ESTÁ: `, req.body)
+      const dadosPino = PinoController._formatarPinoParaBanco(req.body, lng, lat, null);
+      const novoPino = new Pino(dadosPino);
+      const pinoSalvo = await novoPino.save();
+
+      // Vincular pino à temporada ativa
+      const temporadaAtiva = await Temporada.findOne({ status: "ativo" });
+      if (temporadaAtiva) {
+        temporadaAtiva.pinIds.push(pinoSalvo._id);
+        await temporadaAtiva.save();
+        console.log(`📌 Pino ${pinoSalvo._id} vinculado à temporada ${temporadaAtiva.titulo}`);
+      }
+      console.log(`PINO SALVO: `, pinoSalvo)
+
+      PinoController._logSucesso('salvar pino no banco', {
+        id: pinoSalvo._id,
+        nome: pinoSalvo.nome,
+        msg: pinoSalvo.msg,
+        capibas: pinoSalvo.capibas
+      });
+
+      res.status(201).json({
+        message: "Pino criado com sucesso",
+        pino: pinoSalvo
+      });
+
+    } catch (err) {
+      PinoController._logErro('salvar pino no Controller', err);
+      
+      // Erro de duplicação (se houver índices únicos)
+      if (err.code === 11000) {
+        return res.status(400).json({
+          message: "Já existe um pino com estes dados"
+        });
+      }
+      
+      res.status(500).json({
+        message: "Erro interno do servidor ao salvar pino"
+      });
     }
-
-    // Retorna uma resposta de sucesso
-    console.log(`🗑️ Pino deletado: ${pinoId}`);
-    res.json({ message: "Pino deletado com sucesso.", deletedId: pinoId });
-  } catch (err) {
-    // Captura erros (ex: formato de ID inválido) e retorna 500
-    res
-      .status(500)
-      .json({ error: "Erro ao deletar pino no Controller: " + err.message });
   }
-};
 
-// ==================================================
-/**
- * Lógica para atualizar um pino específico pelo seu ID
- * Recebe o ID via parâmetro de rota e os novos dados via corpo da requisição
- * @param {Object} req - Objeto de requisição (espera o ID em req.params.id e os dados em req.body)
- * @param {Object} res - Objeto de resposta do Express
- * @returns {void} Envia o pino atualizado (JSON) ou uma resposta de erro (404 ou 500)
- */
-
-const atualizarPino = async (req, res) => {
-  try {
-    const pinoId = req.params.id;
-    const { nome, latitude, longitude, msg } = req.body;
-
-    // Validação das coordenadas
-    const lng = parseFloat(longitude);
-    const lat = parseFloat(latitude);
-
-    if (isNaN(lng) || isNaN(lat)) {
-      return res
-        .status(400)
-        .send("Erro: Latitude e Longitude devem ser números válidos.");
-    }
-
-    // Tenta encontrar e atualizar o pino
-    const pinoAtualizado = await Pino.findByIdAndUpdate(
-      pinoId,
-      {
-        // Objeto com os campos a serem atualizados
-        nome: nome,
-        localizacao: {
-          type: "Point",
-          coordinates: [lng, lat],
-        },
-        msg: msg,
-      },
-      { new: true } // { new: true } retorna o documento atualizado, não o antigo
+  /**
+   * Obtém todos os pinos do banco de dados
+   */
+  static async getTodosPinos(req, res) {
+    try {
+      const pinos = await Pino.find()
+      .sort({ createdAt: -1 })
+      .populate('usuario', 'nome')
+      .populate('conclusoes.cliente', 'nome email');
+      
+      PinoController._logSucesso('buscar pinos', `${pinos.length} pinos encontrados`);
+      
+      res.json(
+      pinos.map(p => ({
+        ...p.toObject(),
+        conclusoes: p.conclusoes || []
+      }))
     );
-
-    // Verifica se o pino foi encontrado e atualizado
-    if (!pinoAtualizado) {
-      return res.status(404).json({ error: "Pino não encontrado." });
+    } catch (err) {
+      PinoController._logErro('buscar pinos no Controller', err);
+      
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao buscar pinos"
+      });
     }
-
-    // Retorna o pino atualizado em JSON
-    console.log(`🔄 Pino atualizado: ${pinoId}`);
-    res.json(pinoAtualizado);
-  } catch (err) {
-    // Captura erros de banco de dados ou formato de ID
-    res
-      .status(500)
-      .json({ error: "Erro ao atualizar pino no Controller: " + err.message });
   }
-};
 
-// ==================================================
-// Exporta as funções de controller para que possam ser usadas no arquivo de rotas
-module.exports = {
-  criarPino,
-  getTodosPinos,
-  deletarPino,
-  atualizarPino,
-};
+  /**
+   * Deleta um pino específico pelo ID
+   */
+  static async deletarPino(req, res) {
+    try {
+      const pinoId = req.params.id;
+
+      // Validar ID
+      if (!mongoose.Types.ObjectId.isValid(pinoId)) {
+        return res.status(400).json({ 
+          message: "ID do pino inválido" 
+        });
+      }
+
+      const resultado = await Pino.findByIdAndDelete(pinoId);
+
+      if (!resultado) {
+        return res.status(404).json({ 
+          message: "Pino não encontrado" 
+        });
+      }
+
+      // Remover referência da temporada ativa
+      const temporadaAtiva = await Temporada.findOne({ status: "ativo" });
+      if (temporadaAtiva) {
+        temporadaAtiva.pinIds = temporadaAtiva.pinIds.filter(
+          id => id.toString() !== pinoId
+        );
+        await temporadaAtiva.save();
+        console.log(`📌 Pino ${pinoId} removido da temporada ${temporadaAtiva.titulo}`);
+      }
+
+      PinoController._logSucesso('deletar pino', pinoId);
+
+      res.json({ 
+        message: "Pino deletado com sucesso",
+        deletedId: pinoId 
+      });
+
+    } catch (err) {
+      PinoController._logErro('deletar pino no Controller', err);
+      
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao deletar pino"
+      });
+    }
+  }
+
+  /**
+   * Atualiza um pino específico pelo ID
+   */
+  static async atualizarPino(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Validar ID
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ 
+          message: "ID do pino inválido" 
+        });
+      }
+
+      PinoController._logOperacao('atualizar pino', {
+        id,
+        body: req.body
+      });
+
+      // Verificar se o pino existe
+      const pinoExistente = await Pino.findById(id);
+      if (!pinoExistente) {
+        return res.status(404).json({ 
+          message: "Pino não encontrado" 
+        });
+      }
+
+      // Preparar dados para atualização
+      const dadosAtualizacao = { ...req.body };
+      
+      // Processar coordenadas se fornecidas
+      if (req.body.localizacao || req.body.coordinates || 
+          (req.body.latitude !== undefined && req.body.longitude !== undefined)) {
+        
+        const coordenadasExtraidas = PinoController._extrairCoordenadas(req.body);
+        if (!coordenadasExtraidas) {
+          return res.status(400).json({
+            message: "Formato de localização inválido para atualização"
+          });
+        }
+
+        const { lng, lat } = PinoController._validarCoordenadas(coordenadasExtraidas.coordinates);
+        dadosAtualizacao.localizacao = {
+          type: "Point",
+          coordinates: [lng, lat]
+        };
+      }
+
+      // Validar dados básicos (usando coordenadas existentes se não for fornecida atualização)
+      const coordenadasParaValidar = dadosAtualizacao.localizacao?.coordinates || pinoExistente.localizacao.coordinates;
+      const errosValidacao = PinoController._validarDadosPino(
+        dadosAtualizacao.nome || pinoExistente.nome,
+        dadosAtualizacao.msg || pinoExistente.msg,
+        coordenadasParaValidar
+      );
+
+      if (errosValidacao.length > 0) {
+        return res.status(400).json({ 
+          message: "Dados inválidos",
+          errors: errosValidacao
+        });
+      }
+
+      // Processar capibas
+      if (dadosAtualizacao.capibas !== undefined) {
+        dadosAtualizacao.capibas = Math.max(0, Number(dadosAtualizacao.capibas) || 0);
+      }
+
+      // Remover campos desnecessários
+      delete dadosAtualizacao.coordinates;
+      delete dadosAtualizacao.latitude;
+      delete dadosAtualizacao.longitude;
+
+      // Atualizar pino
+      const pinoAtualizado = await Pino.findByIdAndUpdate(
+        id,
+        dadosAtualizacao,
+        { new: true, runValidators: true }
+      );
+
+      PinoController._logSucesso('atualizar pino', {
+        id: pinoAtualizado._id,
+        nome: pinoAtualizado.nome,
+        capibas: pinoAtualizado.capibas
+      });
+
+      res.json({
+        message: "Pino atualizado com sucesso",
+        pino: pinoAtualizado
+      });
+
+    } catch (error) {
+      PinoController._logErro('atualizar pino', error);
+      
+      // Tratamento específico de erros do Mongoose
+      if (error.name === 'ValidationError') {
+        return res.status(400).json({ 
+          message: "Dados inválidos",
+          errors: Object.values(error.errors).map(err => err.message)
+        });
+      }
+      
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao atualizar pino" 
+      });
+    }
+  }
+
+  /**
+   * Busca um pino específico pelo ID
+   */
+  static async buscarPinoPorId(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Validar ID
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ 
+          message: "ID do pino inválido" 
+        });
+      }
+
+      PinoController._logOperacao('buscar pino por ID', { id });
+
+      const pino = await Pino.findById(id).populate('usuario', 'nome');
+      
+      if (!pino) {
+        return res.status(404).json({ 
+          message: "Pino não encontrado" 
+        });
+      }
+
+      PinoController._logSucesso('buscar pino por ID', {
+        id: pino._id,
+        nome: pino.nome
+      });
+
+      res.json(pino);
+
+    } catch (error) {
+      PinoController._logErro('buscar pino por ID', error);
+      
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao buscar pino" 
+      });
+    }
+  }
+
+  /**
+   * Busca pinos por proximidade geográfica
+   */
+  static async buscarPinosPorProximidade(req, res) {
+    try {
+      const { longitude, latitude, raio = 1000 } = req.query; // raio em metros
+
+      PinoController._logOperacao('buscar pinos por proximidade', {
+        longitude,
+        latitude,
+        raio
+      });
+
+      // Validar coordenadas
+      if (!longitude || !latitude) {
+        return res.status(400).json({ 
+          message: "Longitude e latitude são obrigatórias" 
+        });
+      }
+
+      const lng = parseFloat(longitude);
+      const lat = parseFloat(latitude);
+      const radius = parseFloat(raio);
+
+      if (isNaN(lng) || isNaN(lat) || isNaN(radius)) {
+        return res.status(400).json({ 
+          message: "Longitude, latitude e raio devem ser números válidos" 
+        });
+      }
+
+      // Validar limites das coordenadas
+      if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+        return res.status(400).json({ 
+          message: "Coordenadas fora dos limites válidos" 
+        });
+      }
+
+      const pinos = await Pino.find({
+        localizacao: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [lng, lat]
+            },
+            $maxDistance: radius
+          }
+        }
+      }).populate('usuario', 'nome');
+
+      PinoController._logSucesso('buscar pinos por proximidade', {
+        encontrados: pinos.length,
+        centro: [lng, lat],
+        raio: radius
+      });
+
+      res.json(pinos);
+
+    } catch (error) {
+      PinoController._logErro('buscar pinos por proximidade', error);
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao buscar pinos por proximidade" 
+      });
+    }
+  }
+
+  /**
+   * Retorna apenas os pinos da temporada ativa
+   */
+  static async getPinosDisponiveis(req, res) {
+    try {
+      // Buscar temporada ativa
+      const agora = new Date();
+      console.log("➡️ getPinosDisponiveis chamado em", agora);
+      const temporada =
+        (await Temporada.findOne({ status: "ativo" }).sort({ dataInicio: -1 })) ||
+        (await Temporada.findOne({
+          dataInicio: { $lte: agora },
+          dataFim: { $gte: agora }
+        }).sort({ dataInicio: -1 }));
+        
+      console.log("Temporada encontrada:", temporada);  
+      if (!temporada) {
+        return res.json({ message: "Nenhuma temporada ativa", pinos: [] });
+      }
+
+      console.log("IDs de pinos da temporada:", temporada.pinIds);
+      // Buscar pinos pelos IDs da temporada
+      const pinos = await Pino.find({ _id: { $in: temporada.pinIds } });
+
+      console.log(`✅ ${pinos.length} pinos disponíveis na temporada ${temporada.titulo}`);
+
+      res.json({
+        temporada: {
+          id: temporada._id,
+          titulo: temporada.titulo,
+          dataInicio: temporada.dataInicio,
+          dataFim: temporada.dataFim,
+          status: temporada.status
+        },
+        pinos
+      });
+    } catch (err) {
+      console.error("❌ Erro ao buscar pinos disponíveis:", err);
+      res.status(500).json({ message: "Erro interno ao buscar pinos disponíveis" });
+    }
+  } 
+  
+  /**
+   * Buscar conclusões de um pino específico
+   * @param {Object} req - Objeto da requisição
+   * @param {Object} res - Objeto da resposta
+   */
+  static async buscarConclusoesPino(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Validar ID
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ 
+          message: "ID do pino inválido" 
+        });
+      }
+
+      const pino = await Pino.findById(id)
+        .populate('conclusoes.cliente', 'nome email')
+        .select('conclusoes nome');
+
+      if (!pino) {
+        return res.status(404).json({ 
+          message: "Pino não encontrado" 
+        });
+      }
+
+      res.json({
+        pinoId: pino._id,
+        nome: pino.nome,
+        totalConclusoes: pino.conclusoes?.length || 0,
+        conclusoes: pino.conclusoes || []
+      });
+
+    } catch (error) {
+      console.error("❌ Erro ao buscar conclusões do pino:", error);
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao buscar conclusões" 
+      });
+    }
+  }
+}
+
+module.exports = PinoController;

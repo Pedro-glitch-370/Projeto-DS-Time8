@@ -1,63 +1,29 @@
-const express = require("express");
-const router = express.Router();
-const path = require("path"); // redenrizar arquivos HTML
-const fs = require("fs"); // ler arquivos Html
-const pinoController = require("../controllers/pinoController"); // importa o controler com a logica de nogocio
+const express = require("express")
+const router = express.Router()
+const PinoController = require("../controllers/pinoController")
 
 // ==================================================
-// Rota que retorna todos os pinos
-router.get("/", pinoController.getTodosPinos);
-
+// Rotas para pinos
 // ==================================================
-// Rota pra renderizar HTML (fica igual, pois é lógica de front/arquivo)
-router.get("/adicionar", (req, res) => {
-  try {
-    const htmlPath = path.join(__dirname, "../test/adicionarpinos.html");
-    const htmlContent = fs.readFileSync(htmlPath, "utf8");
-    res.send(htmlContent);
-  } catch (err) {
-    console.error("❌ Erro ao carregar HTML:", err);
-    res.status(500).send("Erro ao carregar página");
-  }
+
+// GET - Todos os pinos
+router.get("/", PinoController.getTodosPinos)
+
+// POST - Criar novo pino
+router.post("/adicionar", PinoController.criarPino)
+
+// PUT - Atualizar pino
+router.put("/atualizar/:id", PinoController.atualizarPino)
+
+// DELETE - Deletar pino
+router.delete("/deletar/:id", PinoController.deletarPino)
+
+// GET - Pegar pinos da temporada ativa
+router.get("/available", async (req, res) => {
+  await PinoController.getPinosDisponiveis(req, res);
 });
 
-// ==================================================
-// Rota pra criar novo pino
-router.post("/adicionar", pinoController.criarPino);
+// GET - Buscar conclusões de um pino
+router.get("/:id/conclusoes", PinoController.buscarConclusoesPino);
 
-// ==================================================
-// Rota pra renderizar HTML de deleção
-router.get("/deletar", (req, res) => {
-  try {
-    const htmlPath = path.join(__dirname, "../test/deletarpinos.html");
-    const htmlContent = fs.readFileSync(htmlPath, "utf8");
-    res.send(htmlContent);
-  } catch (err) {
-    console.error("❌ Erro ao carregar HTML:", err);
-    res.status(500).send("Erro ao carregar página");
-  }
-});
-
-// ==================================================
-// Rota pra deletar um pino pelo ID
-router.delete("/deletar/:id", pinoController.deletarPino);
-
-// ==================================================
-// Rota pra renderizar HTML de atualização (vai ser substituída)
-router.get("/atualizar", (req, res) => {
-  try {
-    const htmlPath = path.join(__dirname, "../test/atualizarpinos.html");
-    const htmlContent = fs.readFileSync(htmlPath, "utf8");
-    res.send(htmlContent);
-  } catch (err) {
-    console.error("❌ Erro ao carregar HTML:", err);
-    res.status(500).send("Erro ao carregar página");
-  }
-});
-
-// ==================================================
-// Rota para atualizar
-router.put("/atualizar/:id", pinoController.atualizarPino);
-
-// ==================================================
-module.exports = router;
+module.exports = router
