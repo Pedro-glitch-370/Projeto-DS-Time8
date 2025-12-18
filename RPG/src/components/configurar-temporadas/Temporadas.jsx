@@ -181,16 +181,28 @@ export default function Temporadas() {
         />
 
         <h4>Selecionar Pinos</h4>
-        {pinos.map((pino) => (
-          <label key={pino._id}>
-            <input
-              type="checkbox"
-              checked={pinIds.includes(pino._id)}
-              onChange={() => togglePino(pino._id)}
-            />
-            {pino.nome || pino._id}
-          </label>
-        ))}
+        {pinos.map((pino) => {
+          // Verifica se esse pino já tá em outra temporada
+          const jaUsado = temporadas.some(t => 
+            t.pinIds?.some(id => {
+              // pinIds pode vir como array de objetos ou de strings
+              return (typeof id === "string" ? id : id._id) === pino._id;
+            })
+          );
+
+          return (
+            <label key={pino._id}>
+              <input
+                type="checkbox"
+                checked={pinIds.includes(pino._id)}
+                onChange={() => togglePino(pino._id)}
+                disabled={jaUsado}
+              />
+              {pino.nome || pino._id}
+              {jaUsado && <span style={{ color: "red" }}>*já em temporada</span>}
+            </label>
+          );
+        })}
 
         <button type="submit">Criar Temporada</button>
       </form>
@@ -215,7 +227,7 @@ export default function Temporadas() {
                 <p>Pinos:</p>
                 <ul>
                   {temporadaAtual.pinIds.map((pino) => (
-                    <li key={pino._id}>{pino.nome || pino._id} {console.log(pino)}</li>
+                    <li key={pino._id}>{pino.nome || pino._id}</li>
                   ))}
                 </ul>
               </div>
@@ -242,7 +254,7 @@ export default function Temporadas() {
                 <p>Pinos:</p>
                 <ul>
                   {t.pinIds.map((pino) => (
-                    <li key={pino._id}>{pino.nome || pino._id} {console.log(pino)}</li>
+                    <li key={pino._id}>{pino.nome || pino._id}</li>
                   ))}
                 </ul>
               </div>
