@@ -1,0 +1,33 @@
+services:
+  database-service: 
+    image: mongo:6.0
+    container_name: mongodb_rpg
+    ports:
+      - "27017:27017"
+
+  backend-service:
+    build: ./backend
+    restart: always
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - PORT=5001  
+      - MONGO_URI=mongodb://database-service:27017/rpg_database
+    depends_on:
+      - database-service
+
+  frontend-service:
+    build: ./RPG
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./RPG:/app
+      - /app/node_modules
+    depends_on:
+      - backend-service
+
+volumes:
+  mongo_data:

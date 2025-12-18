@@ -11,30 +11,19 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    // Pega a URI de conexão, utilizando uma variável de ambiente ou um valor padrão
-    const MONGODB_URI =
-      process.env.MONGODB_URI || "mongodb://localhost:27017/RPG"
-    //"mongodb+srv://pedroh7brito_db_user:Ew1L1igsu2ixWkVs@naxron.hba9ufc.mongodb.net/"
-    //"mongodb+srv://acsj2_db_user:aaaa@cluster0.02dncab.mongodb.net/"
-    //"mongodb://localhost:27017/RPG"
-    //"mongodb://127.0.0.1:27017/RPG"
+    const MONGODB_URI = process.env.MONGODB_URI || "mongodb://database-service:27017/rpg_database";
 
-    // Conecta ao MongoDB usando Mongoose
-    const connection = await mongoose.connect(MONGODB_URI)
+    const connection = await mongoose.connect(MONGODB_URI);
 
-    // Logs de sucesso e detalhes da conexão
-    console.log("Conectado ao MongoDB:", connection.connection.name)
-    console.log("Host:", connection.connection.host)
-    console.log("Porta:", connection.connection.port)
+    console.log("✅ Conectado ao MongoDB:", connection.connection.name);
+    console.log("📍 Host:", connection.connection.host);
 
     return connection;
   } catch (error) {
-    // Logs de erro e encerramento do processo em caso de falha crítica na conexão inicial
-    console.error("Erro ao conectar com MongoDB:", error.message)
-    process.exit(1)
+    console.error("❌ Erro ao conectar com MongoDB:", error.message);
+    process.exit(1);
   }
-}
-
+};
 // ==================================================
 /**
  * Fecha a conexão ativa com o MongoDB
