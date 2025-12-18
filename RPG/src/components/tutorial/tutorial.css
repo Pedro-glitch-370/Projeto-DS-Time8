@@ -1,0 +1,39 @@
+.tutorial-container {
+  padding: 1rem 1.5rem;
+  margin: 5% auto;
+  margin-top: 80px;
+  max-width: 700px;
+  background: white;
+  border-left: 6px solid #1449c0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  color: black;
+}
+
+.tutorial-container h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #1449c0;
+}
+
+.tutorial-section {
+  margin-bottom: 1.5rem;
+}
+
+.tutorial-section h3 {
+  color: #1449c0;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+.tutorial-section p,
+.tutorial-section ul {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.tutorial-section ul {
+  padding-left: 1rem;
+  list-style-type: disc;
+}

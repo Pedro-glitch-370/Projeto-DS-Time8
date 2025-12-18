@@ -15,7 +15,6 @@
 
 /* Lista de tarefas */
 .lista-tarefas {
-
   display: flex;
   flex-direction: column;
   gap: 20px;

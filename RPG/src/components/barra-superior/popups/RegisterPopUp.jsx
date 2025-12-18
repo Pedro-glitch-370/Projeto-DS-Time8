@@ -53,7 +53,7 @@ export default function RegisterPopup({ onClose, abrirLogin }) {
         setTimeout(() => {
           onClose();
           abrirLogin();
-        }, 2000);
+        }, 1500);
       } else {
         setMensagemErro(data.message || "Erro no registro. Tente novamente.");
       }

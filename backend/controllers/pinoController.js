@@ -169,17 +169,27 @@ class PinoController {
 
       // Validar e parsear coordenadas
       const { lng, lat } = PinoController._validarCoordenadas(coordenadasExtraidas.coordinates);
-      
       console.log("📍 Coordenadas processadas:", { longitude: lng, latitude: lat });
 
       // Criar e salvar pino
+      console.log(`O BODY EM CRIAR E SALVAR ESTÁ: `, req.body)
       const dadosPino = PinoController._formatarPinoParaBanco(req.body, lng, lat, null);
       const novoPino = new Pino(dadosPino);
       const pinoSalvo = await novoPino.save();
 
+      // Vincular pino à temporada ativa
+      const temporadaAtiva = await Temporada.findOne({ status: "ativo" });
+      if (temporadaAtiva) {
+        temporadaAtiva.pinIds.push(pinoSalvo._id);
+        await temporadaAtiva.save();
+        console.log(`📌 Pino ${pinoSalvo._id} vinculado à temporada ${temporadaAtiva.titulo}`);
+      }
+      console.log(`PINO SALVO: `, pinoSalvo)
+
       PinoController._logSucesso('salvar pino no banco', {
         id: pinoSalvo._id,
         nome: pinoSalvo.nome,
+        msg: pinoSalvo.msg,
         capibas: pinoSalvo.capibas
       });
 
@@ -251,6 +261,16 @@ class PinoController {
         return res.status(404).json({ 
           message: "Pino não encontrado" 
         });
+      }
+
+      // Remover referência da temporada ativa
+      const temporadaAtiva = await Temporada.findOne({ status: "ativo" });
+      if (temporadaAtiva) {
+        temporadaAtiva.pinIds = temporadaAtiva.pinIds.filter(
+          id => id.toString() !== pinoId
+        );
+        await temporadaAtiva.save();
+        console.log(`📌 Pino ${pinoId} removido da temporada ${temporadaAtiva.titulo}`);
       }
 
       PinoController._logSucesso('deletar pino', pinoId);

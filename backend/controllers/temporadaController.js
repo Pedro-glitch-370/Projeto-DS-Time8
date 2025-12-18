@@ -1,7 +1,6 @@
 const Temporada = require("../models/temporadaModel");
 
 class TemporadaController {
-  // Logs
   static _logOperacao(operacao, dados) {
     console.log(`🔍 ${operacao}:`, dados);
   }
@@ -68,11 +67,15 @@ class TemporadaController {
     try {
       const agora = new Date();
       const temporada =
-        (await Temporada.findOne({ status: "ativo" }).sort({ dataInicio: -1 })) ||
+        (await Temporada.findOne({ status: "ativo" })
+          .sort({ dataInicio: -1 })
+          .populate("pinIds")) ||
         (await Temporada.findOne({
           dataInicio: { $lte: agora },
           dataFim: { $gte: agora }
-        }).sort({ dataInicio: -1 }));
+        })
+          .sort({ dataInicio: -1 })
+          .populate("pinIds"));
 
       if (!temporada) {
         return res.json({ message: "Nenhuma temporada ativa", temporada: null });
@@ -132,7 +135,6 @@ class TemporadaController {
       res.status(500).json({ error: "Erro interno ao atualizar temporada" });
     }
   }
-
 }
 
 module.exports = TemporadaController;

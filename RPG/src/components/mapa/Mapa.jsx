@@ -3,21 +3,22 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 // Serviços e componentes
 import { handleSavePino, handleDeletePino, handleUpdatePino } from "./acoesPinos.js";
 import { MAP_CONFIG, ICONS } from "./constantes/constantesMapa.js";
 import { createUserLocationIcon, createUserLocationUpdatingIcon, createUserLocationFallbackIcon } from "./constantes/iconsLeaflet.js";
+import Loading from "../loading/Loading.jsx";
 import usePinosManagement from "./usePinosManagement.js";
 import MapClickHandler from "./MapClickHandler.jsx";
 import Sidebar from "../barra-lateral/barraLateral.jsx";
-import { authService } from "../../services/authService.js";
-
 import StatusLocalizacao from "./StatusLocalizacao.jsx";
+import { authService } from "../../services/authService.js";
 import { localizacaoService } from "../../services/localizacaoService.js";
 import { clienteService } from "../../services/clienteService.js";
 import { adminService } from "../../services/adminService.js";
+import { temporadaService } from "../../services/temporadaService.js"
 
 // Configuração do Leaflet - remove URLs padrão
 delete L.Icon.Default.prototype._getIconUrl;
@@ -33,6 +34,7 @@ export default function Mapa() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [tempPin, setTempPin] = useState(null);
   const [selectedPino, setSelectedPino] = useState(null);
+  const [showLoading, setShowLoading] = useState(true);
   
   // Estados de autenticação
   const [user, setUser] = useState(null);
@@ -48,6 +50,7 @@ export default function Mapa() {
   const [atualizandoLocalizacao, setAtualizandoLocalizacao] = useState(false);
   
   // Estado de tarefas concluídas
+  const [temporadaAtual, setTemporadaAtual] = useState(null);
   const [tarefasConcluidas, setTarefasConcluidas] = useState(new Map());
   const [presencasConfirmadas, setPresencasConfirmadas] = useState({});
   const atualizarPresencaDoPino = (pinoId, valor) => {
@@ -61,6 +64,15 @@ export default function Mapa() {
   const atualizarMensagemLocalizacao = (pinoId, msg) => {
     setMensagemLocalizacao(prev => ({ ...prev, [pinoId]: msg }));
   };
+
+  // Timer para garantir 1.5s de loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Verifica autenticação ao carregar
   useEffect(() => {
@@ -95,12 +107,22 @@ export default function Mapa() {
     checkAuth();
 
     // Escuta mudanças no usuário
-    console.log(`ANTES DA SEGUNDA`);
-    console.log(authService.isAdmin());
     window.addEventListener("userChanged", checkAuth);
 
     // Limpa o listener ao desmontar
     return () => window.removeEventListener("userChanged", checkAuth);
+  }, []);
+
+  useEffect(() => {
+    const carregarTemporadaAtual = async () => {
+      try {
+        const atual = await temporadaService.getTemporadaAtual();
+        setTemporadaAtual(atual && atual.pinIds ? atual : null);
+      } catch (error) {
+        console.error("Erro ao carregar temporada atual:", error);
+      }
+    };
+    carregarTemporadaAtual();
   }, []);
 
   // Atualiza dados do usuário (capibas e tarefas)
@@ -242,14 +264,23 @@ export default function Mapa() {
     }
   }, [isCheckingAuth, fetchPinos]);
 
+  // Função auxiliar para os handlers
+  const atualizarTemporadaAtual = async () => {
+    const temporada = await temporadaService.getTemporadaAtual();
+    setTemporadaAtual(temporada);
+  };
+
   // Handlers para operações com pinos
   const onSavePino = useCallback(
-    (dados) => handleSavePino({ dados, addPino, setIsSidebarOpen, setTempPin, setSelectedPino }),
+    async (dados) => {
+      await handleSavePino({ dados, addPino, setIsSidebarOpen, setTempPin, setSelectedPino });
+      await atualizarTemporadaAtual();
+    },
     [addPino]
   );
 
   const onUpdatePino = useCallback(
-    (dados) => {
+    async (dados) => {
       if (selectedPino?._id) {
         handleUpdatePino({
           pinoId: selectedPino._id,
@@ -258,13 +289,17 @@ export default function Mapa() {
           setIsSidebarOpen,
           setSelectedPino,
         });
+        await atualizarTemporadaAtual();
       }
     },
     [selectedPino, updatePino]
   );
 
   const onDeletePino = useCallback(
-    (pinoId) => handleDeletePino({ pinoId, removePino, setIsSidebarOpen, setSelectedPino }),
+    async (pinoId) => {
+      await handleDeletePino({ pinoId, removePino, setIsSidebarOpen, setSelectedPino });
+      await atualizarTemporadaAtual();
+    },
     [removePino]
   );
 
@@ -518,12 +553,6 @@ export default function Mapa() {
     );
   };
 
-  // Filtra pinos com coordenadas válidas
-  const pinosValidos = useMemo(
-    () => pinos.filter((pino) => pino.localizacao?.coordinates?.length === 2),
-    [pinos]
-  );
-
   // Determina ícone da localização do usuário
   const getUserLocationIcon = () => {
     if (atualizandoLocalizacao) return createUserLocationUpdatingIcon();
@@ -532,13 +561,8 @@ export default function Mapa() {
   };
 
   // Estados de loading
-  if (isCheckingAuth || loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Carregando...</p>
-      </div>
-    );
+  if (showLoading || isCheckingAuth || loading) {
+    return <Loading />;
   }
 
   if (error && pinos.length === 0) {
@@ -561,6 +585,12 @@ export default function Mapa() {
         precisao={precisaoLocalizacao}
         onReiniciar={reiniciarRastreamentoLocalizacao}
       />
+
+      {(!temporadaAtual || temporadaAtual.pinIds.length === 0) && (
+        <div className="sem-temporada-overlay">
+          🚫 Nenhuma temporada ativa no momento
+        </div>
+      )}
 
       {/* Info de capibas e tarefas (apenas para clientes) */}
       {user && !isAdmin && (
@@ -652,32 +682,32 @@ export default function Mapa() {
           )}
 
           {/* Pinos existentes no mapa */}
-          {pinosValidos.map((pino) => {
-          const pinoId = pino._id;
-
-          const concluidoPorAlguem = Array.isArray(pino.conclusoes) && pino.conclusoes.length > 0;
-          const concluidoPorUsuario = tarefasConcluidas.has(pino._id);
-
-          const tarefaConcluida = concluidoPorUsuario || concluidoPorAlguem;
-
-          return (
-            <Marker
-              key={pinoId || pino.id}
-              position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}
-              eventHandlers={{ click: () => onPinoClick(pino) }}
-            >
-              <Popup>
-                  <PinoPopupContent 
-                    pino={pino} 
-                    pinoId={pinoId} 
-                    tarefaConcluida={tarefaConcluida}
-                    presencaConfirmada={presencasConfirmadas[pinoId] || false}
-                    setPresencaConfirmada={(v) => atualizarPresencaDoPino(pinoId, v)}
-                  />
-              </Popup>
-            </Marker>
-          );
-        })}
+          {temporadaAtual && temporadaAtual.pinIds
+          .filter(pino => pino.localizacao?.coordinates?.length === 2)
+          .map((pino) => {
+            const pinoId = pino._id;
+            const concluidoPorAlguem = Array.isArray(pino.conclusoes) && pino.conclusoes.length > 0;
+            const concluidoPorUsuario = tarefasConcluidas.has(pino._id);
+            const tarefaConcluida = concluidoPorUsuario || concluidoPorAlguem;
+            
+            return (
+              <Marker
+                key={pinoId || pino.id}
+                position={[pino.localizacao.coordinates[1], pino.localizacao.coordinates[0]]}
+                eventHandlers={{ click: () => onPinoClick(pino) }}
+              >
+                <Popup>
+                    <PinoPopupContent 
+                      pino={pino} 
+                      pinoId={pinoId} 
+                      tarefaConcluida={tarefaConcluida}
+                      presencaConfirmada={presencasConfirmadas[pinoId] || false}
+                      setPresencaConfirmada={(v) => atualizarPresencaDoPino(pinoId, v)}
+                    />
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
 

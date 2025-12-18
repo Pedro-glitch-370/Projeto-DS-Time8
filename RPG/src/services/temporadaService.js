@@ -85,6 +85,17 @@ export const temporadaService = {
     
     return erros;
   },
+
+  // Pegar temporada atual
+  async getTemporadaAtual() {
+    try {
+      const response = await api.get('/temporadas/atual');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erro ao carregar temporada atual:', error);
+      throw error;
+    }
+  },
   
   formatarDadosParaAPI(temporadaData) {
     return {

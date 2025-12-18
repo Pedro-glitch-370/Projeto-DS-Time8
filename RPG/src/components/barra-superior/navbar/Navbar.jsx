@@ -67,7 +67,7 @@ export default function Navbar() {
                 {usuarioLogado ? (
                     <div 
                     className="user-welcome" 
-                    onClick={() => setUserMenuAberto(true)}
+                    onClick={() => setUserMenuAberto(prev => !prev)}
                     >
                     <span className="user-avatar-small">{getUserInitials()}</span>
                     <span className="user-name-small">Olá, {usuarioLogado.nome}</span>
@@ -107,6 +107,7 @@ export default function Navbar() {
 
                     setUsuarioLogado(usuario);
                     localStorage.setItem("user", JSON.stringify(usuario));
+                    setUserMenuAberto(false);
                 }}
                 abrirRegistro={() => { setLoginPopupAberto(false); setRegisterPopupAberto(true); }}
             />

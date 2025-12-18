@@ -3,52 +3,6 @@ import api from "./api.js";
 // Funções auxiliares
 
 /**
- * Formata coordenadas para o padrão esperado pela API
- * Suporta múltiplos formatos de entrada:
- * - Array [longitude, latitude] em propriedade 'coordinates'
- * - Propriedades separadas 'latitude' e 'longitude'
- * @param {Object} pinoData - Dados do pino contendo coordenadas
- * @returns {Array} Array no formato [longitude, latitude]
- * @throws {Error} Se formato das coordenadas for inválido
- */
-const formatarCoordenadas = (pinoData) => {
-  // Verifica se já existe array de coordinates
-  if (pinoData.coordinates && Array.isArray(pinoData.coordinates)) {
-    return pinoData.coordinates;
-  }
-  
-  // Verifica se existe latitude e longitude separados
-  if (pinoData.latitude !== undefined && pinoData.longitude !== undefined) {
-    return [pinoData.longitude, pinoData.latitude];
-  }
-  
-  // Lança erro se formato não for reconhecido
-  throw new Error('Formato de coordenadas inválido. Use coordinates array ou latitude/longitude separados');
-};
-
-/**
- * Formata todos os dados do pino para o padrão esperado pela API
- * Garante tipos corretos e estrutura consistente
- * @param {Object} pinoData - Dados brutos do pino
- * @returns {Object} Dados formatados para a API
- */
-const formatarDadosPino = (pinoData) => {
-  // Formata coordenadas primeiro (pode lançar erro)
-  const coordinates = formatarCoordenadas(pinoData);
-  
-  // Retorna objeto no formato esperado pela API
-  return {
-    nome: pinoData.nome,
-    msg: pinoData.msg,
-    capibas: Number(pinoData.capibas) || 0, // Garante que capibas seja número
-    localizacao: {
-      type: "Point", // Tipo GeoJSON para coordenadas
-      coordinates: coordinates // [longitude, latitude]
-    }
-  };
-};
-
-/**
  * Registra detalhes da requisição para debugging
  * @param {string} operacao - Nome da operação sendo realizada
  * @param {Object} dados - Dados que serão enviados para a API
@@ -145,13 +99,11 @@ export const pinoService = {
    */
   adicionarPino: async (pinoData) => {
     try {
-      // Formata dados para padrão da API
-      const dadosFormatados = formatarDadosPino(pinoData);
       // Log dos dados que serão enviados
-      logRequisicao('ADICIONAR PINO', dadosFormatados);
+      logRequisicao('ADICIONAR PINO', pinoData);
 
       // Envia requisição para API
-      const response = await api.post('/pinos/adicionar', dadosFormatados);
+      const response = await api.post('/pinos/adicionar', pinoData);
       
       console.log('✅ PINO CRIADO COM SUCESSO');
       return response.data;
@@ -192,13 +144,11 @@ export const pinoService = {
    */
   atualizarPino: async (pinoId, dadosAtualizados) => {
     try {
-      // Formata dados para padrão da API
-      const dadosFormatados = formatarDadosPino(dadosAtualizados);
       // Log dos dados que serão enviados
-      logRequisicao('ATUALIZAR PINO', dadosFormatados);
+      logRequisicao('ATUALIZAR PINO', dadosAtualizados);
 
       // Envia requisição para API
-      const response = await api.put(`/pinos/atualizar/${pinoId}`, dadosFormatados);
+      const response = await api.put(`/pinos/atualizar/${pinoId}`, dadosAtualizados);
       
       console.log('✅ PINO ATUALIZADO COM SUCESSO');
       return response.data;

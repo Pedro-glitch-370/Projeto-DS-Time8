@@ -210,13 +210,26 @@ export default function Temporadas() {
               {new Date(temporadaAtual.dataFim).toLocaleDateString("pt-BR")}
             </p>
             <p>Status: {temporadaAtual.status}</p>
+            {temporadaAtual.pinIds && temporadaAtual.pinIds.length > 0 && (
+              <div className="pinos-lista">
+                <p>Pinos:</p>
+                <ul>
+                  {temporadaAtual.pinIds.map((pino) => (
+                    <li key={pino._id}>{pino.nome || pino._id} {console.log(pino)}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <button className="btn-deletar-temp" onClick={() => handleDeletar(temporadaAtual._id)}>Deletar</button>
           </div>
         ) : (
           <p>Nenhuma temporada ativa</p>
         )}
 
         <h3>Temporadas Existentes</h3>
-        {temporadas.map((t) => (
+        {temporadas.length === 0 ? (
+          <p>Nenhuma temporada existente</p>
+        ) : (temporadas.map((t) => (
           <div key={t._id} className="temporada-item">
             <h1><strong>{t.titulo}</strong></h1>
             <p>
@@ -244,7 +257,7 @@ export default function Temporadas() {
                 <button className="btn-deletar-temp" onClick={() => handleDeletar(t._id)}>Deletar</button>
               )}
           </div>
-        ))}
+        )))}
       </div>
       
     </div>
