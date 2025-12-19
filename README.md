@@ -63,7 +63,7 @@ Para os testes de interface, foi utilizada a framework **Cypress**, que possibil
 ---
 
 ## 📦 Dockerização
-O grupo realizou com sucesso a dockerização do projeto utilizando Docker e Docker Compose, permitindo a execução do sistema de forma padronizada em qualquer ambiente. Os seguintes serviços são para os quais foram criadas imagens Docker.
+O grupo realizou com sucesso a dockerização do projeto utilizando [Docker](https://github.com/Pedro-glitch-370/Projeto-DS-Time8/blob/main/RPG/Dockerfile) e [Docker Compose](https://github.com/Pedro-glitch-370/Projeto-DS-Time8/blob/main/Docker-compose.yml), permitindo a execução do sistema de forma padronizada em qualquer ambiente. Os seguintes serviços são para os quais foram criadas imagens Docker.
 
 ### Banco de Dados (mongo:6.0):
 - MongoDB versão 6.0 (Serviço responsável pelo armazenamento dos dados da aplicação)
