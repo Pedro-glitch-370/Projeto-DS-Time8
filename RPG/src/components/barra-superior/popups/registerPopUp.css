@@ -105,7 +105,7 @@
 .popup-register button[type="submit"] {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(135deg, var(--primary-green) 0%, var(--hover-green) 100%);
+  background: linear-gradient(135deg, #4DC48A 0%, #2f7854 100%);
   color: var(--white);
   border: none;
   border-radius: 8px;
@@ -209,7 +209,7 @@
 }
 
 .user-type-register input[type="radio"]:checked + span {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, #1e5fd9 100%) !important;
+  background: linear-gradient(135deg, #1e5fd9 0%, var(--primary-blue) 100%) !important;
   color: var(--white) !important;
   box-shadow: 0 4px 12px rgba(20, 73, 192, 0.3);
 }

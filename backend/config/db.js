@@ -11,7 +11,7 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    const MONGODB_URI = process.env.MONGODB_URI || "mongodb://database-service:27017/rpg_database";
+    const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://pedroh7brito_db_user:Ew1L1igsu2ixWkVs@naxron.hba9ufc.mongodb.net/";
 
     const connection = await mongoose.connect(MONGODB_URI);
 

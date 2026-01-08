@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import GrupoModal from "../../grupos/GrupoModal"; 
 import RankingModal from "../../grupos/RankingModal"; 
 import { authService } from "../../../services/authService";
@@ -7,13 +7,31 @@ import "../../barra-superior/menu/settingsMenu.css";
 export default function MenuLateral({ isOpen, onClose, user, atualizarUsuario }) {
   const [isGrupoModalOpen, setIsGrupoModalOpen] = useState(false);
   const [isRankingModalOpen, setIsRankingModalOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      const id = requestAnimationFrame(() => setVisible(true));
+      return () => cancelAnimationFrame(id);
+    } else {
+      setVisible(false);
+    }
+  }, [isOpen]);
 
   const handleLogout = () => {
     authService.logout();
     window.location.reload();
   };
+
+  function handleClose() {
+    setVisible(false);
+    const timeout = setTimeout(() => {
+      onClose();
+    }, 300);
+    return () => clearTimeout(timeout);
+  }
+
+  if (!isOpen) return null;
 
   return (
     <>
@@ -33,13 +51,16 @@ export default function MenuLateral({ isOpen, onClose, user, atualizarUsuario })
         />
       )}
 
-      <div className="settings-overlay" onClick={onClose}>
+      <div className="settings-overlay" onClick={handleClose}>
 
-        <div className="settings-menu" onClick={(e) => e.stopPropagation()}>
+        <div
+          className={`settings-menu ${visible ? "open" : ""}`}
+          onClick={(e) => e.stopPropagation()}
+        >
           
           <div className="settings-header" style={{ marginBottom: '15px' }}>
             <h3>🏠 Menu Principal</h3>
-            <button className="closeButton" onClick={onClose}>&times;</button>
+            <button className="closeButton" onClick={handleClose}>&times;</button>
           </div>
 
           <div className="settings-menu-content">

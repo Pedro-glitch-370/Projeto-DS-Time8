@@ -96,7 +96,6 @@ export const authService = {
     localStorage.removeItem('user');
     window.dispatchEvent(new Event("userChanged"));
     // Redireciona para página de login
-    //window.location.href = 'login.html';
   },
 
   /**

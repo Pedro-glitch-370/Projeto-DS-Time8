@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./tarefasConcluidas.css";
 import { pinoService } from "../../../services/pinoService";
+import LoadingMenor from "../../loading/LoadingMenor";
 
 export default function TarefasConcluidas() {
   const [usuarioLogado, setUsuarioLogado] = useState(null); 
   const [tarefasConcluidas, setTarefasConcluidas] = useState([]);
   const [tarefasDisponiveis, setTarefasDisponiveis] = useState(0);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Verificar login e carregar dados do usuário
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (!userData) {
       alert("⚠️ Você precisa estar logado para acessar suas tarefas!");
-      window.location.href = "/";
+      navigate("/");
       return;
     }
 
@@ -22,9 +25,9 @@ export default function TarefasConcluidas() {
       setUsuarioLogado(user);
     } catch (error) {
       console.error("Erro ao parsear dados do usuário:", error);
-      window.location.href = "/";
+      navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
   // Carregar tarefas da API
   useEffect(() => {
@@ -59,13 +62,7 @@ export default function TarefasConcluidas() {
   }, [usuarioLogado]);
 
   if (loading) {
-    return (
-      <div className="sem-tarefas">
-        <div className="loading-spinner-tarefas"></div>
-        <h3>Carregando suas tarefas...</h3>
-        <p>Aguarde enquanto buscamos seu progresso</p>
-      </div>
-    );
+    return <LoadingMenor />
   }
 
   return (
@@ -131,7 +128,7 @@ export default function TarefasConcluidas() {
             <p>Comece a completar tarefas para ver seu histórico aqui!</p>
             <button 
               className="btn-explorar"
-              onClick={() => window.location.href = "/tarefas"}
+              onClick={() => navigate("/")}
             >
               Explorar Tarefas
             </button>

@@ -25,17 +25,16 @@
   background: white;
   border-radius: 15px;
   padding: 25px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   border-left: 6px solid #1449c0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease;
   min-width: 80%;
   margin-left: 15px;
   margin-right: 15px;
 }
 
 .tarefa-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
 }
 
 .tarefa-item h3 {

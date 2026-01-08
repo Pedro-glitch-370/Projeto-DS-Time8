@@ -42,7 +42,6 @@ background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
 color: white;
 padding: 2rem;
 text-align: center;
-border-bottom: 4px solid #667eea;
 }
 
 .header-gerenciar h1 {
@@ -76,49 +75,36 @@ margin: 1rem;
 justify-content: flex-start;
 }
 
-.back-link-gerenciar {
+.back-link-gerenciar, .logout-btn-gerenciar {
 display: flex;
 align-items: center;
 justify-content: center;
-color: #667eea;
+color: white;
 text-decoration: none;
 font-weight: 500;
 padding: 0.4rem 0.8rem;
-border: 2px solid #667eea;
 border-radius: 8px;
 cursor: pointer;
 transition: all 0.3s ease;
 max-width: 220px;
 height: 40px;
 font-size: small;
+border: none;
+}
+
+.back-link-gerenciar {
+background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
 }
 
 .back-link-gerenciar:hover {
-background: #667eea;
-color: white;
 transform: translateY(-2px);
 }
 
 .logout-btn-gerenciar {
-display: flex;
-align-items: center;
-justify-content: center;
-color: #e74c3c;
-text-decoration: none;
-font-weight: 500;
-padding: 0.4rem 0.8rem;
-border: 2px solid #e74c3c;
-border-radius: 8px;
-cursor: pointer;
-transition: all 0.3s ease;
-max-width: 220px;
-height: 40px;
-font-size: small;
+background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
 }
 
 .logout-btn-gerenciar:hover {
-background: #c0392b;
-color: white;
 transform: translateY(-2px);
 }
 
@@ -175,7 +161,7 @@ transition: all 0.3s ease;
 .tab.active {
 background: white;
 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-color: #667eea;
+color: var(--primary-blue);
 }
 
 /* Users Grid */

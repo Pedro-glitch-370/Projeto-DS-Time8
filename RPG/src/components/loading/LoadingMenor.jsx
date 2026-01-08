@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import "../../css/loading.css";
 
-const Loading = () => {
+const LoadingMenor = () => {
   const particlesRef = useRef(null);
 
   useEffect(() => {
@@ -35,22 +35,14 @@ const Loading = () => {
   }, []);
 
   return (
-    <div id="loading">
+    <div id="loading-menor">
       <div className="particles" id="particles" ref={particlesRef}></div>
       <div className="loading-content">
-        <div className="logo-loading">
-          <img src="\src\assets\LogoConecta.png" alt="Logo Conecta" />
-        </div>
-        <h1 className="loading-text">Recife Point Game</h1>
-        <p className="loading-subtext">
-          Carregando sua aventura por Recife...
-        </p>
-        <div className="progress-bar">
-          <div className="progress"></div>
-        </div>
+        <div className="loading-spinner"></div>
+        <h1 className="loading-text">Carregando...</h1>
       </div>
     </div>
   );
 }
 
-export default Loading
+export default LoadingMenor

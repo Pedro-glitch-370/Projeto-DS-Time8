@@ -1,10 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { isUserAdmin } from "../para-react/userUtils";
 import "./settingsMenu.css";
 
-export default function SettingsMenu({ onClose }) {
+export default function SettingsMenu({ onClose, isOpen }) {
+  const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isOpen) {
+      const id = requestAnimationFrame(() => setVisible(true));
+      return () => cancelAnimationFrame(id);
+    } else {
+      setVisible(false);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     function handleEsc(e) {
@@ -38,13 +48,23 @@ export default function SettingsMenu({ onClose }) {
     }
   }
 
+  function handleClose() {
+    setVisible(false);
+    const timeout = setTimeout(() => {
+      onClose();
+    }, 300);
+    return () => clearTimeout(timeout);
+  }
+
+  if (!isOpen) return null;
+  
   return (
     <div className="settings-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="settings-menu">
+      <div className={`settings-menu ${visible ? "open" : ""}`}>
         
         <div className="settings-header">
           <h3>⚙️ Configurações</h3>
-          <span className="close-settings" onClick={onClose}>&times;</span>
+          <span className="close-settings" onClick={handleClose}>&times;</span>
         </div>
 
         <div className="settings-menu-content">

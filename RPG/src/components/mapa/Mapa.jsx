@@ -34,7 +34,6 @@ export default function Mapa() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [tempPin, setTempPin] = useState(null);
   const [selectedPino, setSelectedPino] = useState(null);
-  const [showLoading, setShowLoading] = useState(true);
   
   // Estados de autenticação
   const [user, setUser] = useState(null);
@@ -64,15 +63,6 @@ export default function Mapa() {
   const atualizarMensagemLocalizacao = (pinoId, msg) => {
     setMensagemLocalizacao(prev => ({ ...prev, [pinoId]: msg }));
   };
-
-  // Timer para garantir 1.5s de loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // Verifica autenticação ao carregar
   useEffect(() => {
@@ -561,7 +551,7 @@ export default function Mapa() {
   };
 
   // Estados de loading
-  if (showLoading || isCheckingAuth || loading) {
+  if (isCheckingAuth || loading) {
     return <Loading />;
   }
 

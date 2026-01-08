@@ -132,9 +132,10 @@ export default function Navbar() {
             />
         )}
 
-        {settingsMenuAberto && (
-            <SettingsMenu onClose={() => setSettingsMenuAberto(false)} />
-        )}
+        <SettingsMenu
+            onClose={() => setSettingsMenuAberto(false)}
+            isOpen={settingsMenuAberto}
+        />
 
         <MenuLateral 
             isOpen={menuLateralAberto} 

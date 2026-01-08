@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./tarefasSolicitadas.css";
 import { solicitacaoService } from "../../../services/solicitacaoService";
+import LoadingMenor from "../../loading/LoadingMenor";
 
 export default function TarefasSolicitadas() {
   const [usuarioLogado, setUsuarioLogado] = useState(null);
@@ -302,14 +303,7 @@ export default function TarefasSolicitadas() {
   };
 
   if (loading) {
-    return (
-      <div className="solicitacoes-container">
-        <div className="loading-solicitacoes">
-          <div className="spinner"></div>
-          <h3>Carregando solicitações...</h3>
-        </div>
-      </div>
-    );
+    return <LoadingMenor />
   }
 
   return (
@@ -357,7 +351,7 @@ export default function TarefasSolicitadas() {
               setMostrarFormulario(!mostrarFormulario);
             }}
           >
-            {mostrarFormulario ? "✖️ Cancelar" : "➕ Sugerir Nova Tarefa"}
+            {mostrarFormulario ? "Cancelar" : "Sugerir Nova Tarefa"}
           </button>
         </div>
       )}
@@ -503,16 +497,13 @@ export default function TarefasSolicitadas() {
                 </div>
                 
                 {/* Área do solicitante EM BAIXO (agora formatado corretamente) */}
-                <div className="solicitacao-solicitante">
-                  <div className="solicitante-info">
-                    <span className="solicitante-icon">👤</span>
+                <div className="metadata-item">
                     <div className="solicitante-detalhes">
-                      <span className="solicitante-label">Solicitante:</span>
+                      <span className="metadata-label">👤 Solicitante:</span>
                       <span className={`solicitante-nome ${solicitanteInfo.isCurrentUser ? 'solicitante-atual' : ''}`}>
                         {solicitanteInfo.displayName}
                       </span>
                     </div>
-                  </div>
                 </div>
                 
                 {/* Ações */}

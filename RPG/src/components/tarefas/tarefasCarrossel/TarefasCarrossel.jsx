@@ -3,6 +3,7 @@ import "./tarefasCarrossel.css";
 import TarefasDisponiveis from '../tarefasDisponiveis/TarefasDisponiveis'
 import TarefasConcluidas from '../tarefasConcluidas/TarefasConcluidas';
 import TarefasSolicitadas from '../tarefasSolicitadas/TarefasSolicitadas';
+import Loading from "../../loading/Loading";
 
 const TarefasCarrossel = () => {
     // Estado para controlar qual aba vai estar ativa no carrossel

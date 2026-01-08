@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./tarefasDisponiveis.css";
 import { pinoService } from "../../../services/pinoService";
+import LoadingMenor from "../../loading/LoadingMenor";
 
 export default function TarefasDisponiveis() {
   const [usuarioLogado, setUsuarioLogado] = useState(null); 
@@ -75,12 +76,7 @@ export default function TarefasDisponiveis() {
   }, [tarefas]);
 
   if (loading) {
-    return (
-      <div className="sem-tarefas">
-        <h3>Carregando tarefas...</h3>
-        <p>Aguarde enquanto buscamos tarefas</p>
-      </div>
-    );
+    return <LoadingMenor />
   }
 
   // MODIFICADO: Agora verifica tarefasDisponiveis, não todas as tarefas
