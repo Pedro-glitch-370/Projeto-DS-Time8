@@ -1,41 +1,78 @@
 .tutorial-container {
   position: relative;
-  padding: 1rem 1.5rem;
-  margin: 5% auto;
+  padding: 2rem 1.5rem;
   margin-top: 80px;
+  margin-left: auto;
+  margin-right: auto;
   max-width: 700px;
-  background: white;
-  border-left: 6px solid #1449c0;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  color: black;
+  height: 520px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  color: white;
   z-index: 2;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  animation: fadeInLogo 1s ease-in-out;
+  overflow-y: hidden;
 }
 
 .tutorial-container h2 {
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  margin-bottom: 2rem;
   text-align: center;
-  color: #1449c0;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .tutorial-section {
   margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.4s ease;
+  transform: scale(1);
+  opacity: 0.8;
+}
+
+.tutorial-section:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+.tutorial-section.ativa {
+  transform: scale(1.02);
+  background-color: rgba(255, 255, 255, 0.15);
+  opacity: 1;
 }
 
 .tutorial-section h3 {
-  color: #1449c0;
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   margin-bottom: 10px;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.tutorial-section p,
-.tutorial-section ul {
-  font-size: 0.95rem;
-  line-height: 1.4;
+.conteudo {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
 }
 
-.tutorial-section ul {
-  padding-left: 1rem;
+.tutorial-section.ativa .conteudo {
+  max-height: 500px;
+  transition: max-height 1.5s ease;
+}
+
+.conteudo p,
+.conteudo ul {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: white;
+}
+
+.conteudo ul {
+  padding-left: 1.2rem;
   list-style-type: disc;
 }
