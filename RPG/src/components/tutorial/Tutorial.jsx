@@ -1,7 +1,9 @@
+import Particulas from "../particulas/Particulas";
 import "./tutorial.css";
 
 export default function Tutorial() {
   return (
+    <>
     <div className="tutorial-container">
       <h2>Como usar esta plataforma?</h2>
 
@@ -38,5 +40,7 @@ export default function Tutorial() {
         </p>
       </div>
     </div>
+    <Particulas />
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAtualizarUsuarioLogado } from "../barra-superior/utils/userState";
-import "../../css/gerenciarUsers.css";
+import "./gerenciarUsers.css";
 
 const API_BASE_URL = "http://localhost:5001/api/auth";
 
@@ -172,7 +172,7 @@ const GerenciarUsers = () => {
         {/* Content */}
         <div className="content-gerenciar">
             <div className="nav-links">
-                <a className="back-link-gerenciar" href="/">Voltar ao Mapa</a>
+                <a className="back-link-gerenciar" href="/mapa">Voltar ao Mapa</a>
                 <button className="logout-btn-gerenciar" onClick={logout}>Sair</button>
             </div>
 

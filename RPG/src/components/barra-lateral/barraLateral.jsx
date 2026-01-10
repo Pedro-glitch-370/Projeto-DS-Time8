@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "../../css/barraLateral.css";
+import "./barraLateral.css";
 import { validateForm, extractCoordinates, logDebugInfo } from "./funcoes-auxiliares";
 import { SidebarHeader, InputField, CapibasInput,
   ActionButtons, PinoInfo } from "./componentes-auxiliares/componentesAux";

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getUserInitials, isUserAdmin } from "../para-react/userUtils";
 import LoginPopup from "../popups/LoginPopUp";
 import RegisterPopup from "../popups/RegisterPopUp";
@@ -6,28 +6,18 @@ import UserMenu from "../menu/UserMenu";
 import SettingsMenu from "../menu/SettingsMenu";
 import MenuLateral from "../../barra-lateral/menu-lateral/MenuLateral";
 import { NavLink, useNavigate } from "react-router-dom";
-import { setAtualizarUsuarioLogado } from "../utils/userState";
 import { authService } from "../../../services/authService";
 import { clienteService } from "../../../services/clienteService";
+import { useAuthPopup, useUser } from "../../../context/exportsContext";
 import "../../../css/navbar.css";
 
 export default function Navbar() {
-    const [loginPopupAberto, setLoginPopupAberto] = useState(false);
-    const [registerPopupAberto, setRegisterPopupAberto] = useState(false);
-    const [userMenuAberto, setUserMenuAberto] = useState(false);
+    const { loginPopupAberto, setLoginPopupAberto, registerPopupAberto, setRegisterPopupAberto } = useAuthPopup();
+    const { usuarioLogado, setUsuarioLogado, userMenuAberto, setUserMenuAberto, logout } = useUser();
     const [settingsMenuAberto, setSettingsMenuAberto] = useState(false);
     const [menuLateralAberto, setMenuLateralAberto] = useState(false);
-    const [usuarioLogado, setUsuarioLogado] = useState(null);
 
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const savedUser = localStorage.getItem("user");
-        if (savedUser) {
-            setUsuarioLogado(JSON.parse(savedUser));
-        }
-        setAtualizarUsuarioLogado(setUsuarioLogado);
-    }, []);
 
     // Função para atualizar dados do usuário (ex: quando ganha pontos no grupo)
     const atualizarUsuario = async () => {
@@ -57,7 +47,7 @@ export default function Navbar() {
         </div>
 
         <div className="meio">
-            <NavLink to="/" className={({ isActive }) => isActive ? "ativo" : ""}>Mapa</NavLink>
+            <NavLink to="/mapa" className={({ isActive }) => isActive ? "ativo" : ""}>Mapa</NavLink>
             <NavLink to="/tarefas" className={({ isActive }) => isActive ? "ativo" : ""}>Minhas Tarefas</NavLink>
             <NavLink to="/tutorial" className={({ isActive }) => isActive ? "ativo" : ""}>Tutorial</NavLink>
         </div>
@@ -125,10 +115,7 @@ export default function Navbar() {
                 usuarioLogado={usuarioLogado}
                 abaLoginAberta={loginPopupAberto}
                 onClose={() => setUserMenuAberto(false)}
-                onLogout={() => {
-                authService.logout();
-                setUsuarioLogado(null);
-                }}
+                onLogout={logout}
             />
         )}
 

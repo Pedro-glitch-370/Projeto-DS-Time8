@@ -128,7 +128,7 @@ export default function TarefasConcluidas() {
             <p>Comece a completar tarefas para ver seu histórico aqui!</p>
             <button 
               className="btn-explorar"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/mapa")}
             >
               Explorar Tarefas
             </button>
