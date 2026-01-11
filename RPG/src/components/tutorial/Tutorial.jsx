@@ -29,7 +29,7 @@ export default function Tutorial() {
         </div>
 
         <div className={`tutorial-section ${ativa === 3 ? "ativa" : ""}`} onClick={() => toggleSecao(3)}>
-          <h3>📝 Minhas Tarefas</h3>
+          <h3>📝 Gerenciar Tarefas</h3>
           <div className="conteudo">
             <p>Na aba <strong>Minhas Tarefas</strong>, você pode:</p>
             <ul>
@@ -43,7 +43,7 @@ export default function Tutorial() {
         <div className={`tutorial-section ${ativa === 4 ? "ativa" : ""}`} onClick={() => toggleSecao(4)}>
           <h3>🤝 Trabalho em grupo</h3>
           <div className="conteudo">
-            <p>As tarefas são feitas em equipe. Ao colaborar com outros usuários, você ajuda a cuidar da cidade de Recife e acumula conquistas junto com sua turma.</p>
+            <p>As tarefas são feitas, de preferência, em <strong>equipe</strong>. Ao colaborar com outros usuários, você pode coletar <strong>mais Capibas</strong> e cuidar ainda mais da sua cidade!</p>
           </div>
         </div>
       </div>

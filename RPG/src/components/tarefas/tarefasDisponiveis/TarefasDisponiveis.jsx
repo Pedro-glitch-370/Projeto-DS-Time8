@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./tarefasDisponiveis.css";
 import { pinoService } from "../../../services/pinoService";
 import LoadingMenor from "../../loading/LoadingMenor";
@@ -8,6 +9,13 @@ export default function TarefasDisponiveis() {
   const [tarefas, setTarefas] = useState([]);
   const [tarefasDisponiveis, setTarefasDisponiveis] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [ativa, setAtiva] = useState(null);
+
+  const navigate = useNavigate();
+
+  const toggleTarefa = (id) => {
+    setAtiva(ativa === id ? null : id);
+  };
 
   // Verificar login e carregar dados do usuário
   useEffect(() => {
@@ -53,7 +61,7 @@ export default function TarefasDisponiveis() {
 
         setTarefas(todas);
         
-        // FILTRA: Mostra apenas tarefas NÃO concluídas
+        // Mostra apenas tarefas não concluídas
         const disponiveis = todas.filter(tarefa => !tarefa.concluida);
         setTarefasDisponiveis(disponiveis);
         
@@ -79,12 +87,11 @@ export default function TarefasDisponiveis() {
     return <LoadingMenor />
   }
 
-  // MODIFICADO: Agora verifica tarefasDisponiveis, não todas as tarefas
   if (tarefasDisponiveis.length === 0) {
     return (
       <div className="sem-tarefas">
-        <h3>🎉 Parabéns!</h3>
-        <p>Você completou todas as tarefas disponíveis!</p>
+        <h3>Sem tarefas!</h3>
+        <p>No momento, não há nenhuma tarefa disponível. Nos vemos na próxima temporada!</p>
         <p className="status-info">
           {usuarioLogado?.tipo === "cliente" 
             ? `💰 Total de capibas: ${usuarioLogado.capibas || 0}`
@@ -95,21 +102,27 @@ export default function TarefasDisponiveis() {
     );
   }
 
-  // MODIFICADO: Renderiza tarefasDisponiveis, não todas as tarefas
   return (
     <div className="lista-tarefas">
-      
       {tarefasDisponiveis.map((tarefa) => (
         <div
           key={tarefa.id}
-          className="tarefa-item" // Removida a classe tarefa-concluida pois não mostra mais tarefas concluídas
+          className={`tarefa-item ${ativa === tarefa.id ? "ativa" : ""}`}
+          onClick={() => toggleTarefa(tarefa.id)}
         >
           <h3>{tarefa.nome}</h3>
-          <p>{tarefa.descricao}</p>
-          <p className="recompensa">
-            🎁 Recompensa: {tarefa.recompensa} capibas
-          </p>
-          {/* BOTÃO REMOVIDO - APENAS VISUALIZAÇÃO */}
+          <div className="conteudo">
+            <p>{tarefa.descricao}</p>
+            <p className="recompensa">
+              Recompensa: <strong id="destaque-recompensa">{tarefa.recompensa} capibas</strong> 🪙
+            </p>
+          </div>
+          <div className="botao-mapa" onClick={(e) => {
+            e.stopPropagation();
+            navigate("/mapa");
+          }}>
+              🗺️
+          </div>
         </div>
       ))}
     </div>

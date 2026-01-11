@@ -5,24 +5,27 @@
   margin-left: 15px;
   margin-right: 15px;
   gap: 20px;
+  z-index: 2;
 }
 
 /* Seção de Progresso */
 .secao-progresso {
-  background: white;
-  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(80px);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
   padding: 25px;
   margin-bottom: 30px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e0e0e0;
 }
 
 .titulo-progresso {
   font-size: 1.8rem;
-  color: #333;
-  margin-bottom: 15px;
+  color: white;
+  margin-bottom: 25px;
   text-align: center;
   font-weight: 600;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .stats-progresso {
@@ -34,172 +37,173 @@
 
 .stat-item {
   text-align: center;
-  background: #f8f9fa;
-  border-radius: 10px;
+  background: rgba(90, 204, 149, 0.5);
+  border: 2px solid rgba(113, 223, 170, 0.5);
+  border-radius: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   padding: 20px;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
 }
 
 .stat-item:hover {
-  transform: translateY(-2px);
+  transform: scale(1.01);
+  box-shadow: 0 12px 15px rgba(0, 0, 0, 0.25);
 }
 
 .stat-numero {
   font-size: 2.2rem;
   font-weight: bold;
-  color: #2f7854;
+  color: white;
   margin-bottom: 5px;
 }
 
-.stat-label {
-  font-size: 0.9rem;
-  color: #666;
-  font-weight: 500;
+.stat-label-concluidas {
+  color: white;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
 }
 
 /* Barra de Progresso */
 .barra-progresso-container {
-  margin: 25px 0;
+  margin: 30px 0;
+  padding: 0 10px;
 }
 
 .barra-progresso {
-  height: 12px;
-  background: #e0e0e0;
-  border-radius: 6px;
+  height: 16px;
+  max-width: 400px;
+  margin: 0 auto 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
   overflow: hidden;
-  margin-bottom: 10px;
 }
 
 .barra-progresso-preenchida {
   height: 100%;
-  background: linear-gradient(90deg, #4DC48A, #2f7854);
-  border-radius: 6px;
+  background: linear-gradient(90deg, #1e5fd9, #4DC48A);
+  border-radius: 20px;
   transition: width 0.8s ease-in-out;
 }
 
 .progresso-texto {
   text-align: center;
   font-size: 0.95rem;
-  color: #666;
-  font-weight: 500;
+  color: white;
+  opacity: 0.9;
 }
 
 /* Mensagem Motivacional */
 .mensagem-motivacional {
   display: flex;
-  align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 15px;
-  background: linear-gradient(135deg, #f0f7ff, #e3f2fd);
-  border-radius: 10px;
-  padding: 20px;
-  margin-top: 25px;
-  border-left: 4px solid #047EEB;
-}
-
-.icone-motivacional {
-  font-size: 2rem;
+  border-radius: 20px;
+  padding: 10px 20px;
+  margin-bottom: 20px;
 }
 
 .mensagem-motivacional h3 {
-  color: #333;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
   margin-bottom: 5px;
   font-size: 1.2rem;
 }
 
 .mensagem-motivacional p {
-  color: #666;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
   margin: 0;
   font-size: 0.95rem;
   line-height: 1.4;
 }
 
+.tarefa-concluida-vertical:hover {
+  transform: scale(1.01);
+  box-shadow: 0 12px 15px rgba(0, 0, 0, 0.3);
+}
+
 /* Seção de Tarefas Concluídas */
 .secao-tarefas-concluidas {
-  background: white;
-  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(80px);
+  border-radius: 20px;
   padding: 25px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e0e0e0;
+  border: 2px solid rgba(255, 255, 255, 0.4);
 }
 
 .titulo-tarefas {
   font-size: 1.8rem;
-  color: #333;
+  color: white;
   margin-bottom: 25px;
   font-weight: 600;
   text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Lista Vertical de Tarefas */
 .lista-tarefas-vertical {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
+  padding: 1rem;
+  z-index: 2;
 }
 
 .tarefa-concluida-vertical {
-  display: flex;
+  position: relative;
   gap: 15px;
-  background: #f8f9fa;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   padding: 20px;
-  border-left: 4px solid #2f7854;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .tarefa-concluida-vertical:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: scale(1.01);
+  box-shadow: 0 12px 15px rgba(0, 0, 0, 0.3);
 }
 
-.tarefa-numero {
-  background: #4DC48A;
-  color: white;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-.tarefa-conteudo {
-  flex: 1;
+.tarefa-concluida-vertical.ativa {
+  transform: scale(1.02);
+  background: rgba(90, 204, 149, 0.5);
+  border: 2px solid rgba(113, 223, 170, 0.5);
 }
 
 .tarefa-cabecalho {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 10px;
   gap: 10px;
 }
 
-.tarefa-titulo {
-  font-size: 1.2rem;
-  color: #333;
-  margin: 0;
-  flex: 1;
+.tarefa-titulo, .tarefa-numero {
+  font-size: 1.3rem;
+  color: white;
 }
 
-.badge-concluida {
-  background: #2f7854;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  white-space: nowrap;
+.conteudo-concluida {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+
+.tarefa-concluida-vertical.ativa .conteudo-concluida {
+  max-height: 500px;
+  transition: max-height 1.5s ease;
 }
 
 .tarefa-descricao {
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
   margin: 0;
   line-height: 1.5;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 /* Estado Vazio - Tarefas Concluídas */
