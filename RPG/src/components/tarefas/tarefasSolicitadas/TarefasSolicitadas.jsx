@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./tarefasSolicitadas.css";
 import { solicitacaoService } from "../../../services/solicitacaoService";
 import LoadingMenor from "../../loading/LoadingMenor";
@@ -17,6 +17,20 @@ export default function TarefasSolicitadas() {
   });
   
   const [filtroStatus, setFiltroStatus] = useState("todas");
+  const toggleFormulario = () => {
+    setSolicitacaoEditando(null);
+    setNovaSolicitacao({ nome: "", descricao: "", capibas: "" });
+    setMostrarFormulario(!mostrarFormulario);
+  };
+  const formularioRef = useRef(null);
+
+  const [ativaSolicitacao, setAtivaSolicitacao] = useState(null);
+  const toggleSolicitacao = (id) => {
+    setAtivaSolicitacao(ativaSolicitacao === id ? null : id);
+  };
+
+  const [tutorialAtivo, setTutorialAtivo] = useState(false);
+  const toggleTutorial = () => setTutorialAtivo(!tutorialAtivo);
 
   // Verificar login
   useEffect(() => {
@@ -135,6 +149,9 @@ export default function TarefasSolicitadas() {
       capibas: solicitacao.capibas || "" // Converte 0 para string vazia se for 0
     });
     setMostrarFormulario(true);
+    setTimeout(() => {
+      formularioRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   // Função para cancelar edição
@@ -311,12 +328,7 @@ export default function TarefasSolicitadas() {
       {/* Cabeçalho */}
       <div className="solicitacao-card">
         <div className="solicitacoes-header">
-          <h2>📋 {usuarioLogado?.tipo === "admin" ? "Todas as Solicitações" : "Minhas Solicitações"}</h2>
-          <p>
-            {usuarioLogado?.tipo === "admin" 
-              ? "Gerencie todas as solicitações do sistema" 
-              : "Sugira novas tarefas ou acompanhe suas sugestões"}
-          </p>
+          <h2>📋 {usuarioLogado?.tipo === "admin" ? "Gerenciar Solicitações" : "Minhas Solicitações"}</h2>
         </div>
 
         {/* Estatísticas */}
@@ -338,101 +350,108 @@ export default function TarefasSolicitadas() {
             <div className="stat-label">Rejeitadas</div>
           </div>
         </div>
-      </div>
 
-      {/* Botão para nova solicitação (apenas clientes) */}
-      {usuarioLogado?.tipo === "cliente" && (
-        <div className="nova-solicitacao-btn-container">
-          <button 
-            className="btn-nova-solicitacao"
-            onClick={() => {
-              setSolicitacaoEditando(null);
-              setNovaSolicitacao({ nome: "", descricao: "", capibas: "" }); // String vazia
-              setMostrarFormulario(!mostrarFormulario);
-            }}
+        {usuarioLogado?.tipo === "cliente" && (
+          <div
+            className={`solicitacao-wrapper ${mostrarFormulario ? "ativa" : ""}`}
           >
-            {mostrarFormulario ? "Cancelar" : "Sugerir Nova Tarefa"}
-          </button>
-        </div>
-      )}
+            <button className={`solicitacao-titulo ${mostrarFormulario ? "ativo" : "inativo"}`}
+                    onClick={toggleFormulario}
+            >
+              {mostrarFormulario ? "Sugerindo Tarefa" : "Sugerir Nova Tarefa"}
+            </button>
 
-      {/* Formulário de nova/editar solicitação */}
-      {mostrarFormulario && (
-        <div className="form-nova-solicitacao">
-          <h3>{solicitacaoEditando ? "✏️ Editar Solicitação" : "📝 Sugerir Nova Tarefa"}</h3>
-          <form onSubmit={handleEnviarSolicitacao}>
-            <div className="form-group">
-              <label>Nome da Tarefa *</label>
-              <input
-                type="text"
-                value={novaSolicitacao.nome}
-                onChange={(e) => setNovaSolicitacao({...novaSolicitacao, nome: e.target.value})}
-                placeholder="Ex: Coletar amostras no jardim"
-                required
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Descrição da Tarefa *</label>
-              <textarea
-                value={novaSolicitacao.descricao}
-                onChange={(e) => setNovaSolicitacao({...novaSolicitacao, descricao: e.target.value})}
-                placeholder="Descreva detalhadamente a tarefa..."
-                rows="4"
-                required
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Capibas Sugeridos (opcional)</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={novaSolicitacao.capibas}
-                onChange={handleCapibasChange}
-                placeholder="Quantidade de capibas"
-                min="0"
-              />
-              <small className="form-hint">
-                Digite um número não negativo. Deixe em branco para 0.
-              </small>
-            </div>
-            
-            <div className="form-actions">
-              <button type="submit" className="btn-enviar">
-                {solicitacaoEditando ? "Atualizar Solicitação" : "Enviar Solicitação"}
-              </button>
-              <button 
-                type="button" 
-                className="btn-cancelar"
-                onClick={handleCancelarEdicao}
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+            <div ref={formularioRef} className="conteudo-solicitacao">
+              {mostrarFormulario && (
+                <form onSubmit={handleEnviarSolicitacao}>
+                  <div className="form-group">
+                    <label>Nome da Tarefa *</label>
+                    <input
+                      type="text"
+                      value={novaSolicitacao.nome}
+                      onChange={(e) =>
+                        setNovaSolicitacao({
+                          ...novaSolicitacao,
+                          nome: e.target.value,
+                        })
+                      }
+                      placeholder="Ex: Coletar amostras no jardim"
+                      required
+                    />
+                  </div>
 
-      {/* Filtros */}
-      <div className="solicitacoes-filtros">
-        <div className="filtros-container">
-          <label>Filtrar por status:</label>
-          <select 
-            value={filtroStatus} 
-            onChange={(e) => setFiltroStatus(e.target.value)}
-            className="select-filtro"
-          >
-            <option value="todas">Todas</option>
-            <option value="pendente">⏳ Pendentes</option>
-            <option value="aprovada">✅ Aprovadas</option>
-            <option value="rejeitada">❌ Rejeitadas</option>
-          </select>
-        </div>
+                  <div className="form-group">
+                    <label>Descrição da Tarefa *</label>
+                    <textarea
+                      value={novaSolicitacao.descricao}
+                      onChange={(e) =>
+                        setNovaSolicitacao({
+                          ...novaSolicitacao,
+                          descricao: e.target.value,
+                        })
+                      }
+                      placeholder="Descreva detalhadamente a tarefa"
+                      rows="4"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Capibas Sugeridos (opcional)</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={novaSolicitacao.capibas}
+                      onChange={handleCapibasChange}
+                      placeholder="Quantidade de capibas"
+                      min="0"
+                    />
+                    <small className="form-hint">
+                      Digite um número não negativo. Deixe em branco para 0.
+                    </small>
+                  </div>
+
+                  <div className="form-actions">
+                    <button type="submit" className="btn-enviar">
+                      {solicitacaoEditando ? "Atualizar Solicitação" : "Enviar Solicitação"}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-cancelar"
+                      onClick={handleCancelarEdicao}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Lista de solicitações */}
-      <div className="solicitacoes-lista">
+      <div className="solicitacao-card">
+        <div className="solicitacoes-header">
+          <h2>📩 Solicitações Enviadas</h2>
+        </div>
+        {/* Filtros */}
+        <div className="solicitacoes-filtros">
+          <div className="filtros-container">
+            <label>Filtrar por status:</label>
+            <select 
+              value={filtroStatus} 
+              onChange={(e) => setFiltroStatus(e.target.value)}
+              className="select-filtro"
+            >
+              <option value="todas">Todas</option>
+              <option value="pendente">⏳ Pendentes</option>
+              <option value="aprovada">✅ Aprovadas</option>
+              <option value="rejeitada">❌ Rejeitadas</option>
+            </select>
+          </div>
+        </div>
+
         {solicitacoesFiltradas.length === 0 ? (
           <div className="sem-solicitacoes">
             <div className="icone-vazio">📭</div>
@@ -452,100 +471,103 @@ export default function TarefasSolicitadas() {
             const solicitanteInfo = getNomeSolicitanteFormatado(solicitacao);
             
             return (
-              <div key={solicitacao._id} className="solicitacao-card">
+              <div key={solicitacao._id}
+                   className={`solicitacao-filtrada ${ativaSolicitacao === solicitacao._id ? "ativa" : ""}`}    
+              >
                 {/* Header com nome da tarefa e status */}
-                <div className="solicitacao-header">
-                  <div>
-                    <h3>{solicitacao.nome}</h3>
-                    {/* Descrição da tarefica EM CIMA */}
-                    <div className="solicitacao-body">
-                      <p className="solicitacao-descricao">{solicitacao.msg}</p>
-                    </div>
-                  </div>
+                <div className="solicitacao-header" onClick={() => toggleSolicitacao(solicitacao._id)}>
+                  <h3>{solicitacao.nome}</h3>
                   <span className={`status-badge ${statusBadge.classe}`}>
                     {statusBadge.texto}
                   </span>
                 </div>
                 
-                {/* Informações adicionais */}
-                <div className="solicitacao-metadata">
-                  <div className="metadata-item">
-                    <span className="metadata-label">💰 Capibas Sugeridos:</span>
-                    <span className="metadata-value">{solicitacao.capibas || 0}</span>
-                  </div>
-                  
-                  <div className="metadata-item">
-                    <span className="metadata-label">📅 Data:</span>
-                    <span className="metadata-value">
-                      {new Date(solicitacao.createdAt).toLocaleDateString('pt-BR')}
-                    </span>
-                  </div>
-                  
-                  {solicitacao.aprovadoPor && (
+                {/* Conteúdo expansível */}
+                <section className="conteudo-solicitacao">
+                  <div className="solicitacao-metadata" id="solicitacao-descricao">
                     <div className="metadata-item">
-                      <span className="metadata-label">✅ Aprovado por:</span>
-                      <span className="metadata-value">{solicitacao.aprovadoPor}</span>
+                      <span className="metadata-label">✍️ Descrição:</span>
+                      <span className="metadata-value">{solicitacao.msg}</span>
                     </div>
-                  )}
-                  
-                  {solicitacao.motivoRejeicao && (
+                  </div>
+                  <div className="solicitacao-metadata">
                     <div className="metadata-item">
-                      <span className="metadata-label">❌ Motivo da rejeição:</span>
-                      <span className="metadata-value">{solicitacao.motivoRejeicao}</span>
+                      <span className="metadata-label">💰 Capibas Sugeridos:</span>
+                      <span className="metadata-value">{solicitacao.capibas || 0}</span>
                     </div>
-                  )}
-                </div>
-                
-                {/* Área do solicitante EM BAIXO (agora formatado corretamente) */}
-                <div className="metadata-item">
-                    <div className="solicitante-detalhes">
-                      <span className="metadata-label">👤 Solicitante:</span>
-                      <span className={`solicitante-nome ${solicitanteInfo.isCurrentUser ? 'solicitante-atual' : ''}`}>
-                        {solicitanteInfo.displayName}
+                    
+                    <div className="metadata-item">
+                      <span className="metadata-label">📅 Data:</span>
+                      <span className="metadata-value">
+                        {new Date(solicitacao.createdAt).toLocaleDateString('pt-BR')}
                       </span>
                     </div>
-                </div>
-                
-                {/* Ações */}
-                <div className="solicitacao-actions">
-                  {/* Ações para Admin */}
-                  {permissoes.podeAprovarRejeitar && (
-                    <>
-                      <button 
-                        className="btn-aprovar"
-                        onClick={() => handleAprovarSolicitacao(solicitacao._id)}
-                      >
-                        ✅ Aprovar
-                      </button>
-                      <button 
-                        className="btn-rejeitar"
-                        onClick={() => handleRejeitarSolicitacao(solicitacao._id)}
-                      >
-                        ❌ Rejeitar
-                      </button>
-                    </>
-                  )}
+                    
+                    {solicitacao.aprovadoPor && (
+                      <div className="metadata-item">
+                        <span className="metadata-label">✅ Aprovado por:</span>
+                        <span className="metadata-value">{solicitacao.aprovadoPor}</span>
+                      </div>
+                    )}
+                    
+                    {solicitacao.motivoRejeicao && (
+                      <div className="metadata-item">
+                        <span className="metadata-label">❌ Motivo da rejeição:</span>
+                        <span className="metadata-value">{solicitacao.motivoRejeicao}</span>
+                      </div>
+                    )}
+                  </div>
                   
-                  {/* Ações para Cliente (dono) */}
-                  {permissoes.podeEditar && (
-                    <button 
-                      className="btn-editar"
-                      onClick={() => handleAbrirEdicao(solicitacao)}
-                    >
-                      ✏️ Editar
-                    </button>
-                  )}
+                  <div className="metadata-item">
+                      <div className="solicitante-detalhes">
+                        <span className="metadata-label">👤 Solicitante:</span>
+                        <span className={`solicitante-nome ${solicitanteInfo.isCurrentUser ? 'solicitante-atual' : ''}`}>
+                          {solicitanteInfo.displayName}
+                        </span>
+                      </div>
+                  </div>
                   
-                  {/* Botão de excluir (admin ou dono) */}
-                  {permissoes.podeExcluir && (
-                    <button 
-                      className="btn-deletar"
-                      onClick={() => handleDeletarSolicitacao(solicitacao._id)}
-                    >
-                      🗑️ Excluir
-                    </button>
-                  )}
-                </div>
+                  {/* Ações */}
+                  <div className="solicitacao-actions">
+                    {/* Ações para Admin */}
+                    {permissoes.podeAprovarRejeitar && (
+                      <>
+                        <button 
+                          className="btn-aprovar"
+                          onClick={() => handleAprovarSolicitacao(solicitacao._id)}
+                        >
+                          Aprovar
+                        </button>
+                        <button 
+                          className="btn-rejeitar"
+                          onClick={() => handleRejeitarSolicitacao(solicitacao._id)}
+                        >
+                          Rejeitar
+                        </button>
+                      </>
+                    )}
+                    
+                    {/* Ações para Cliente (dono) */}
+                    {permissoes.podeEditar && (
+                      <button 
+                        className="btn-editar"
+                        onClick={() => handleAbrirEdicao(solicitacao)}
+                      >
+                        Editar
+                      </button>
+                    )}
+                    
+                    {/* Botão de excluir (admin ou dono) */}
+                    {permissoes.podeExcluir && (
+                      <button 
+                        className="btn-deletar"
+                        onClick={() => handleDeletarSolicitacao(solicitacao._id)}
+                      >
+                        Excluir
+                      </button>
+                    )}
+                  </div>
+                </section>
               </div>
             );
           })
@@ -553,54 +575,61 @@ export default function TarefasSolicitadas() {
       </div>
 
       {/* Seção "Como usar" */}
-      <div className="solicitacoes-info">
-        <div className="info-card">
-          <h4> Como usar esta página?</h4>
+      <div className={`solicitacoes-info ${tutorialAtivo ? "ativa" : ""}`}>
+        <div className="info-card" onClick={toggleTutorial}>
+          <h4 className="info-titulo">
+            {tutorialAtivo ? "📘 Como usar esta página" : "📘 Mostrar instruções"}
+          </h4>
+
           <div className="info-content">
-            <div className="info-item">
-              <div className="info-icon">➕</div>
-              <div className="info-text">
-                <h5>Sugerir nova tarefa</h5>
-                <p>Clique no botão "Sugerir Nova Tarefa" para enviar uma sugestão de atividade.</p>
-              </div>
-            </div>
-            
-            <div className="info-item">
-              <div className="info-icon">👤</div>
-              <div className="info-text">
-                <h5>Ver solicitante</h5>
-                <p>Cada tarefa mostra quem a sugeriu na seção "Solicitante". Se for você, aparecerá apenas "Você".</p>
-              </div>
-            </div>
-            
-            <div className="info-item">
-              <div className="info-icon">⏳✅❌</div>
-              <div className="info-text">
-                <h5>Status das solicitações</h5>
-                <p>
-                  <strong>⏳ Pendente:</strong> Aguardando aprovação<br/>
-                  <strong>✅ Aprovada:</strong> Tarefa aceita<br/>
-                  <strong>❌ Rejeitada:</strong> Tarefa não aceita
-                </p>
-              </div>
-            </div>
-            
-            <div className="info-item">
-              <div className="info-icon">🔧</div>
-              <div className="info-text">
-                <h5>Editar/Excluir</h5>
-                <p>Você pode editar ou excluir apenas suas próprias solicitações pendentes.</p>
-              </div>
-            </div>
-            
-            {usuarioLogado?.tipo === "admin" && (
-              <div className="info-item">
-                <div className="info-icon">👑</div>
-                <div className="info-text">
-                  <h5>Funções de administrador</h5>
-                  <p>Como administrador, você pode aprovar ou rejeitar qualquer solicitação pendente.</p>
+            {tutorialAtivo && (
+              <>
+                <div className="info-item" id="primeiro-info-item">
+                  <div className="info-icon">➕</div>
+                  <div className="info-text">
+                    <h5>Sugerir nova tarefa</h5>
+                    <p>Clique no botão "Sugerir Nova Tarefa" para enviar uma sugestão de atividade.</p>
+                  </div>
                 </div>
-              </div>
+
+                <div className="info-item">
+                  <div className="info-icon">👤</div>
+                  <div className="info-text">
+                    <h5>Ver solicitante</h5>
+                    <p>Cada tarefa mostra quem a sugeriu na seção "Solicitante". Se for você, aparecerá apenas "Você".</p>
+                  </div>
+                </div>
+
+                <div className="info-item">
+                  <div className="info-icon">⏳✅❌</div>
+                  <div className="info-text">
+                    <h5>Status das solicitações</h5>
+                    <p>
+                      <strong>⏳ Pendente:</strong> Aguardando aprovação<br/>
+                      <strong>✅ Aprovada:</strong> Tarefa aceita<br/>
+                      <strong>❌ Rejeitada:</strong> Tarefa não aceita
+                    </p>
+                  </div>
+                </div>
+
+                <div className="info-item">
+                  <div className="info-icon">🔧</div>
+                  <div className="info-text">
+                    <h5>Editar/Excluir</h5>
+                    <p>Você pode editar ou excluir apenas suas próprias solicitações pendentes.</p>
+                  </div>
+                </div>
+
+                {usuarioLogado?.tipo === "admin" && (
+                  <div className="info-item">
+                    <div className="info-icon">👑</div>
+                    <div className="info-text">
+                      <h5>Funções de administrador</h5>
+                      <p>Como administrador, você pode aprovar ou rejeitar qualquer solicitação pendente.</p>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
