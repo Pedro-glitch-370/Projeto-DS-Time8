@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAtualizarUsuarioLogado } from "../barra-superior/utils/userState";
+import Particulas from "../particulas/Particulas";
 import "./gerenciarUsers.css";
 
 const API_BASE_URL = "http://localhost:5001/api/auth";
@@ -24,6 +25,11 @@ const GerenciarUsers = () => {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  const [ativa, setAtiva] = useState(null);
+  const toggleTarefa = (id) => {
+    setAtiva(ativa === id ? null : id);
+  };
 
   const navigate = useNavigate();
 
@@ -161,138 +167,178 @@ const GerenciarUsers = () => {
 
     return (
         <div className="admin-container">
-        {/* Header */}
-        <div className="header-gerenciar">
-            <h1>Gerenciar Usuários</h1>
-            <div className="user-info-gerenciar">
-            <p className="user-welcome-gerenciar">Administrador atual: {currentUser?.nome}</p>
-            </div>
-        </div>
-
-        {/* Content */}
-        <div className="content-gerenciar">
-            <div className="nav-links">
-                <a className="back-link-gerenciar" href="/mapa">Voltar ao Mapa</a>
-                <button className="logout-btn-gerenciar" onClick={logout}>Sair</button>
-            </div>
-
-            {/* Stats */}
-            <div className="stats-gerenciar">
-            <div className="stat-card">
-                <div className="stat-number-gerenciar">{totalAdmins}</div>
-                <div className="stat-label-gerenciar">Administradores</div>
-            </div>
-            <div className="stat-card">
-                <div className="stat-number-gerenciar">{totalClientes}</div>
-                <div className="stat-label-gerenciar">Clientes</div>
-            </div>
-            <div className="stat-card">
-                <div className="stat-number-gerenciar">{totalUsers}</div>
-                <div className="stat-label-gerenciar">Usuários ao Total</div>
-            </div>
-            </div>
-
-            {/* Feedback */}
-            {errorMessage && <div className="error-gerenciar">{errorMessage}</div>}
-            {successMessage && <div className="success-gerenciar">{successMessage}</div>}
-
-            {/* Tabs */}
-            <div className="tabs">
-                <button
-                    className={`tab ${activeTab === "admins" ? "active" : ""}`}
-                    onClick={() => openTab("admins")}
-                >
-                    Administradores
-                </button>
-                <button
-                    className={`tab ${activeTab === "clientes" ? "active" : ""}`}
-                    onClick={() => openTab("clientes")}
-                >
-                    Clientes
-                </button>
-            </div>
-
-            {/* Tab content */}
-            {activeTab === "admins" && (
-                <div id="admins" className="tab-content active">
-                    {loadingAdmins ? (
-                    <div className="loading-gerenciar">Carregando administradores...</div>
-                    ) : admins.length === 0 ? (
-                    <div className="empty-state">
-                        <h3>📭 Nenhum administrador encontrado</h3>
-                        <p>Não há administradores cadastrados no sistema.</p>
-                    </div>
-                    ) : (
-                    <div className="users-grid">
-                        {admins.map((admin) => (
-                        <div className="user-card" key={admin._id}>
-                            <div className="user-info-card">
-                            <div className="user-name">{admin.nome}</div>
-                            <div className="user-email">📧 {admin.email}</div>
-                            <div className="user-details-gerenciar">
-                                <span className="user-type admin">👑 Administrador</span>
-                                <span className="user-stats">
-                                🛠️ {admin.permissoes ? admin.permissoes.length : 0} permissões
-                                </span>
-                            </div>
-                            </div>
-                            <div className="user-actions">
-                            <button
-                                className="delete-btn"
-                                onClick={() => confirmDelete("admin", admin._id, admin.nome)}
-                            >
-                                🗑️ Excluir
-                            </button>
-                            </div>
-                        </div>
-                        ))}
-                    </div>
-                    )}
+        <div className="conteudo-gerenciar">
+            {/* Header */}
+            <div className="header-gerenciar">
+                <h1>Gerenciar Usuários</h1>
+                <div className="user-info-gerenciar">
+                <p className="user-welcome-gerenciar">Administrador atual: {currentUser?.nome}</p>
                 </div>
-            )}
-            {activeTab === "clientes" && (
-                <div id="clientes" className="tab-content active">
-                    {loadingClientes ? (
-                    <div className="loading-gerenciar">Carregando clientes...</div>
-                    ) : clientes.length === 0 ? (
-                    <div className="empty-state">
-                        <h3>📭 Nenhum cliente encontrado</h3>
-                        <p>Não há clientes cadastrados no sistema.</p>
-                    </div>
-                    ) : (
-                    <div className="users-grid">
-                        {clientes.map((cliente) => (
-                        <div className="user-card" key={cliente._id}>
-                            <div className="user-info-card">
-                            <div className="user-name">{cliente.nome}</div>
-                            <div className="user-email">📧 {cliente.email}</div>
-                            <div className="user-details-gerenciar">
-                                <span className="user-type cliente">👤 Cliente</span>
-                                <span className="user-stats">🪙 {cliente.capibas || 0} capibas</span>
-                                {cliente.tarefasCompletas && (
-                                <span className="user-stats">
-                                    ✅ {cliente.tarefasCompletas} tarefas
-                                </span>
-                                )}
-                            </div>
-                            </div>
-                            <div className="user-actions">
-                            <button
-                                className="delete-btn"
-                                onClick={() =>
-                                confirmDelete("cliente", cliente._id, cliente.nome)
-                                }
-                            >
-                                🗑️ Excluir
-                            </button>
-                            </div>
-                        </div>
-                        ))}
-                    </div>
-                    )}
+            </div>
+
+            {/* Content */}
+            <div className="content-gerenciar">
+                {/* Stats */}
+                <div className="stats-gerenciar">
+                <div className="stat-item">
+                    <div className="stat-numero">{totalAdmins}</div>
+                    <div className="stat-label-concluidas">Administradores</div>
                 </div>
-            )}
-        </div>
+                <div className="stat-item">
+                    <div className="stat-numero">{totalClientes}</div>
+                    <div className="stat-label-concluidas">Clientes</div>
+                </div>
+                <div className="stat-item">
+                    <div className="stat-numero">{totalUsers}</div>
+                    <div className="stat-label-concluidas">Usuários ao Total</div>
+                </div>
+                </div>
+
+                <div className="nav-links">
+                    <button className="back-link-gerenciar">↩ Voltar ao Mapa</button>
+                    <button className="logout-btn-gerenciar" onClick={logout}>⏻ Sair</button>
+                </div>
+
+                {/* Feedback */}
+                {errorMessage && <div className="error-gerenciar">{errorMessage}</div>}
+                {successMessage && <div className="success-gerenciar">{successMessage}</div>}
+
+                <div className="header-gerenciar" id="segundo-titulo-gerenciar">
+                    <h1>Lista de Usuários</h1>
+                </div>
+
+                {/* Tabs */}
+                <div className="tabs">
+                    <button
+                        className={`tab ${activeTab === "admins" ? "active" : ""}`}
+                        onClick={() => openTab("admins")}
+                    >
+                        Administradores
+                    </button>
+                    <button
+                        className={`tab ${activeTab === "clientes" ? "active" : ""}`}
+                        onClick={() => openTab("clientes")}
+                    >
+                        Clientes
+                    </button>
+                </div>
+
+                {/* Tab content */}
+                {activeTab === "admins" && (
+                    <div id="admins" className="tab-content active">
+                        {loadingAdmins ? (
+                        <div className="loading-gerenciar">Carregando administradores...</div>
+                        ) : admins.length === 0 ? (
+                        <div className="empty-state">
+                            <h3>📭 Nenhum administrador encontrado</h3>
+                            <p>Não há administradores cadastrados no sistema.</p>
+                        </div>
+                        ) : (
+                        <div className="users-grid">
+                            {admins.map((admin) => (
+                            <div key={admin._id} 
+                                className={`user-card ${ativa === admin._id ? "ativa" : ""}`}
+                            >
+                                <div className="user-info-card">
+                                    {/* Parte visível */}
+                                    <div className="user-info-visivel">
+                                        <div className="user-name-gerenciar">{admin.nome}</div>
+                                        <div className="user-actions">
+                                            <button
+                                                className="info-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleTarefa(admin._id);
+                                                }}
+                                                >
+                                                ℹ️ Info
+                                            </button>
+                                            <button
+                                                className="delete-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    confirmDelete("cliente", admin._id, admin.nome);
+                                                }}
+                                                >
+                                                🗑️ Excluir
+                                            </button>
+                                        </div>
+                                    </div>
+                                
+                                
+                                    {/* Parte revelada */}
+                                    <div className="user-details-gerenciar" onClick={() => toggleTarefa(admin._id)}>
+                                        <span className="user-stats">📧 {admin.email}</span>
+                                        <span className="user-stats">
+                                        🛠️ {admin.permissoes ? admin.permissoes.length : 0} permissões
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            ))}
+                        </div>
+                        )}
+                    </div>
+                )}
+                {activeTab === "clientes" && (
+                    <div id="clientes" className="tab-content active">
+                        {loadingClientes ? (
+                        <div className="loading-gerenciar">Carregando clientes...</div>
+                        ) : clientes.length === 0 ? (
+                        <div className="empty-state">
+                            <h3>📭 Nenhum cliente encontrado</h3>
+                            <p>Não há clientes cadastrados no sistema.</p>
+                        </div>
+                        ) : (
+                        <div className="users-grid">
+                            {clientes.map((cliente) => (
+                            <div key={cliente._id}
+                                className={`user-card ${ativa === cliente._id ? "ativa" : ""}`}
+                            >
+                                <div className="user-info-card">
+                                    {/* Parte visível */}
+                                    <div className="user-info-visivel">
+                                        <div className="user-name-gerenciar">{cliente.nome}</div>
+                                        <div className="user-actions">
+                                            <button
+                                                className="info-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleTarefa(cliente._id);
+                                                }}
+                                                >
+                                                ℹ️ Info
+                                            </button>
+                                            <button
+                                                className="delete-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    confirmDelete("cliente", cliente._id, cliente.nome);
+                                                }}
+                                                >
+                                                🗑️ Excluir
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Parte revelada */}
+                                    <div className="user-details-gerenciar" onClick={() => toggleTarefa(cliente._id)}>
+                                        <span className="user-stats">📧 {cliente.email}</span>
+                                        <span className="user-stats">🪙 {cliente.capibas || 0} capibas</span>
+                                        {cliente.tarefasCompletas ? (
+                                        <span className="user-stats">✅ {cliente.tarefasCompletas} tarefas</span>
+                                        ) : <span className="user-stats">❗ 0 tarefas</span>}
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            ))}
+                        </div>
+                        )}
+                    </div>
+                )}
+            </div>
 
         {/* Modal */}
         {console.log(boolDelete)}
@@ -308,6 +354,8 @@ const GerenciarUsers = () => {
                 </div>
             </div>        
         )}
+        </div>
+        <Particulas />
         </div>
     );
 }

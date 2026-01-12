@@ -197,24 +197,20 @@
   border: none;
   font-weight: bold;
   cursor: pointer;
+  color: #2c3e50;
+  background: rgba(255, 255, 255, 0.25);
   transition: all 0.3s ease;
 }
 
-.btn-editar {
-  background-color: #f39c12;
-  color: white;
-}
-
 .btn-editar:hover {
+  color: white;
+  background-color: #f39c12;
   transform: scale(1.05);
 }
 
-.btn-deletar {
-  background-color: #7f8c8d;
-  color: white;
-}
-
 .btn-deletar:hover {
+  color: white;
+  background-color: #7f8c8d;
   transform: scale(1.05);
 }
 
@@ -225,23 +221,19 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.btn-aprovar {
-  background-color: #2f7854;
-  color: white;
+  color: #2c3e50;
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .btn-aprovar:hover {
+  color: white;
+  background-color: #2f7854;
   transform: scale(1.05);
 }
 
-.btn-rejeitar {
-  background-color: #c0392b;
-  color: white;
-}
-
 .btn-rejeitar:hover {
+  color: white;
+  background-color: #c0392b;
   transform: scale(1.05);
 }
 
@@ -415,10 +407,10 @@
   flex-direction: column;
   padding: 10px 20px;
   width: 100%;
+  max-width: 770px;
   border: none;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.65);
-  color: #2c3e50;
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .solicitante-detalhes {
