@@ -4,12 +4,13 @@ import LoginPopup from "../popups/LoginPopUp";
 import RegisterPopup from "../popups/RegisterPopUp";
 import UserMenu from "../menu/UserMenu";
 import SettingsMenu from "../menu/SettingsMenu";
-import MenuLateral from "../../barra-lateral/menu-lateral/MenuLateral";
+import MenuLateral from "../menu-lateral/MenuLateral";
 import { NavLink, useNavigate } from "react-router-dom";
 import { authService } from "../../../services/authService";
 import { clienteService } from "../../../services/clienteService";
-import { useAuthPopup, useUser } from "../../../context/exportsContext";
-import "../../../css/navbar.css";
+import { useAuthPopup } from "../../../context/ExportsContext";
+import { useUser } from "../../../context/ExportsContext";
+import "./navbar.css";
 
 export default function Navbar() {
     const { loginPopupAberto, setLoginPopupAberto, registerPopupAberto, setRegisterPopupAberto } = useAuthPopup();

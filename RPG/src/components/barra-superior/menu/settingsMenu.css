@@ -34,20 +34,24 @@
 
 /* Botões de fechar */
 .close-settings {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  font-size: 2rem;
-  color: gray;
+  background: none;
+  border: none;
+  font-size: 28px;
   cursor: pointer;
-  line-height: 1;
-  transition: all 0.3s ease;
-  border-radius: 4px;
+  color: var(--neutral-color);
+  padding: 4px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--transition);
 }
 
 .close-settings:hover {
-  color: black;
-  background: #f8f9fa;
+  background-color: #f1f5f9;
+  color: var(--danger-color);
 }
 
 /* Botões de ação */

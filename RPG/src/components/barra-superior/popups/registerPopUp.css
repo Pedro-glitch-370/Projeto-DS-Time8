@@ -50,20 +50,25 @@
 /* Botões de fechar */
 .close-popup {
   position: absolute;
-  top: 15px;
   right: 20px;
-  font-size: 2rem;
-  color: var(--text-gray);
+  background: none;
+  border: none;
+  font-size: 28px;
   cursor: pointer;
-  line-height: 1;
-  transition: all 0.3s ease;
+  color: var(--neutral-color);
   padding: 4px;
-  border-radius: 4px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--transition);
 }
 
 .close-popup:hover {
-  color: var(--text-dark);
-  background: #f8f9fa;
+  background-color: #f1f5f9;
+  color: var(--danger-color);
 }
 
 /* ==================================================
@@ -105,7 +110,7 @@
 .popup-register button[type="submit"] {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(135deg, #4DC48A 0%, #2f7854 100%);
+  background: #2f7854;
   color: var(--white);
   border: none;
   border-radius: 8px;
@@ -116,7 +121,7 @@
 }
 
 .popup-register button[type="submit"]:hover {
-  transform: translateY(-2px);
+  transform: scale(1.01);
   box-shadow: 0 5px 15px rgba(47, 120, 84, 0.4);
 }
 

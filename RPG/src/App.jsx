@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthPopupProvider } from './context/AuthPopupContext.jsx';
 import { UserProvider } from './context/UserContext.jsx';
+import Redirect from './context/Redirect.jsx';
 import Mapa from './components/mapa/Mapa.jsx'
 import TarefasCarrossel from './components/tarefas/tarefasCarrossel/TarefasCarrossel.jsx';
 import Navbar from './components/barra-superior/navbar/Navbar.jsx';
@@ -19,10 +20,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Inicio />} />
             <Route path="/mapa" element={<Mapa />} />
-            <Route path="/tarefas" element={<TarefasCarrossel />} />
+            <Route path="/tarefas" element={<Redirect> <TarefasCarrossel /> </Redirect>} />
             <Route path="/tutorial" element={<Tutorial />} />
-            <Route path="/gerenciar" element={<GerenciarUsers />} />
-            <Route path='/temporadas' element={<Temporadas />} />
+            <Route path="/gerenciar" element={<Redirect> <GerenciarUsers /> </Redirect>} />
+            <Route path='/temporadas' element={<Redirect> <Temporadas /> </Redirect>} />
           </Routes>
         </UserProvider>
       </AuthPopupProvider>

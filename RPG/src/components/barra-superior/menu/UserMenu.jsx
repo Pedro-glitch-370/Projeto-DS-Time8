@@ -21,7 +21,7 @@ export default function UserMenu({ usuarioLogado, abaLoginAberta, onClose, onLog
           <div className="user-details">
             <div className="user-name">{usuarioLogado.nome}</div>
             <div className="user-email">{usuarioLogado.email}</div>
-            <div className="user-type">{usuarioLogado.tipo}</div>
+            <div className="user-tipo">{usuarioLogado.tipo}</div>
           </div>
         </div>
         <div className="user-menu-actions">

@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from "react";
+import { useUser } from "../../../context/ExportsContext";
 import "./tarefasSolicitadas.css";
 import { solicitacaoService } from "../../../services/solicitacaoService";
 import LoadingMenor from "../../loading/LoadingMenor";
 
 export default function TarefasSolicitadas() {
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
+  const { usuarioLogado } = useUser(); 
   const [solicitacoes, setSolicitacoes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -31,24 +32,6 @@ export default function TarefasSolicitadas() {
 
   const [tutorialAtivo, setTutorialAtivo] = useState(false);
   const toggleTutorial = () => setTutorialAtivo(!tutorialAtivo);
-
-  // Verificar login
-  useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (!userData) {
-      alert("⚠️ Você precisa estar logado para acessar as solicitações!");
-      window.location.href = "/";
-      return;
-    }
-
-    try {
-      const user = JSON.parse(userData);
-      setUsuarioLogado(user);
-    } catch (error) {
-      console.error("Erro ao parsear dados do usuário:", error);
-      window.location.href = "/";
-    }
-  }, []);
 
   // Carregar solicitações
   useEffect(() => {

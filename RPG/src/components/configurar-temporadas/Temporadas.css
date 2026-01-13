@@ -160,6 +160,13 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+#sem-temporada-ativa {
+  font-size: 1rem;
+  font-weight: 500;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 .conteudo-temporada {
   max-height: 0;
   overflow: hidden;
@@ -227,12 +234,10 @@
 }
 
 .mensagem.sucesso {
-  background-color: #d4edda;
   color: #155724;
 }
 
 .mensagem.erro {
-  background-color: #f8d7da;
   color: #721c24;
 }
 

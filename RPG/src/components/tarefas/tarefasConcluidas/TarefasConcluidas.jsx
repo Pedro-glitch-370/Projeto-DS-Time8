@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../../context/ExportsContext";
 import "./tarefasConcluidas.css";
 import { pinoService } from "../../../services/pinoService";
 import LoadingMenor from "../../loading/LoadingMenor";
 
 export default function TarefasConcluidas() {
-  const [usuarioLogado, setUsuarioLogado] = useState(null); 
+  const { usuarioLogado } = useUser(); 
   const [tarefasConcluidas, setTarefasConcluidas] = useState([]);
   const [tarefasDisponiveis, setTarefasDisponiveis] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -16,24 +17,6 @@ export default function TarefasConcluidas() {
   };
 
   const navigate = useNavigate();
-
-  // Verificar login e carregar dados do usuário
-  useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (!userData) {
-      alert("⚠️ Você precisa estar logado para acessar suas tarefas!");
-      navigate("/");
-      return;
-    }
-
-    try {
-      const user = JSON.parse(userData);
-      setUsuarioLogado(user);
-    } catch (error) {
-      console.error("Erro ao parsear dados do usuário:", error);
-      navigate("/");
-    }
-  }, [navigate]);
 
   // Carregar tarefas da API
   useEffect(() => {

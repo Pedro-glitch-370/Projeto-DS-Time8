@@ -9,8 +9,13 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUsuarioLogado(JSON.parse(savedUser));
+    if (savedUser && savedUser !== "undefined" && savedUser !== "null") {
+      try {
+        setUsuarioLogado(JSON.parse(savedUser));
+      } catch (err) {
+        console.error("Erro ao parsear usuário:", err);
+        localStorage.removeItem("user");
+      }
     }
   }, []);
 

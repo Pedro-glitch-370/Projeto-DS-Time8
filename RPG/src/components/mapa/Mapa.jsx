@@ -1,4 +1,4 @@
-import "../../css/mapa.css";
+import "./mapa.css";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -576,9 +576,15 @@ export default function Mapa() {
         onReiniciar={reiniciarRastreamentoLocalizacao}
       />
 
-      {(!temporadaAtual || temporadaAtual.pinIds.length === 0) && (
+      {!temporadaAtual && (
         <div className="sem-temporada-overlay">
           🚫 Nenhuma temporada ativa no momento
+        </div>
+      )}
+      
+      {temporadaAtual && temporadaAtual.pinIds.length === 0 && (
+        <div className="sem-temporada-overlay">
+          🚫 Nenhuma tarefa disponível no momento
         </div>
       )}
 

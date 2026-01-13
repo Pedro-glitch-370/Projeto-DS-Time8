@@ -7,31 +7,31 @@ import "./gerenciarUsers.css";
 const API_BASE_URL = "http://localhost:5001/api/auth";
 
 const GerenciarUsers = () => {
-  const [currentUser, setCurrentUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
 
-  const [totalAdmins, setTotalAdmins] = useState(0);
-  const [admins, setAdmins] = useState([]);
+    const [totalAdmins, setTotalAdmins] = useState(0);
+    const [admins, setAdmins] = useState([]);
 
-  const [totalClientes, setTotalClientes] = useState(0);
-  const [clientes, setClientes] = useState([]);
+    const [totalClientes, setTotalClientes] = useState(0);
+    const [clientes, setClientes] = useState([]);
 
-  const [loadingAdmins, setLoadingAdmins] = useState(true);
-  const [loadingClientes, setLoadingClientes] = useState(true);
+    const [loadingAdmins, setLoadingAdmins] = useState(true);
+    const [loadingClientes, setLoadingClientes] = useState(true);
 
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [activeTab, setActiveTab] = useState("admins");
-  const [userToDelete, setUserToDelete] = useState(null);
-  const [boolDelete, setBoolDelete] = useState(false);
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [activeTab, setActiveTab] = useState("admins");
+    const [userToDelete, setUserToDelete] = useState(null);
+    const [boolDelete, setBoolDelete] = useState(false);
 
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
-  const [ativa, setAtiva] = useState(null);
-  const toggleTarefa = (id) => {
-    setAtiva(ativa === id ? null : id);
-  };
+    const [ativa, setAtiva] = useState(null);
+    const toggleTarefa = (id) => {
+        setAtiva(ativa === id ? null : id);
+    };
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
     // Para segurança
     useEffect(() => {
@@ -193,8 +193,8 @@ const GerenciarUsers = () => {
                 </div>
 
                 <div className="nav-links">
-                    <button className="back-link-gerenciar">↩ Voltar ao Mapa</button>
-                    <button className="logout-btn-gerenciar" onClick={logout}>⏻ Sair</button>
+                    <button className="back-link-gerenciar">Voltar ao Mapa</button>
+                    <button className="logout-btn-gerenciar" onClick={logout}>Sair</button>
                 </div>
 
                 {/* Feedback */}
@@ -239,18 +239,14 @@ const GerenciarUsers = () => {
                             >
                                 <div className="user-info-card">
                                     {/* Parte visível */}
-                                    <div className="user-info-visivel">
+                                    <div className="user-info-visivel"
+                                         onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleTarefa(admin._id);
+                                         }}
+                                    >
                                         <div className="user-name-gerenciar">{admin.nome}</div>
                                         <div className="user-actions">
-                                            <button
-                                                className="info-btn"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleTarefa(admin._id);
-                                                }}
-                                                >
-                                                ℹ️ Info
-                                            </button>
                                             <button
                                                 className="delete-btn"
                                                 onClick={(e) => {
@@ -258,7 +254,7 @@ const GerenciarUsers = () => {
                                                     confirmDelete("cliente", admin._id, admin.nome);
                                                 }}
                                                 >
-                                                🗑️ Excluir
+                                                Excluir
                                             </button>
                                         </div>
                                     </div>
@@ -296,18 +292,14 @@ const GerenciarUsers = () => {
                             >
                                 <div className="user-info-card">
                                     {/* Parte visível */}
-                                    <div className="user-info-visivel">
+                                    <div className="user-info-visivel"
+                                         onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleTarefa(cliente._id);
+                                         }}
+                                    >
                                         <div className="user-name-gerenciar">{cliente.nome}</div>
                                         <div className="user-actions">
-                                            <button
-                                                className="info-btn"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleTarefa(cliente._id);
-                                                }}
-                                                >
-                                                ℹ️ Info
-                                            </button>
                                             <button
                                                 className="delete-btn"
                                                 onClick={(e) => {
@@ -315,7 +307,7 @@ const GerenciarUsers = () => {
                                                     confirmDelete("cliente", cliente._id, cliente.nome);
                                                 }}
                                                 >
-                                                🗑️ Excluir
+                                                Excluir
                                             </button>
                                         </div>
                                     </div>

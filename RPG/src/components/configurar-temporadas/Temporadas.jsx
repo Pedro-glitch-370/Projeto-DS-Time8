@@ -139,7 +139,6 @@ export default function Temporadas() {
     }
   };
 
-
   // Deletar temporada
   const handleDeletar = async (id) => {
     try {
@@ -247,20 +246,26 @@ export default function Temporadas() {
                 {new Date(temporadaAtual.dataFim).toLocaleDateString("pt-BR")}
               </p>
               <p>Status: {temporadaAtual.status}</p>
-              {temporadaAtual.pinIds && temporadaAtual.pinIds.length > 0 && (
+              {temporadaAtual.pinIds && (
                 <div className="pinos-lista">
-                  <p>Pinos:</p>
-                  <ul>
-                    {temporadaAtual.pinIds.map((pino) => (
-                      <li key={pino._id}>{pino.nome || pino._id}</li>
-                    ))}
-                  </ul>
+                  {temporadaAtual.pinIds.length > 0 ? (
+                    <>
+                      <p>Pinos:</p>
+                      <ul>
+                        {temporadaAtual.pinIds.map((pino) => (
+                          <li key={pino._id}>{pino.nome || pino._id}</li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : (
+                    <p><strong>Sem pinos de tarefa</strong></p>
+                  )}
                 </div>
               )}
             </div>
           </div>
         ) : (
-          <p>Nenhuma temporada ativa</p>
+          <p className="temporada-item" id="sem-temporada-ativa">Nenhuma temporada ativa</p>
         )}
 
         <h4>Temporadas Existentes</h4>
@@ -293,14 +298,20 @@ export default function Temporadas() {
                 {new Date(t.dataFim).toLocaleDateString("pt-BR")}
               </p>
               <p>Status: {t.status}</p>
-              {t.pinIds && t.pinIds.length > 0 && (
+              {t.pinIds && (
                 <div className="pinos-lista">
-                  <p>Pinos:</p>
-                  <ul>
-                    {t.pinIds.map((pino) => (
-                      <li key={pino._id}>{pino.nome || pino._id}</li>
-                    ))}
-                  </ul>
+                  {t.pinIds.length > 0 ? (
+                    <>
+                      <p>Pinos:</p>
+                      <ul>
+                        {t.pinIds.map((pino) => (
+                          <li key={pino._id}>{pino.nome || pino._id}</li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : (
+                    <p><strong>Sem pinos de tarefa</strong></p>
+                  )}
                 </div>
               )}
             </div>

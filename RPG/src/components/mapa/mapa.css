@@ -26,7 +26,7 @@ html, body, #root {
 
 .sem-temporada-overlay {
   position: absolute;
-  top: 550px;
+  top: 90%;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.9);
@@ -35,7 +35,7 @@ html, body, #root {
   font-size: 0.95rem;
   color: #444;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  z-index: 9999;
+  z-index: 999;
 }
 
 .mapa-wrapper {

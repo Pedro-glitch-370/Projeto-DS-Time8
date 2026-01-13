@@ -83,15 +83,16 @@ export default function MenuLateral({ isOpen, onClose, user, atualizarUsuario })
             
             {/* Botões de Navegação */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              
-              <button 
+              {user && (
+                <button 
                 className="settings-option" 
                 onClick={() => setIsGrupoModalOpen(true)}
-              >
-                {user && user.grupo 
-                  ? '👥 Visualizar Meu Grupo' 
-                  : '👥 Entrar/Criar Grupos'}
-              </button>
+                >
+                  {user.grupo 
+                    ? '👥 Visualizar Meu Grupo' 
+                    : '👥 Entrar/Criar Grupos'}
+                </button>)
+              }
 
               {/* Botão do Ranking */}
               <button 
@@ -100,7 +101,7 @@ export default function MenuLateral({ isOpen, onClose, user, atualizarUsuario })
               >
                 🏆 Ver Ranking Municipal
               </button>
-
+              
               {user && (
                 <button 
                   className="settings-option"

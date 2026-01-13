@@ -77,7 +77,7 @@
 
 .barra-superior .meio a:hover {
   background-color: var(--hover-white);
-  transform: translateY(-1px);
+  transform: scale(1.01);
 }
 
 .barra-superior .meio a.ativo {
@@ -160,7 +160,7 @@
 
 #login:hover {
   background-color: var(--hover-green);
-  transform: translateY(-1.5px);
+  transform: scale(1.01);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
@@ -179,21 +179,18 @@
 .user-welcome:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: var(--white);
-  transform: translateY(-1px);
+  transform: scale(1.01);
 }
 
 .user-avatar-small {
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-green) 0%, var(--hover-green) 100%);
+  background: linear-gradient(135deg, #4DC48A 0%, #2F7854 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   color: var(--white);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.user-avatar-small {
   width: 35px;
   height: 35px;
   font-size: 0.85rem;

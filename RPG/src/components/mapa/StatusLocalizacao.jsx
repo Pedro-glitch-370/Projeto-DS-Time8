@@ -61,7 +61,7 @@ export default function StatusLocalizacao({
       <div className="status-content">
         <div className="status-title">
           {getStatusTitle()}
-          {isAdmin && <span className="admin-badge">👑 Admin</span>}
+          {isAdmin && <span className="admin-badge"> Admin</span>}
         </div>
         
         {/* Informações de precisão do GPS (apenas quando rastreamento ativo) */}
