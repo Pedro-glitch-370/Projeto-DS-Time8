@@ -3,6 +3,7 @@ import { temporadaService } from "../../services/temporadaService";
 import { pinoService } from "../../services/pinoService";
 import { authService } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
+import Particulas from "../particulas/Particulas";
 import "./Temporadas.css";
 
 export default function Temporadas() {
@@ -15,6 +16,12 @@ export default function Temporadas() {
   const [temporadas, setTemporadas] = useState([]);
   const [temporadaAtual, setTemporadaAtual] = useState(null);
   const [mensagem, setMensagem] = useState("");
+  const [ativa, setAtiva] = useState(null);
+  const toggleTarefa = (id) => {
+    setAtiva(ativa === id ? null : id);
+  };
+  const [atualAtiva, setAtualAtiva] = useState(null);
+  const toggleAtual = () => setAtualAtiva(!atualAtiva);
 
   const navigate = useNavigate();
 
@@ -154,11 +161,14 @@ export default function Temporadas() {
 
   return (
     <div className="temporadas-container">
+      <div className="conteudo-temporadas">
       <div className="header-temporadas">
-        <h2>Configurar Temporadas</h2>
+        <h1>Configurar Temporadas</h1>
+        <p className="user-welcome-gerenciar">Preencha os campos abaixo para criar uma temporada</p>
       </div>
       
       <form onSubmit={handleCriarTemporada}>
+        <h4>Informações Gerais (obrigatório)</h4>
         <input
           type="text"
           placeholder="Título"
@@ -180,7 +190,7 @@ export default function Temporadas() {
           onChange={(e) => setDataFim(e.target.value)}
         />
 
-        <h4>Selecionar Pinos</h4>
+        <h4>Selecionar Pinos (opcional)</h4>
         {pinos.map((pino) => {
           // Verifica se esse pino já tá em outra temporada
           const jaUsado = temporadas.some(t => 
@@ -199,79 +209,111 @@ export default function Temporadas() {
                 disabled={jaUsado}
               />
               {pino.nome || pino._id}
-              {jaUsado && <span style={{ color: "red" }}>*já em temporada</span>}
+              {jaUsado && <span>*já em temporada</span>}
             </label>
           );
         })}
 
         <button type="submit">Criar Temporada</button>
       </form>
-
       {mensagem &&
-        <p className={`mensagem ${mensagem.startsWith("✅") ? "sucesso" : "erro"}`}>
-          {mensagem}
-        </p>}
+      <p className={`mensagem ${mensagem.startsWith("✅") ? "sucesso" : "erro"}`}>
+        {mensagem}
+      </p>
+      }
+      </div>
+
+      <div className="conteudo-temporadas">
+      <div className="header-temporadas">
+        <h1>Lista de Temporadas</h1>
+      </div>
 
       <div className="temporadas-existentes">
-        <h3>Temporada Atual</h3>
+        <h4>Temporada Atual</h4>
         {temporadaAtual ? (
-          <div className="temporada-item">
-            <h1><strong>{temporadaAtual.titulo}</strong></h1>
-            <p>
-              {new Date(temporadaAtual.dataInicio).toLocaleDateString("pt-BR")} -{" "}
-              {new Date(temporadaAtual.dataFim).toLocaleDateString("pt-BR")}
-            </p>
-            <p>Status: {temporadaAtual.status}</p>
-            {temporadaAtual.pinIds && temporadaAtual.pinIds.length > 0 && (
-              <div className="pinos-lista">
-                <p>Pinos:</p>
-                <ul>
-                  {temporadaAtual.pinIds.map((pino) => (
-                    <li key={pino._id}>{pino.nome || pino._id}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <button className="btn-deletar-temp" onClick={() => handleDeletar(temporadaAtual._id)}>Deletar</button>
+          <div className={`temporada-item ${atualAtiva ? "ativa" : ""}`}>
+            <div className="header-lista-temporadas">
+              <h1 onClick={(e) => {
+                e.stopPropagation();
+                toggleAtual();
+              }}>
+                <strong>{temporadaAtual.titulo}</strong>
+              </h1>
+              <button className="btn-deletar-temp" onClick={() => handleDeletar(temporadaAtual._id)}>Deletar</button>
+            </div>
+            <div className="conteudo-temporada">
+              <p>
+                {new Date(temporadaAtual.dataInicio).toLocaleDateString("pt-BR")} -{" "}
+                {new Date(temporadaAtual.dataFim).toLocaleDateString("pt-BR")}
+              </p>
+              <p>Status: {temporadaAtual.status}</p>
+              {temporadaAtual.pinIds && temporadaAtual.pinIds.length > 0 && (
+                <div className="pinos-lista">
+                  <p>Pinos:</p>
+                  <ul>
+                    {temporadaAtual.pinIds.map((pino) => (
+                      <li key={pino._id}>{pino.nome || pino._id}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <p>Nenhuma temporada ativa</p>
         )}
 
-        <h3>Temporadas Existentes</h3>
+        <h4>Temporadas Existentes</h4>
         {temporadas.length === 0 ? (
           <p>Nenhuma temporada existente</p>
         ) : (temporadas.map((t) => (
-          <div key={t._id} className="temporada-item">
-            <h1><strong>{t.titulo}</strong></h1>
-            <p>
-              {new Date(t.dataInicio).toLocaleDateString("pt-BR")} -{" "}
-              {new Date(t.dataFim).toLocaleDateString("pt-BR")}
-            </p>
-            <p>Status: {t.status}</p>
-            {t.pinIds && t.pinIds.length > 0 && (
-              <div className="pinos-lista">
-                <p>Pinos:</p>
-                <ul>
-                  {t.pinIds.map((pino) => (
-                    <li key={pino._id}>{pino.nome || pino._id}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {t.status !== "ativo" ? (
-                <>
-                  <button className="btn-ativar-temp" onClick={() => handleAtivar(t._id)}>Ativar</button>
+          <div key={t._id} className={`temporada-item ${ativa === t._id ? "ativa" : ""}`}>
+            <div className="header-lista-temporadas">
+              <h1 onClick={(e) => {
+                    e.stopPropagation();
+                    toggleTarefa(t._id);
+                  }}
+              >
+                  <strong>{t.titulo}</strong>
+              </h1>
+              <div>
+                {t.status !== "ativo" ? (
+                  <>
+                    <button className="btn-ativar-temp" onClick={() => handleAtivar(t._id)}>Ativar</button>
+                    <button className="btn-deletar-temp" onClick={() => handleDeletar(t._id)}>Deletar</button>
+                  </>
+                ) : (
                   <button className="btn-deletar-temp" onClick={() => handleDeletar(t._id)}>Deletar</button>
-                </>
-              ) : (
-                <button className="btn-deletar-temp" onClick={() => handleDeletar(t._id)}>Deletar</button>
+                )}
+              </div>
+            </div>
+            <div className="conteudo-temporada">
+              <p>
+                {new Date(t.dataInicio).toLocaleDateString("pt-BR")} -{" "}
+                {new Date(t.dataFim).toLocaleDateString("pt-BR")}
+              </p>
+              <p>Status: {t.status}</p>
+              {t.pinIds && t.pinIds.length > 0 && (
+                <div className="pinos-lista">
+                  <p>Pinos:</p>
+                  <ul>
+                    {t.pinIds.map((pino) => (
+                      <li key={pino._id}>{pino.nome || pino._id}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
+            </div>
           </div>
         )))}
+        {mensagem &&
+        <p className={`mensagem ${mensagem.startsWith("✅") ? "sucesso" : "erro"}`}>
+          {mensagem}
+        </p>
+        }
       </div>
-      
+      </div>
+      <Particulas />
     </div>
   );
 }

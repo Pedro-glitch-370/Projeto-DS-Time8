@@ -8,7 +8,7 @@
 
 /* Seção de Progresso */
 .secao-progresso {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(80px);
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 20px;
@@ -119,7 +119,7 @@
 
 /* Seção de Tarefas Concluídas */
 .secao-tarefas-concluidas {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(80px);
   border-radius: 20px;
   padding: 25px;
@@ -148,7 +148,7 @@
 .tarefa-concluida-vertical {
   position: relative;
   gap: 15px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 20px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);

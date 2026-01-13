@@ -171,9 +171,7 @@ const GerenciarUsers = () => {
             {/* Header */}
             <div className="header-gerenciar">
                 <h1>Gerenciar Usuários</h1>
-                <div className="user-info-gerenciar">
                 <p className="user-welcome-gerenciar">Administrador atual: {currentUser?.nome}</p>
-                </div>
             </div>
 
             {/* Content */}

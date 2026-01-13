@@ -276,7 +276,7 @@
 }
 
 .solicitacao-card {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(80px);
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 20px;
@@ -470,32 +470,25 @@
 /* Sem solicitações */
 .sem-solicitacoes {
   text-align: center;
-  padding: 80px 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-  border: 2px dashed #dfe6e9;
+  padding: 40px 20px;
 }
 
-.icone-vazio {
-  font-size: 5rem;
-  margin-bottom: 25px;
-  opacity: 0.3;
-  color: #7f8c8d;
+.sem-solicitacoes .icone-vazio {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  opacity: 0.7;
 }
 
 .sem-solicitacoes h3 {
-  color: #2c3e50;
-  margin-bottom: 15px;
-  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
 }
 
 .sem-solicitacoes p {
-  color: #7f8c8d;
-  font-size: 1.1rem;
-  max-width: 500px;
-  margin: 0 auto;
-  line-height: 1.6;
+  color: white;
+  margin-bottom: 25px;
+  line-height: 1.5;
 }
 
 /* Informações */
@@ -504,7 +497,7 @@
 }
 
 .info-card {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(80px);
   border-radius: 20px;
   padding: 20px;
