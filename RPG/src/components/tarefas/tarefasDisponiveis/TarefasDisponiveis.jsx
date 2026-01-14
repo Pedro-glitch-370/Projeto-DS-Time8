@@ -40,7 +40,8 @@ export default function TarefasDisponiveis() {
   useEffect(() => {
     async function carregarTarefas() {
       try {
-        //const pinos = await pinoService.getPinos();
+        if (!temporadaAtual || !temporadaAtual.pinIds) return;
+
         const concluidas = usuarioLogado?.tarefasConcluidas || [];
 
         // Mapeia todas as tarefas
@@ -83,47 +84,51 @@ export default function TarefasDisponiveis() {
   if (tarefasDisponiveis.length === 0) {
     return (
       <div className="sem-tarefas">
-        <h2 className="titulo-tarefas">Sem Tarefas!</h2>
-        <p className="sem-tarefas-descricao">No momento, não há nenhuma tarefa disponível. Nos vemos na próxima temporada!</p>
-        <p className="sem-tarefas-extra">
-          {usuarioLogado?.tipo === "cliente" 
-            ? `💰 Total de capibas: ${usuarioLogado.capibas || 0}`
-            : `📊 Tarefas testadas: ${usuarioLogado?.tarefasCompletas || 0}`
-          }
-        </p>
+        <header>
+          <h2 className="titulo-tarefas">Sem Tarefas!</h2>
+        </header>
+        <main>
+          <p className="sem-tarefas-descricao">No momento, não há nenhuma tarefa disponível. Nos vemos na próxima temporada!</p>
+          <p className="sem-tarefas-extra">
+            {usuarioLogado?.tipo === "cliente" 
+              ? `💰 Total de capibas: ${usuarioLogado.capibas || 0}`
+              : `📊 Tarefas testadas: ${usuarioLogado?.tarefasCompletas || 0}`
+            }
+          </p>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="secao-lista-tarefas">
-      <div className="header-lista-tarefas">
+    <section className="secao-lista-tarefas">
+      <header className="header-lista-tarefas">
         <h2 className="titulo-lista-tarefas">⚔️ Tarefas da Temporada</h2>
         <p className="subtitulo-tarefas">Temporada atual: {temporadaAtual.titulo}</p>
-      </div>
-      <div className="lista-tarefas">
+      </header>
+      <main className="lista-tarefas">
         {tarefasDisponiveis.map((tarefa) => (
-          <div
+          <section
             key={tarefa.id}
             className={`tarefa-item ${ativa === tarefa.id ? "ativa" : ""}`}
             onClick={() => toggleTarefa(tarefa.id)}
           >
             <h3>{tarefa.nome}</h3>
-            <div className="conteudo">
+            <article className="conteudo">
               <p>{tarefa.descricao}</p>
               <p className="recompensa">
                 Recompensa: <strong id="destaque-recompensa">{tarefa.recompensa} capibas</strong> 🪙
               </p>
-            </div>
-            <div className="botao-mapa" onClick={(e) => {
+            </article>
+            <article className="botao-mapa" onClick={(e) => {
               e.stopPropagation();
               navigate("/mapa");
             }}>
                 🗺️
-            </div>
-          </div>
+            </article>
+          </section>
         ))}
-      </div>
-    </div>
+      </main>
+    </section>
   );
 }

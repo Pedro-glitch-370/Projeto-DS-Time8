@@ -307,35 +307,35 @@ export default function TarefasSolicitadas() {
   }
 
   return (
-    <div className="solicitacoes-container">
+    <section className="solicitacoes-container">
       {/* Cabeçalho */}
-      <div className="solicitacao-card">
-        <div className="solicitacoes-header">
+      <article className="solicitacao-card">
+        <header className="solicitacoes-header">
           <h2>📋 {usuarioLogado?.tipo === "admin" ? "Gerenciar Solicitações" : "Minhas Solicitações"}</h2>
-        </div>
+        </header>
 
         {/* Estatísticas */}
-        <div className="solicitacoes-stats">
-          <div className="stat-card-solicitar">
+        <section className="solicitacoes-stats">
+          <article className="stat-card-solicitar">
             <div className="stat-number">{solicitacoes.length}</div>
             <div className="stat-label">Total</div>
-          </div>
-          <div className="stat-card-solicitar">
+          </article>
+          <article className="stat-card-solicitar">
             <div className="stat-number">{solicitacoes.filter(s => s.status === 'pendente').length}</div>
             <div className="stat-label">Pendentes</div>
-          </div>
-          <div className="stat-card-solicitar">
+          </article>
+          <article className="stat-card-solicitar">
             <div className="stat-number">{solicitacoes.filter(s => s.status === 'aprovada').length}</div>
             <div className="stat-label">Aprovadas</div>
-          </div>
-          <div className="stat-card-solicitar">
+          </article>
+          <article className="stat-card-solicitar">
             <div className="stat-number">{solicitacoes.filter(s => s.status === 'rejeitada').length}</div>
             <div className="stat-label">Rejeitadas</div>
-          </div>
-        </div>
+          </article>
+        </section>
 
         {usuarioLogado?.tipo === "cliente" && (
-          <div
+          <section
             className={`solicitacao-wrapper ${mostrarFormulario ? "ativa" : ""}`}
           >
             <button className={`solicitacao-titulo ${mostrarFormulario ? "ativo" : "inativo"}`}
@@ -347,7 +347,7 @@ export default function TarefasSolicitadas() {
             <div ref={formularioRef} className="conteudo-solicitacao">
               {mostrarFormulario && (
                 <form onSubmit={handleEnviarSolicitacao}>
-                  <div className="form-group">
+                  <article className="form-group">
                     <label>Nome da Tarefa *</label>
                     <input
                       type="text"
@@ -361,9 +361,9 @@ export default function TarefasSolicitadas() {
                       placeholder="Ex: Coletar amostras no jardim"
                       required
                     />
-                  </div>
+                  </article>
 
-                  <div className="form-group">
+                  <article className="form-group">
                     <label>Descrição da Tarefa *</label>
                     <textarea
                       value={novaSolicitacao.descricao}
@@ -377,9 +377,9 @@ export default function TarefasSolicitadas() {
                       rows="4"
                       required
                     />
-                  </div>
+                  </article>
 
-                  <div className="form-group">
+                  <article className="form-group">
                     <label>Capibas Sugeridos (opcional)</label>
                     <input
                       type="text"
@@ -392,9 +392,9 @@ export default function TarefasSolicitadas() {
                     <small className="form-hint">
                       Digite um número não negativo. Deixe em branco para 0.
                     </small>
-                  </div>
+                  </article>
 
-                  <div className="form-actions">
+                  <article className="form-actions">
                     <button type="submit" className="btn-enviar">
                       {solicitacaoEditando ? "Atualizar Solicitação" : "Enviar Solicitação"}
                     </button>
@@ -405,21 +405,21 @@ export default function TarefasSolicitadas() {
                     >
                       Cancelar
                     </button>
-                  </div>
+                  </article>
                 </form>
               )}
             </div>
-          </div>
+          </section>
         )}
-      </div>
+      </article>
 
       {/* Lista de solicitações */}
-      <div className="solicitacao-card">
-        <div className="solicitacoes-header">
+      <article className="solicitacao-card">
+        <header className="solicitacoes-header">
           <h2>📩 Solicitações Enviadas</h2>
-        </div>
+        </header>
         {/* Filtros */}
-        <div className="solicitacoes-filtros">
+        <section className="solicitacoes-filtros">
           <div className="filtros-container">
             <label>Filtrar por status:</label>
             <select 
@@ -433,10 +433,10 @@ export default function TarefasSolicitadas() {
               <option value="rejeitada">❌ Rejeitadas</option>
             </select>
           </div>
-        </div>
+        </section>
 
         {solicitacoesFiltradas.length === 0 ? (
-          <div className="sem-solicitacoes">
+          <section className="sem-solicitacoes">
             <div className="icone-vazio">📭</div>
             <h3>Nenhuma solicitação encontrada</h3>
             <p>
@@ -446,7 +446,7 @@ export default function TarefasSolicitadas() {
                   : "Você ainda não enviou nenhuma solicitação." 
                 : `Nenhuma solicitação com status "${filtroStatus}"`}
             </p>
-          </div>
+          </section>
         ) : (
           solicitacoesFiltradas.map((solicitacao) => {
             const statusBadge = getStatusBadge(solicitacao.status);
@@ -454,7 +454,7 @@ export default function TarefasSolicitadas() {
             const solicitanteInfo = getNomeSolicitanteFormatado(solicitacao);
             
             return (
-              <div key={solicitacao._id}
+              <section key={solicitacao._id}
                    className={`solicitacao-filtrada ${ativaSolicitacao === solicitacao._id ? "ativa" : ""}`}    
               >
                 {/* Header com nome da tarefa e status */}
@@ -466,14 +466,14 @@ export default function TarefasSolicitadas() {
                 </div>
                 
                 {/* Conteúdo expansível */}
-                <section className="conteudo-solicitacao">
-                  <div className="solicitacao-metadata" id="solicitacao-descricao">
+                <article className="conteudo-solicitacao">
+                  <section className="solicitacao-metadata" id="solicitacao-descricao">
                     <div className="metadata-item">
                       <span className="metadata-label">✍️ Descrição:</span>
                       <span className="metadata-value">{solicitacao.msg}</span>
                     </div>
-                  </div>
-                  <div className="solicitacao-metadata">
+                  </section>
+                  <section className="solicitacao-metadata">
                     <div className="metadata-item">
                       <span className="metadata-label">💰 Capibas Sugeridos:</span>
                       <span className="metadata-value">{solicitacao.capibas || 0}</span>
@@ -499,19 +499,19 @@ export default function TarefasSolicitadas() {
                         <span className="metadata-value">{solicitacao.motivoRejeicao}</span>
                       </div>
                     )}
-                  </div>
+                  </section>
                   
-                  <div className="metadata-item">
+                  <section className="metadata-item">
                       <div className="solicitante-detalhes">
                         <span className="metadata-label">👤 Solicitante:</span>
                         <span className={`solicitante-nome ${solicitanteInfo.isCurrentUser ? 'solicitante-atual' : ''}`}>
                           {solicitanteInfo.displayName}
                         </span>
                       </div>
-                  </div>
+                  </section>
                   
                   {/* Ações */}
-                  <div className="solicitacao-actions">
+                  <section className="solicitacao-actions">
                     {/* Ações para Admin */}
                     {permissoes.podeAprovarRejeitar && (
                       <>
@@ -549,16 +549,16 @@ export default function TarefasSolicitadas() {
                         Excluir
                       </button>
                     )}
-                  </div>
-                </section>
-              </div>
+                  </section>
+                </article>
+              </section>
             );
           })
         )}
-      </div>
+      </article>
 
       {/* Seção "Como usar" */}
-      <div className={`solicitacoes-info ${tutorialAtivo ? "ativa" : ""}`}>
+      <article className={`solicitacoes-info ${tutorialAtivo ? "ativa" : ""}`}>
         <div className="info-card" onClick={toggleTutorial}>
           <h4 className="info-titulo">
             {tutorialAtivo ? "📘 Como usar esta página" : "📘 Mostrar instruções"}
@@ -616,7 +616,7 @@ export default function TarefasSolicitadas() {
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </article>
+    </section>
   );
 }

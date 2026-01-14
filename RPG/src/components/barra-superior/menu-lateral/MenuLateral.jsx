@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import GrupoModal from "../../grupos/GrupoModal"; 
 import RankingModal from "../../grupos/RankingModal"; 
 import { authService } from "../../../services/authService";
+import { useAuthPopup } from "../../../context/exportsContext";
 import "../../barra-superior/menu/settingsMenu.css";
 
 export default function MenuLateral({ isOpen, onClose, user, atualizarUsuario }) {
   const [isGrupoModalOpen, setIsGrupoModalOpen] = useState(false);
   const [isRankingModalOpen, setIsRankingModalOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+  const { setLoginPopupAberto } = useAuthPopup();
 
   useEffect(() => {
     if (isOpen) {
@@ -76,9 +78,12 @@ export default function MenuLateral({ isOpen, onClose, user, atualizarUsuario })
                 </div>
               </div>
             ) : (
-              <div className="infoBox-menuLat">
-                <p>Você não está logado.</p>
-              </div>
+              <button 
+                className="settings-option"
+                onClick={() => setLoginPopupAberto(true)}
+              >
+                ➜ Entrar numa conta
+              </button>
             )}
             
             {/* Botões de Navegação */}

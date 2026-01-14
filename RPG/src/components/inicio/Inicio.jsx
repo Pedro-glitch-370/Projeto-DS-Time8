@@ -21,15 +21,14 @@ export default function Inicio() {
   return (
     <> 
       <div className="inicio-container">
-        <Particulas />
-        <div className="conteudo-central">
-          <div className="logo-area">
+        <section className="conteudo-central">
+          <header className="logo-area">
             <img src="/src/assets/LogoConecta.png" alt="Logo" className="logo-inicio"/>
             <h1 className="titulo">Recife Point Game</h1>
-          </div>
+          </header>
 
           {mostrarOpcoes && (
-            <div className="botoes-area fade-in">
+            <main className="botoes-area fade-in">
               <button className="botao" onClick={() => setLoginPopupAberto(true)}>
                 Entrar numa conta
               </button>
@@ -39,9 +38,10 @@ export default function Inicio() {
               <button className="botao" onClick={() => navigate("/mapa")}>
                 Seguir sem conta
               </button>
-            </div>
+            </main>
           )}
-        </div>
+        </section>
+        <Particulas />
       </div>
     </>
   );

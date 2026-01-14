@@ -16,6 +16,8 @@ export default function Temporadas() {
   const [temporadas, setTemporadas] = useState([]);
   const [temporadaAtual, setTemporadaAtual] = useState(null);
   const [mensagem, setMensagem] = useState("");
+  const [boolDelete, setBoolDelete] = useState(false);
+  const [temporadaToDelete, setTemporadaToDelete] = useState(null);
   const [ativa, setAtiva] = useState(null);
   const toggleTarefa = (id) => {
     setAtiva(ativa === id ? null : id);
@@ -139,16 +141,33 @@ export default function Temporadas() {
     }
   };
 
+  // Abrir modal de confirmação
+  const confirmDeletar = (temporada) => {
+      setTemporadaToDelete(temporada);
+      setBoolDelete(true);
+  };
+
   // Deletar temporada
-  const handleDeletar = async (id) => {
+  const handleDeletar = async () => {
+    if (!temporadaToDelete) return;
+
     try {
-      await temporadaService.deletarTemporada(id);
+      await temporadaService.deletarTemporada(temporadaToDelete._id);
       setMensagem("✅ Temporada deletada com sucesso!");
       const temporadasData = await temporadaService.getTemporadas();
       setTemporadas(temporadasData);
-    } catch (error) {
-      setMensagem("❌ Erro ao deletar temporada: ", error);
+    } catch (err) {
+      setMensagem("❌ Erro ao deletar temporada: ", err);
+    } finally {
+      setTemporadaToDelete(null);
+      setBoolDelete(false);
     }
+  };
+
+  // Fechar modal de confirmação
+  const closeModal = () => {
+      setTemporadaToDelete(null);
+      setBoolDelete(false);
   };
 
   // Seleção de pinos
@@ -160,170 +179,183 @@ export default function Temporadas() {
 
   return (
     <div className="temporadas-container">
-      <div className="conteudo-temporadas">
-      <div className="header-temporadas">
-        <h1>Configurar Temporadas</h1>
-        <p className="user-welcome-gerenciar">Preencha os campos abaixo para criar uma temporada</p>
-      </div>
-      
-      <form onSubmit={handleCriarTemporada}>
-        <h4>Informações Gerais (obrigatório)</h4>
-        <input
-          type="text"
-          placeholder="Título"
-          value={titulo}
-          onChange={(e) => setTitulo(e.target.value)}
-        />
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="agendado">Agendado</option>
-          <option value="ativo">Ativo</option>
-        </select>
-        <input
-          type="date"
-          value={dataInicio}
-          onChange={(e) => setDataInicio(e.target.value)}
-        />
-        <input
-          type="date"
-          value={dataFim}
-          onChange={(e) => setDataFim(e.target.value)}
-        />
+      <section className="conteudo-temporadas">
+        <header className="header-temporadas">
+          <h1>Configurar Temporadas</h1>
+          <p className="user-welcome-gerenciar">Preencha os campos abaixo para criar uma temporada</p>
+        </header>
+        
+        <form onSubmit={handleCriarTemporada}>
+          <h4>Informações Gerais (obrigatório)</h4>
+          <input
+            type="text"
+            placeholder="Título"
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+          />
+          <select value={status} onChange={(e) => setStatus(e.target.value)}>
+            <option value="agendado">Agendado</option>
+            <option value="ativo">Ativo</option>
+          </select>
+          <input
+            type="date"
+            value={dataInicio}
+            onChange={(e) => setDataInicio(e.target.value)}
+          />
+          <input
+            type="date"
+            value={dataFim}
+            onChange={(e) => setDataFim(e.target.value)}
+          />
 
-        <h4>Selecionar Pinos (opcional)</h4>
-        {pinos.map((pino) => {
-          // Verifica se esse pino já tá em outra temporada
-          const jaUsado = temporadas.some(t => 
-            t.pinIds?.some(id => {
-              // pinIds pode vir como array de objetos ou de strings
-              return (typeof id === "string" ? id : id._id) === pino._id;
-            })
-          );
+          <h4>Selecionar Pinos (opcional)</h4>
+          {pinos.map((pino) => {
+            // Verifica se esse pino já tá em outra temporada
+            const jaUsado = temporadas.some(t => 
+              t.pinIds?.some(id => {
+                // pinIds pode vir como array de objetos ou de strings
+                return (typeof id === "string" ? id : id._id) === pino._id;
+              })
+            );
 
-          return (
-            <label key={pino._id}>
-              <input
-                type="checkbox"
-                checked={pinIds.includes(pino._id)}
-                onChange={() => togglePino(pino._id)}
-                disabled={jaUsado}
-              />
-              {pino.nome || pino._id}
-              {jaUsado && <span>*já em temporada</span>}
-            </label>
-          );
-        })}
+            return (
+              <label key={pino._id}>
+                <input
+                  type="checkbox"
+                  checked={pinIds.includes(pino._id)}
+                  onChange={() => togglePino(pino._id)}
+                  disabled={jaUsado}
+                />
+                {pino.nome || pino._id}
+                {jaUsado && <span>*já em temporada</span>}
+              </label>
+            );
+          })}
 
-        <button type="submit">Criar Temporada</button>
-      </form>
-      {mensagem &&
-      <p className={`mensagem ${mensagem.startsWith("✅") ? "sucesso" : "erro"}`}>
-        {mensagem}
-      </p>
-      }
-      </div>
-
-      <div className="conteudo-temporadas">
-      <div className="header-temporadas">
-        <h1>Lista de Temporadas</h1>
-      </div>
-
-      <div className="temporadas-existentes">
-        <h4>Temporada Atual</h4>
-        {temporadaAtual ? (
-          <div className={`temporada-item ${atualAtiva ? "ativa" : ""}`}>
-            <div className="header-lista-temporadas">
-              <h1 onClick={(e) => {
-                e.stopPropagation();
-                toggleAtual();
-              }}>
-                <strong>{temporadaAtual.titulo}</strong>
-              </h1>
-              <button className="btn-deletar-temp" onClick={() => handleDeletar(temporadaAtual._id)}>Deletar</button>
-            </div>
-            <div className="conteudo-temporada">
-              <p>
-                {new Date(temporadaAtual.dataInicio).toLocaleDateString("pt-BR")} -{" "}
-                {new Date(temporadaAtual.dataFim).toLocaleDateString("pt-BR")}
-              </p>
-              <p>Status: {temporadaAtual.status}</p>
-              {temporadaAtual.pinIds && (
-                <div className="pinos-lista">
-                  {temporadaAtual.pinIds.length > 0 ? (
-                    <>
-                      <p>Pinos:</p>
-                      <ul>
-                        {temporadaAtual.pinIds.map((pino) => (
-                          <li key={pino._id}>{pino.nome || pino._id}</li>
-                        ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <p><strong>Sem pinos de tarefa</strong></p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <p className="temporada-item" id="sem-temporada-ativa">Nenhuma temporada ativa</p>
-        )}
-
-        <h4>Temporadas Existentes</h4>
-        {temporadas.length === 0 ? (
-          <p>Nenhuma temporada existente</p>
-        ) : (temporadas.map((t) => (
-          <div key={t._id} className={`temporada-item ${ativa === t._id ? "ativa" : ""}`}>
-            <div className="header-lista-temporadas">
-              <h1 onClick={(e) => {
-                    e.stopPropagation();
-                    toggleTarefa(t._id);
-                  }}
-              >
-                  <strong>{t.titulo}</strong>
-              </h1>
-              <div>
-                {t.status !== "ativo" ? (
-                  <>
-                    <button className="btn-ativar-temp" onClick={() => handleAtivar(t._id)}>Ativar</button>
-                    <button className="btn-deletar-temp" onClick={() => handleDeletar(t._id)}>Deletar</button>
-                  </>
-                ) : (
-                  <button className="btn-deletar-temp" onClick={() => handleDeletar(t._id)}>Deletar</button>
-                )}
-              </div>
-            </div>
-            <div className="conteudo-temporada">
-              <p>
-                {new Date(t.dataInicio).toLocaleDateString("pt-BR")} -{" "}
-                {new Date(t.dataFim).toLocaleDateString("pt-BR")}
-              </p>
-              <p>Status: {t.status}</p>
-              {t.pinIds && (
-                <div className="pinos-lista">
-                  {t.pinIds.length > 0 ? (
-                    <>
-                      <p>Pinos:</p>
-                      <ul>
-                        {t.pinIds.map((pino) => (
-                          <li key={pino._id}>{pino.nome || pino._id}</li>
-                        ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <p><strong>Sem pinos de tarefa</strong></p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )))}
+          <button type="submit">Criar Temporada</button>
+        </form>
         {mensagem &&
         <p className={`mensagem ${mensagem.startsWith("✅") ? "sucesso" : "erro"}`}>
           {mensagem}
         </p>
         }
-      </div>
-      </div>
+      </section>
+
+      <section className="conteudo-temporadas">
+        <header className="header-temporadas">
+          <h1>Lista de Temporadas</h1>
+        </header>
+
+        <div className="temporadas-existentes">
+          <h4>Temporada Atual</h4>
+          {temporadaAtual ? (
+            <div className={`temporada-item ${atualAtiva ? "ativa" : ""}`}>
+              <div className="header-lista-temporadas">
+                <h1 onClick={(e) => {
+                  e.stopPropagation();
+                  toggleAtual();
+                }}>
+                  <strong>{temporadaAtual.titulo}</strong>
+                </h1>
+                <button className="btn-deletar-temp" onClick={() => confirmDeletar(temporadaAtual)}>Deletar</button>
+              </div>
+              <div className="conteudo-temporada">
+                <p>
+                  {new Date(temporadaAtual.dataInicio).toLocaleDateString("pt-BR")} -{" "}
+                  {new Date(temporadaAtual.dataFim).toLocaleDateString("pt-BR")}
+                </p>
+                <p>Status: {temporadaAtual.status}</p>
+                {temporadaAtual.pinIds && (
+                  <div className="pinos-lista">
+                    {temporadaAtual.pinIds.length > 0 ? (
+                      <>
+                        <p>Pinos:</p>
+                        <ul>
+                          {temporadaAtual.pinIds.map((pino) => (
+                            <li key={pino._id}>{pino.nome || pino._id}</li>
+                          ))}
+                        </ul>
+                      </>
+                    ) : (
+                      <p><strong>Sem pinos de tarefa</strong></p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="temporada-item" id="sem-temporada-ativa">Nenhuma temporada ativa</p>
+          )}
+
+          <h4>Temporadas Existentes</h4>
+          {temporadas.length === 0 ? (
+            <p>Nenhuma temporada existente</p>
+          ) : (temporadas.map((t) => (
+            <div key={t._id} className={`temporada-item ${ativa === t._id ? "ativa" : ""}`}>
+              <div className="header-lista-temporadas">
+                <h1 onClick={(e) => {
+                      e.stopPropagation();
+                      toggleTarefa(t._id);
+                    }}
+                >
+                    <strong>{t.titulo}</strong>
+                </h1>
+                <div>
+                  {t.status !== "ativo" ? (
+                    <>
+                      <button className="btn-ativar-temp" onClick={() => handleAtivar(t._id)}>Ativar</button>
+                      <button className="btn-deletar-temp" onClick={() => confirmDeletar(t)}>Deletar</button>
+                    </>
+                  ) : (
+                    <button className="btn-deletar-temp" onClick={() => confirmDeletar(t)}>Deletar</button>
+                  )}
+                </div>
+              </div>
+              <div className="conteudo-temporada">
+                <p>
+                  {new Date(t.dataInicio).toLocaleDateString("pt-BR")} -{" "}
+                  {new Date(t.dataFim).toLocaleDateString("pt-BR")}
+                </p>
+                <p>Status: {t.status}</p>
+                {t.pinIds && (
+                  <div className="pinos-lista">
+                    {t.pinIds.length > 0 ? (
+                      <>
+                        <p>Pinos:</p>
+                        <ul>
+                          {t.pinIds.map((pino) => (
+                            <li key={pino._id}>{pino.nome || pino._id}</li>
+                          ))}
+                        </ul>
+                      </>
+                    ) : (
+                      <p><strong>Sem pinos de tarefa</strong></p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )))}
+          {mensagem &&
+          <p className={`mensagem ${mensagem.startsWith("✅") ? "sucesso" : "erro"}`}>
+            {mensagem}
+          </p>
+          }
+        </div>
+      </section>
+
+      {boolDelete && (
+        <div className="modal-temporadas">
+            <section className="modal-content">
+                <h3>⚠️ Confirmar Exclusão</h3>
+                <p>Tem certeza que deseja excluir "{temporadaToDelete.titulo}"?<br></br>Esta ação não pode ser desfeita.</p>
+                <section className="modal-buttons">
+                    <button className="confirm-btn" onClick={handleDeletar}>Excluir</button>
+                    <button className="cancel-btn" onClick={closeModal}>Cancelar</button>
+                </section>
+            </section>
+        </div>        
+      )}
       <Particulas />
     </div>
   );

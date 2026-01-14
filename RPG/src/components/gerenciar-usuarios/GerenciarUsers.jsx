@@ -167,15 +167,15 @@ const GerenciarUsers = () => {
 
     return (
         <div className="admin-container">
-        <div className="conteudo-gerenciar">
+        <section className="conteudo-gerenciar">
             {/* Header */}
-            <div className="header-gerenciar">
+            <header className="header-gerenciar">
                 <h1>Gerenciar Usuários</h1>
                 <p className="user-welcome-gerenciar">Administrador atual: {currentUser?.nome}</p>
-            </div>
+            </header>
 
             {/* Content */}
-            <div className="content-gerenciar">
+            <article className="content-gerenciar">
                 {/* Stats */}
                 <div className="stats-gerenciar">
                 <div className="stat-item">
@@ -191,22 +191,26 @@ const GerenciarUsers = () => {
                     <div className="stat-label-concluidas">Usuários ao Total</div>
                 </div>
                 </div>
+            </article>
 
-                <div className="nav-links">
-                    <button className="back-link-gerenciar">Voltar ao Mapa</button>
-                    <button className="logout-btn-gerenciar" onClick={logout}>Sair</button>
-                </div>
+            {/* Botões de navegação */}
+            <section className="nav-links">
+                <button className="back-link-gerenciar">Voltar ao Mapa</button>
+                <button className="logout-btn-gerenciar" onClick={logout}>Sair</button>
+            </section>
+        </section>
 
+        <section className="conteudo-gerenciar">
                 {/* Feedback */}
                 {errorMessage && <div className="error-gerenciar">{errorMessage}</div>}
                 {successMessage && <div className="success-gerenciar">{successMessage}</div>}
 
-                <div className="header-gerenciar" id="segundo-titulo-gerenciar">
+                <header className="header-gerenciar">
                     <h1>Lista de Usuários</h1>
-                </div>
+                </header>
 
                 {/* Tabs */}
-                <div className="tabs">
+                <section className="tabs">
                     <button
                         className={`tab ${activeTab === "admins" ? "active" : ""}`}
                         onClick={() => openTab("admins")}
@@ -219,11 +223,11 @@ const GerenciarUsers = () => {
                     >
                         Clientes
                     </button>
-                </div>
+                </section>
 
                 {/* Tab content */}
                 {activeTab === "admins" && (
-                    <div id="admins" className="tab-content active">
+                    <section id="admins" className="tab-content active">
                         {loadingAdmins ? (
                         <div className="loading-gerenciar">Carregando administradores...</div>
                         ) : admins.length === 0 ? (
@@ -232,14 +236,14 @@ const GerenciarUsers = () => {
                             <p>Não há administradores cadastrados no sistema.</p>
                         </div>
                         ) : (
-                        <div className="users-grid">
+                        <article className="users-grid">
                             {admins.map((admin) => (
                             <div key={admin._id} 
                                 className={`user-card ${ativa === admin._id ? "ativa" : ""}`}
                             >
                                 <div className="user-info-card">
                                     {/* Parte visível */}
-                                    <div className="user-info-visivel"
+                                    <section className="user-info-visivel"
                                          onClick={(e) => {
                                             e.stopPropagation();
                                             toggleTarefa(admin._id);
@@ -257,26 +261,26 @@ const GerenciarUsers = () => {
                                                 Excluir
                                             </button>
                                         </div>
-                                    </div>
+                                    </section>
                                 
                                 
                                     {/* Parte revelada */}
-                                    <div className="user-details-gerenciar" onClick={() => toggleTarefa(admin._id)}>
+                                    <section className="user-details-gerenciar" onClick={() => toggleTarefa(admin._id)}>
                                         <span className="user-stats">📧 {admin.email}</span>
                                         <span className="user-stats">
                                         🛠️ {admin.permissoes ? admin.permissoes.length : 0} permissões
                                         </span>
-                                    </div>
+                                    </section>
                                 </div>
                                 
                             </div>
                             ))}
-                        </div>
+                        </article>
                         )}
-                    </div>
+                    </section>
                 )}
                 {activeTab === "clientes" && (
-                    <div id="clientes" className="tab-content active">
+                    <section id="clientes" className="tab-content active">
                         {loadingClientes ? (
                         <div className="loading-gerenciar">Carregando clientes...</div>
                         ) : clientes.length === 0 ? (
@@ -285,14 +289,14 @@ const GerenciarUsers = () => {
                             <p>Não há clientes cadastrados no sistema.</p>
                         </div>
                         ) : (
-                        <div className="users-grid">
+                        <article className="users-grid">
                             {clientes.map((cliente) => (
                             <div key={cliente._id}
                                 className={`user-card ${ativa === cliente._id ? "ativa" : ""}`}
                             >
                                 <div className="user-info-card">
                                     {/* Parte visível */}
-                                    <div className="user-info-visivel"
+                                    <section className="user-info-visivel"
                                          onClick={(e) => {
                                             e.stopPropagation();
                                             toggleTarefa(cliente._id);
@@ -310,41 +314,39 @@ const GerenciarUsers = () => {
                                                 Excluir
                                             </button>
                                         </div>
-                                    </div>
+                                    </section>
 
                                     {/* Parte revelada */}
-                                    <div className="user-details-gerenciar" onClick={() => toggleTarefa(cliente._id)}>
+                                    <section className="user-details-gerenciar" onClick={() => toggleTarefa(cliente._id)}>
                                         <span className="user-stats">📧 {cliente.email}</span>
                                         <span className="user-stats">🪙 {cliente.capibas || 0} capibas</span>
                                         {cliente.tarefasCompletas ? (
                                         <span className="user-stats">✅ {cliente.tarefasCompletas} tarefas</span>
                                         ) : <span className="user-stats">❗ 0 tarefas</span>}
-                                    </div>
+                                    </section>
                                 </div>
                                 
                             </div>
                             ))}
-                        </div>
+                        </article>
                         )}
-                    </div>
+                    </section>
                 )}
-            </div>
+        </section>
 
         {/* Modal */}
-        {console.log(boolDelete)}
         {boolDelete && (
             <div className="modal-gerenciar">
-                <div className="modal-content">
-                <h3>⚠️ Confirmar Exclusão</h3>
-                <p>Tem certeza que deseja excluir "{userToDelete.name}" ({userToDelete.type})?<br></br>Esta ação não pode ser desfeita.</p>
-                <div className="modal-buttons">
-                    <button className="confirm-btn" onClick={handleDeleteUser}>Excluir</button>
-                    <button className="cancel-btn" onClick={closeModal}>Cancelar</button>
-                </div>
-                </div>
+                <section className="modal-content">
+                    <h3>⚠️ Confirmar Exclusão</h3>
+                    <p>Tem certeza que deseja excluir "{userToDelete.name}" ({userToDelete.type})?<br></br>Esta ação não pode ser desfeita.</p>
+                    <section className="modal-buttons">
+                        <button className="confirm-btn" onClick={handleDeleteUser}>Excluir</button>
+                        <button className="cancel-btn" onClick={closeModal}>Cancelar</button>
+                    </section>
+                </section>
             </div>        
         )}
-        </div>
         <Particulas />
         </div>
     );

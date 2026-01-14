@@ -85,6 +85,7 @@
   border-radius: 30px;
   cursor: pointer;
   padding: 8px 20px;
+  margin-bottom: 1rem;
   max-width: 280px;
   width: 100%;
   text-align: center;
@@ -662,6 +663,10 @@
   
   .solicitacao-card {
     padding: 20px;
+  }
+
+  .metadata-label {
+    font-size: 0.75rem;
   }
 }
 

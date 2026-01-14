@@ -195,3 +195,51 @@
   height: 35px;
   font-size: 0.85rem;
 }
+
+@media (max-width: 768px) {
+  .barra-superior {
+    padding: 10px 12px;
+    overflow: hidden;
+  }
+
+  .barra-superior .esquerda,
+  .barra-superior .direita {
+    display: none;
+  }
+
+  .barra-superior .meio {
+    flex: 1 1 100%;
+    justify-content: center;
+    gap: 12px;
+    padding: 6px 12px;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .barra-superior .meio a {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+
+  .logo-img {
+    height: 32px;
+  }
+
+  #login {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+
+  .user-welcome {
+    flex-direction: row;
+    gap: 6px;
+    padding: 6px 12px;
+  }
+
+  .user-avatar-small {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+}

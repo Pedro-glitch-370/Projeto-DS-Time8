@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { isUserAdmin } from "../para-react/userUtils";
+import { authService } from "../../../services/authService";
 import "./settingsMenu.css";
 
 export default function SettingsMenu({ onClose, isOpen }) {
@@ -40,12 +41,9 @@ export default function SettingsMenu({ onClose, isOpen }) {
     }
   }
 
-  function handleBackup() {
-    if (isUserAdmin()) {
-      alert("💾 Backup de dados - Em desenvolvimento");
-    } else {
-      alert("❌ Apenas administradores podem acessar o backup de dados.");
-    }
+  function handleLogout() {
+    authService.logout(); 
+    navigate("/");
   }
 
   function handleClose() {
@@ -70,7 +68,7 @@ export default function SettingsMenu({ onClose, isOpen }) {
         <div className="settings-menu-content">
           <button className="settings-option" onClick={handleManageUsers}>👥 Gerenciar Usuários</button>
           <button className="settings-option" onClick={handleSeasonConfiguration}>🔧 Configurar Temporadas</button>
-          <button className="settings-option" onClick={handleBackup}>💾 Backup de Dados</button>
+          <button className="settings-option" onClick={handleLogout}>↩ Sair da Conta</button>
         </div>
         <div className="copyright">
           Recife Point Game &copy; 2025

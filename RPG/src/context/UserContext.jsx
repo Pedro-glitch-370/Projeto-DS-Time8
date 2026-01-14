@@ -6,6 +6,7 @@ export const UserContext = createContext();
 export function UserProvider({ children }) {
   const [usuarioLogado, setUsuarioLogado] = useState(null);
   const [userMenuAberto, setUserMenuAberto] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -17,6 +18,7 @@ export function UserProvider({ children }) {
         localStorage.removeItem("user");
       }
     }
+    setLoadingUser(false);
   }, []);
 
   const login = (userData) => {
@@ -37,7 +39,8 @@ export function UserProvider({ children }) {
       userMenuAberto,
       setUserMenuAberto,
       login,
-      logout
+      logout,
+      loadingUser
     }}>
       {children}
     </UserContext.Provider>

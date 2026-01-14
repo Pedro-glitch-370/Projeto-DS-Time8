@@ -11,24 +11,26 @@ export default function Tutorial() {
 
   return (
     <>
-      <div className="tutorial-container">
-        <h2>Como usar esta plataforma?</h2>
+      <section className="tutorial-container">
+        <header>
+          <h2>Como usar esta plataforma?</h2>
+        </header>
 
-        <div className={`tutorial-section ${ativa === 1 ? "ativa" : ""}`} onClick={() => toggleSecao(1)}>
+        <article className={`tutorial-section ${ativa === 1 ? "ativa" : ""}`} onClick={() => toggleSecao(1)}>
           <h3>📍 Desbloquear tarefa</h3>
           <div className="conteudo">
             <p>Para desbloquear uma tarefa, você precisa estar dentro de <strong>50 metros</strong> do pino correspondente no mapa. Ao se aproximar, a tarefa ficará disponível para sua equipe.</p>
           </div>
-        </div>
+        </article>
 
-        <div className={`tutorial-section ${ativa === 2 ? "ativa" : ""}`} onClick={() => toggleSecao(2)}>
+        <article className={`tutorial-section ${ativa === 2 ? "ativa" : ""}`} onClick={() => toggleSecao(2)}>
           <h3>✅ Concluir tarefa</h3>
           <div className="conteudo">
             <p>Após realizar a atividade, envie uma <strong>foto</strong> e um <strong>relatório</strong> com os detalhes do que foi feito. Isso permite que a tarefa seja enviada para análise.</p>
           </div>
-        </div>
+        </article>
 
-        <div className={`tutorial-section ${ativa === 3 ? "ativa" : ""}`} onClick={() => toggleSecao(3)}>
+        <article className={`tutorial-section ${ativa === 3 ? "ativa" : ""}`} onClick={() => toggleSecao(3)}>
           <h3>📝 Gerenciar Tarefas</h3>
           <div className="conteudo">
             <p>Na aba <strong>Minhas Tarefas</strong>, você pode:</p>
@@ -38,15 +40,15 @@ export default function Tutorial() {
               <li>Sugerir novas tarefas para sua equipe</li>
             </ul>
           </div>
-        </div>
+        </article>
 
-        <div className={`tutorial-section ${ativa === 4 ? "ativa" : ""}`} onClick={() => toggleSecao(4)}>
+        <article className={`tutorial-section ${ativa === 4 ? "ativa" : ""}`} onClick={() => toggleSecao(4)}>
           <h3>🤝 Trabalho em grupo</h3>
           <div className="conteudo">
             <p>As tarefas são feitas, de preferência, em <strong>equipe</strong>. Ao colaborar com outros usuários, você pode coletar <strong>mais Capibas</strong> e cuidar ainda mais da sua cidade!</p>
           </div>
-        </div>
-      </div>
+        </article>
+      </section>
       <Particulas />
     </>
   );

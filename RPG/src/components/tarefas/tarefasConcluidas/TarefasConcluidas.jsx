@@ -55,20 +55,20 @@ export default function TarefasConcluidas() {
   }
 
   return (
-    <div className="container-tarefas">
+    <section className="container-tarefas">
       {/* Seção de Progresso */}
-      <div className="secao-progresso">
+      <article className="secao-progresso">
         <h2 className="titulo-progresso">📊 Seu Progresso</h2>
-        <div className="stats-progresso">
-          <div className="stat-item">
+        <section className="stats-progresso">
+          <article className="stat-item">
             <div className="stat-numero">{tarefasConcluidas.length}</div>
             <div className="stat-label-concluidas">Tarefas Concluídas</div>
-          </div>
-          <div className="stat-item">
+          </article>
+          <article className="stat-item">
             <div className="stat-numero">{tarefasDisponiveis}</div>
             <div className="stat-label-concluidas">Tarefas Disponíveis</div>
-          </div>
-          <div className="stat-item">
+          </article>
+          <article className="stat-item">
             <div className="stat-numero">
               {tarefasDisponiveis > 0 
                 ? `${Math.round((tarefasConcluidas.length / tarefasDisponiveis) * 100)}%` 
@@ -76,12 +76,12 @@ export default function TarefasConcluidas() {
               }
             </div>
             <div className="stat-label-concluidas">Taxa de Conclusão</div>
-          </div>
-        </div>
+          </article>
+        </section>
 
         {/* Barra de Progresso */}
-        <div className="barra-progresso-container">
-          <div className="mensagem-motivacional">
+        <section className="barra-progresso-container">
+          <article className="mensagem-motivacional">
             <div>
               <h3>
                 {tarefasConcluidas.length > 0 ? "Continue assim!" : "Tá na hora de explorar!"}
@@ -92,9 +92,9 @@ export default function TarefasConcluidas() {
                   : "Comece chamando seus amigos e procurando por uma tarefa próxima."}
               </p>
             </div>
-          </div>
+          </article>
 
-          <div className="barra-progresso">
+          <article className="barra-progresso">
             <div
               className="barra-progresso-preenchida"
               style={{
@@ -104,20 +104,20 @@ export default function TarefasConcluidas() {
                     : "0%",
               }}
             ></div>
-          </div>
+          </article>
 
           <p className="progresso-texto">
             Continue completando tarefas para melhorar seu progresso!
           </p>
-        </div>
-      </div>
+        </section>
+      </article>
 
       {/* Lista de Tarefas Concluídas */}
-      <div className="secao-tarefas-concluidas">
+      <article className="secao-tarefas-concluidas">
         <h2 className="titulo-tarefas">✅ Tarefas Concluídas</h2>
         
         {tarefasConcluidas.length === 0 ? (
-          <div className="sem-tarefas-concluidas">
+          <section className="sem-tarefas-concluidas">
             <div className="icone-vazio">📭</div>
             <h3>Nenhuma tarefa concluída ainda</h3>
             <p>Comece a completar tarefas para ver seu histórico aqui!</p>
@@ -127,9 +127,9 @@ export default function TarefasConcluidas() {
             >
               Explorar Tarefas
             </button>
-          </div>
+          </section>
         ) : (
-          <div className="lista-tarefas-vertical">
+          <section className="lista-tarefas-vertical">
             {tarefasConcluidas.map((tarefa) => (
               <div
                 key={tarefa.id}
@@ -137,21 +137,21 @@ export default function TarefasConcluidas() {
                 onClick={() => toggleTarefa(tarefa.id)}
               >
                 
-                <div className="tarefa-conteudo">
-                  <div className="tarefa-cabecalho">
+                <article className="tarefa-conteudo">
+                  <header className="tarefa-cabecalho">
                     <h3 className="tarefa-titulo">{tarefa.nome}</h3>
                     <span className="tarefa-numero">#{tarefa.ordem}</span>
-                  </div>
+                  </header>
                   <div className="conteudo-concluida">
                     <p className="tarefa-descricao">{tarefa.descricao}</p>
                     <p></p>
                   </div>
-                </div>
+                </article>
               </div>
             ))}
-          </div>
+          </section>
         )}
-      </div>
-    </div>
+      </article>
+    </section>
   );
 }

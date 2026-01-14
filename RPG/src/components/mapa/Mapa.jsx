@@ -14,6 +14,7 @@ import usePinosManagement from "./usePinosManagement.js";
 import MapClickHandler from "./MapClickHandler.jsx";
 import Sidebar from "../barra-lateral/barraLateral.jsx";
 import StatusLocalizacao from "./StatusLocalizacao.jsx";
+import { useUser } from "../../context/ExportsContext.js";
 import { authService } from "../../services/authService.js";
 import { localizacaoService } from "../../services/localizacaoService.js";
 import { clienteService } from "../../services/clienteService.js";
@@ -36,9 +37,9 @@ export default function Mapa() {
   const [selectedPino, setSelectedPino] = useState(null);
   
   // Estados de autenticação
+  const { usuarioLogado } = useUser();
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   
   // Estados de localização
   const [localizacaoUsuario, setLocalizacaoUsuario] = useState(null);
@@ -65,7 +66,7 @@ export default function Mapa() {
   };
 
   // Verifica autenticação ao carregar
-  useEffect(() => {
+  /*useEffect(() => {
     const checkAuth = () => {
       console.log("🔍 Verificando autenticação...");
       const userData = authService.getUser();
@@ -101,7 +102,29 @@ export default function Mapa() {
 
     // Limpa o listener ao desmontar
     return () => window.removeEventListener("userChanged", checkAuth);
-  }, []);
+  }, []);*/
+
+  useEffect(() => {
+    console.log("🔍 Verificando autenticação...");
+    if (usuarioLogado) {
+      console.log(`✅ Há usuário logado: `, usuarioLogado);
+      setUser(usuarioLogado);
+      if (usuarioLogado.tipo == "admin") { setIsAdmin(true); }
+
+      if (usuarioLogado.tarefasConcluidas) {
+          const tarefasMap = new Map();
+          usuarioLogado.tarefasConcluidas.forEach(id => {
+            tarefasMap.set(id, true);
+          });
+          console.log("✅ Tarefas concluídas carregadas:", tarefasMap.size);
+          setTarefasConcluidas(tarefasMap);
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+        setTarefasConcluidas(new Map());
+      }
+    }
+  }, [usuarioLogado, setIsAdmin])
 
   useEffect(() => {
     const carregarTemporadaAtual = async () => {
@@ -185,16 +208,14 @@ export default function Mapa() {
       }
     };
 
-    if (!isCheckingAuth) {
-      solicitarPermissaoLocalizacao();
-    }
+    solicitarPermissaoLocalizacao();
 
     return () => {
       if (watchIdRef.current) {
         localizacaoService.pararRastreamento(watchIdRef.current);
       }
     };
-  }, [isCheckingAuth]);
+  }, []);
 
   // Inicia rastreamento contínuo da localização
   const iniciarRastreamentoLocalizacao = () => {
@@ -248,11 +269,9 @@ export default function Mapa() {
 
   // Busca pinos após verificação de autenticação
   useEffect(() => {
-    if (!isCheckingAuth) {
-      console.log("🗺️ Buscando pinos do mapa...");
-      fetchPinos();
-    }
-  }, [isCheckingAuth, fetchPinos]);
+    console.log("🗺️ Buscando pinos do mapa...");
+    fetchPinos();
+  }, [fetchPinos]);
 
   // Função auxiliar para os handlers
   const atualizarTemporadaAtual = async () => {
@@ -551,7 +570,7 @@ export default function Mapa() {
   };
 
   // Estados de loading
-  if (isCheckingAuth || loading) {
+  if (loading) {
     return <Loading />;
   }
 

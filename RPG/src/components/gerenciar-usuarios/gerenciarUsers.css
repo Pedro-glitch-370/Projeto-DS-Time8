@@ -74,12 +74,6 @@ padding: 20px;
   margin: 0;
 }
 
-#segundo-titulo-gerenciar {
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  padding-top: 25px;
-  margin-top: 25px;
-}
-
 .user-welcome-gerenciar {
   font-size: 1rem;
   margin-top: 0.5rem;
@@ -87,7 +81,6 @@ padding: 20px;
   color: white;
 }
 
-/* Navigation */
 .content-gerenciar {
   margin-left: 8px;
   margin-right: 8px;
@@ -453,7 +446,7 @@ color: #2c3e50;
 
 .confirm-btn:hover {
   background: #c0392b;
-  transform: scale(1.01);
+  transform: scale(1.03);
 }
 
 .cancel-btn {
@@ -469,37 +462,59 @@ color: #2c3e50;
 
 .cancel-btn:hover {
   background: #7f8c8d;
-  transform: scale(1.01);
+  transform: scale(1.03);
 }
 
-/* Responsive */
+/* Responsividade */
 @media (max-width: 768px) {
-.header {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
+.header-gerenciar {
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+}
+
+.user-welcome-gerenciar {
+  text-align: center;
+  font-size: 0.95rem;
+  word-break: break-word;
 }
 
 .user-info-gerenciar {
-    text-align: center;
+  text-align: center;
 }
 
 .user-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
 .user-actions {
-    width: 100%;
-    justify-content: flex-end;
+  width: 100%;
+  justify-content: flex-end;
 }
 
-.stats {
-    grid-template-columns: 1fr;
+.stats-gerenciar {
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin: 10px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.stat-numero {
+  font-size: 1.5rem;
+}
+
+.stat-label-concluidas {
+  font-size: 0.9rem;
 }
 
 .modal-buttons {
-    flex-direction: column;
+  flex-direction: column;
 }
 }

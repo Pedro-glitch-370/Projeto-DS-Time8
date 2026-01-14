@@ -149,3 +149,17 @@
   backdrop-filter: blur(80px);
   font-size: 1.4rem;
 }
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .tarefa-item {
+    padding-right: 60px;
+  }
+  
+  .botao-mapa {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    right: 10px;
+  }
+}
